@@ -32,22 +32,12 @@
                 <!-- Navbar Right Side -->
                 <div class="navbar-nav">
                   {% if current_user.is_authenticated %}
-                    <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a>
-                    <a class="nav-item nav-link font-weight-bold" href="{{ url_for('users.account') }}">{{ current_user.username }}</a>
-                    <a class="nav-item nav-link" href="{{ url_for('users.logout') }}">Logout</a>
+                    <!-- <a class="nav-item nav-link" href="{{ url_for('posts.new_post') }}">New Post</a> -->
+                    <img src="{{ session['picture'] }}" class="rounded-circle mt-1" width="35" height="35" alt="">
+                    <a class="nav-item nav-link font-weight-bold" href="{{ url_for('users.account') }}">{{ session['username'] }}</a>
+                    <a class="nav-item nav-link g_id_signout" href="{{ url_for('users.logout') }}">Sign out</a>
                   {% else %}
-                    <a onclick="window.open(this.href, '_blank', 'width='+(screen.availWidth/2)+', height='+(screen.availHeight*2/3)+', left='+(screen.availWidth/4)+', top='+(screen.availHeight/6)+''); return false;" class="nav-item nav-link" href="{{ url_for('google.login') }}">
-                      <span class="tv-signin-dialog__social tv-signin-dialog__social--big js-social-auth--google-oauth2" title="Google">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path fill="#4285F4" d="M23.6 14.23c0-.71-.06-1.4-.18-2.05H14v3.87h5.38a4.6 4.6 0 01-2 3.02v2.5h3.24c1.89-1.73 2.98-4.3 2.98-7.34z"></path><path fill="#34A853" d="M14 24c2.7 0 4.96-.9 6.62-2.42l-3.23-2.51c-.9.6-2.04.95-3.39.95-2.6 0-4.8-1.76-5.6-4.12H5.06v2.6A10 10 0 0014 24z"></path><path fill="#FBBC05" d="M8.4 15.9a6.01 6.01 0 010-3.8V9.5H5.06a10 10 0 000 9l3.34-2.6z"></path><path fill="#EA4335" d="M14 7.98c1.47 0 2.79.5 3.82 1.5L20.7 6.6A10 10 0 005.06 9.5l3.34 2.6c.8-2.36 3-4.12 5.6-4.12z"></path></svg>
-                        <span class="tv-social__title">Google</span>
-                      </span>
-                    </a>
-                    <a onclick="window.open(this.href, '_blank', 'width='+(screen.availWidth/2)+', height='+(screen.availHeight*2/3)+', left='+(screen.availWidth/4)+', top='+(screen.availHeight/6)+''); return false;" class="nav-item nav-link" href="{{ url_for('facebook.login') }}">
-                      <span class="tv-signin-dialog__social tv-signin-dialog__social--big js-social-auth--facebook" title="Facebook">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path fill="#1877F2" d="M14 4a10 10 0 011.56 19.88v-6.99h2.33l.45-2.89h-2.78v-1.88c0-.79.39-1.56 1.63-1.56h1.26V8.1s-1.14-.2-2.24-.2c-2.28 0-3.77 1.4-3.77 3.9V14H9.9v2.9h2.54v6.98A10.01 10.01 0 0114 4z"></path></svg>
-                        <span class="tv-social__title">Facebook</span>
-                      </span>
-                    </a>
+                    <a class="nav-item nav-link" href="#" onclick="OAuth()">Sign in</a>
                   {% endif %}
                 </div>
               </div>
@@ -85,26 +75,30 @@
           </div>
         </main>
 
-        <script>
-          if (window.opener && window.opener !== window) {
-            window.onunload = refreshParent;
-            function refreshParent() {
-                window.opener.location.reload();
-            }
-            // window.close();
-          }
-        </script>
-
-        <div id="g_id_onload"
-             data-client_id="1091317498854-hlovk955s9na07hpas3ptb3qo7if1ble.apps.googleusercontent.com"
-             data-login_uri="http://localhost:5000/login/google/authorized">
-        </div>
-
         <!-- Optional JavaScript -->
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        
+        <script>
+            function OAuth() {
+              var url = '{{ url_for("users.oauth") }}';
+              var width = screen.availWidth * 0.44;
+              var height = screen.availHeight * 0.83;
+              var left = (screen.availWidth / 2) - (width / 2);
+              var top = (screen.availHeight / 2) - (height / 2);
+              window.open(url, '_blank', 'width='+width+', height='+height+', left='+left+', top='+top+'');
+            }
+        </script>
+
+        {% if not current_user.is_authenticated %}
+          <script src="https://accounts.google.com/gsi/client" async defer></script>
+          <div id="g_id_onload"
+               data-client_id="{{ config['GOOGLE_OAUTH_CLIENT_ID'] }}"
+               data-login_uri="{{ url_for('users.onetap') }}">
+          </div>
+        {% endif %}
+
     </body>
 </html>

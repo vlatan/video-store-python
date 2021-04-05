@@ -14,6 +14,11 @@ def error_403(error):
     return render_template('errors/403.html'), 403
 
 
+@errors.app_errorhandler(405)
+def error_403(error):
+    return render_template('errors/403.html'), 405
+
+
 @errors.app_errorhandler(500)
 @errors.app_errorhandler(MismatchingStateError)
 def error_500(error):

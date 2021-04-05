@@ -13,10 +13,19 @@
 # https://jsfiddle.net/StartBootstrap/amxr8n19/
 
 # https://developers.google.com/identity/gsi/web/guides/overview
+# https://developers.google.com/identity/protocols/oauth2/web-server#httprest_5
+# https://developers.google.com/identity/protocols/oauth2/scopes#oauth2
+# https://developers.google.com/identity/protocols/oauth2/openid-connect#id_token-name
+# https://google-auth-oauthlib.readthedocs.io/en/latest/reference/google_auth_oauthlib.flow.html
 
+
+# https://stackoverflow.com/questions/51601915/how-to-use-the-google-api-without-checking-a-client-secret-json-into-version-con
+# https://developers.google.com/identity/protocols/oauth2/web-server
+
+import os
 from doxapp import create_app
 
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run('localhost', debug=True)

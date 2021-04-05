@@ -20,8 +20,6 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
 
     from doxapp.users.routes import users
-    from doxapp.users.google_oauth import google_bp
-    from doxapp.users.facebook_oauth import facebook_bp
     from doxapp.posts.routes import posts
     from doxapp.main.routes import main
     from doxapp.errors.handlers import errors
@@ -29,7 +27,5 @@ def create_app(config_class=Config):
     app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(errors)
-    app.register_blueprint(google_bp, url_prefix="/login/")
-    app.register_blueprint(facebook_bp, url_prefix="/login/")
 
     return app

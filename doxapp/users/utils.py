@@ -1,9 +1,10 @@
 import os
-import requests
 import secrets
 from PIL import Image
-from oauthlib.oauth2 import WebApplicationClient
-from flask import current_app
+from flask import current_app, session, url_for
+from flask_login import login_user
+from doxapp import db
+from doxapp.models import User
 
 
 def save_picture(form_picture):
@@ -19,13 +20,29 @@ def save_picture(form_picture):
     return picture_fn
 
 
-def get_google_client_provider():
-    try:
-        # define Google client
-        client = WebApplicationClient(current_app.config['GOOGLE_CLIENT_ID'])
-        # get the provider's (our Google App) config
-        provider = requests.get(
-            current_app.config['GOOGLE_DISCOVERY_URL']).json()
-        return client, provider
-    except:
-        return None
+def user_ready(user_info):
+    # if user's email verified
+    if user_info.get('email_verified'):
+        openid = user_info.get('sub')
+        email = user_info.get('email')
+        username = user_info.get('given_name')
+        picture = user_info.get('picture')
+
+        if not username:
+            username = 'Guest'
+        session['username'] = username
+
+        if not picture:
+            picture = url_for('static', filename='profile_pics/default.jpg')
+        session['picture'] = picture
+
+        # search for this user in the database by openid
+        user = User.query.filter_by(openid=openid).first()
+        # if there isn't one create the user
+        if not user:
+            user = User(openid=openid, email=email)
+            db.session.add(user)
+            db.session.commit()
+
+        # begin user session by logging the user in
+        login_user(user, remember=True)

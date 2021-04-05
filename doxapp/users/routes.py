@@ -1,113 +1,107 @@
-import json
+import os
+import hashlib
 import requests
-from flask import (render_template, url_for, flash,
+from google.oauth2 import id_token
+from google.auth.transport import requests as grequests
+from flask import (render_template, url_for, flash, session,
                    redirect, request, Blueprint, current_app)
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import current_user, logout_user, login_required
 from doxapp import db
 from doxapp.models import User, Post
 from doxapp.users.forms import UpdateAccountForm
-from doxapp.users.utils import save_picture, get_google_client_provider
+from doxapp.users.utils import save_picture, user_ready
 
 users = Blueprint('users', __name__)
 
 
-# @users.route('/login/')
-# def login():
-#     if current_user.is_authenticated:
-#         return redirect(url_for('main.home'))
+@users.route('/oauth/onetap', methods=['POST'])
+def onetap():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
 
-#     # define client (Google App) and get provider config
-#     client, google_provider_cfg = get_google_client_provider()
+    csrf_token_body = request.form.get('g_csrf_token')
+    csrf_token_cookie = request.cookies.get('g_csrf_token')
+    if not (csrf_token_body and csrf_token_cookie and csrf_token_body == csrf_token_cookie):
+        # log this instead of flashing
+        flash('Failed to verify double submit cookie.', 'info')
+        return redirect(url_for('main.home'))
 
-#     # check if we got the provider config
-#     if google_provider_cfg is None:
-#         flash('Unable to authenticate!', 'warning')
-#         return redirect(url_for('main.home'))
+    try:
+        # verify the integrity of the ID token and get the user info
+        token = request.form.get('credential')
+        CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
+        user_info = id_token.verify_oauth2_token(
+            token, grequests.Request(), CLIENT_ID)
+    except Exception as e:
+        # in production log this error instead of flashing it
+        flash(e, 'info')
+        return redirect(url_for('main.home'))
 
-#     # find out what URL to hit for Google login
-#     authorization_endpoint = google_provider_cfg['authorization_endpoint']
-
-#     # use library to construct the request for Google login and provide
-#     # scopes that let you retrieve user's profile from Google
-#     request_uri = client.prepare_request_uri(
-#         authorization_endpoint,
-#         redirect_uri=request.base_url + 'callback',
-#         scope=['openid', 'email', 'profile']
-#     )
-#     return redirect(request_uri)
+    user_ready(user_info)
+    return redirect(url_for('main.home'))
 
 
-# @users.route('/login/callback')
-# def google_callback():
-#     # Get authorization code Google sent back to you
-#     code = request.args.get('code')
+@users.route('/oauth')
+def oauth():
+    if current_user.is_authenticated:
+        return render_template('close_window.html')
 
-#     # define client (Google App) and get provider config
-#     client, google_provider_cfg = get_google_client_provider()
+    try:
+        DISCOVERY_URL = current_app.config['GOOGLE_DISCOVERY_URL']
+        PROVIDER = requests.get(DISCOVERY_URL).json()
+    # log this error
+    except Exception:
+        return render_template('close_window.html')
 
-#     # check if we got the provider config
-#     if google_provider_cfg is None:
-#         flash('Unable to authenticate!', 'warning')
-#         return redirect(url_for('main.home'))
+    CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
+    CLIENT_SECRET = current_app.config['GOOGLE_OAUTH_CLIENT_SECRET']
+    SCOPE = current_app.config['GOOGLE_OAUTH_SCOPES']
+    REDIRECT_URI = url_for('users.oauth', _external=True)
+    AUTH_ENDPOINT = PROVIDER['authorization_endpoint']
+    TOKEN_ENDPOINT = PROVIDER['token_endpoint']
 
-#     # Find out what URL to hit to get tokens that allow you to ask for
-#     # things on behalf of a user
-#     token_endpoint = google_provider_cfg['token_endpoint']
+    # check if this view has 'code' argument in it
+    if 'code' not in request.args:
+        # create an anti-forgery unique token
+        STATE = hashlib.sha256(os.urandom(1024)).hexdigest()
+        # put it in a session
+        session['state'] = STATE
+        # construct the authorization url
+        auth_uri = (f'{AUTH_ENDPOINT}?response_type=code&'
+                    f'state={STATE}&client_id={CLIENT_ID}&'
+                    f'redirect_uri={REDIRECT_URI}&scope={SCOPE}')
+        # request authorization from Google
+        return redirect(auth_uri)
+    else:
+        # check if the anti-forgery unique session token is valid
+        if request.args.get('state') != session['state']:
+            return render_template('close_window.html')
+        # get the code Google sent us
+        auth_code = request.args.get('code')
+        # construct the payload for getting the token
+        data = {'code': auth_code,
+                'client_id': CLIENT_ID,
+                'client_secret': CLIENT_SECRET,
+                'redirect_uri': REDIRECT_URI,
+                'grant_type': 'authorization_code'}
+        try:
+            # get the credentials from Google
+            credentials = requests.post(TOKEN_ENDPOINT, data=data).json()
+        except Exception as e:
+            flash(e, "info")
+            return render_template('close_window.html')
 
-#     # Prepare and send a request to get tokens!
-#     token_url, headers, body = client.prepare_token_request(
-#         token_endpoint,
-#         authorization_response=request.url,
-#         redirect_url=request.base_url,
-#         code=code
-#     )
-#     token_response = requests.post(
-#         token_url,
-#         headers=headers,
-#         data=body,
-#         auth=(current_app.config['GOOGLE_CLIENT_ID'],
-#               current_app.config['GOOGLE_CLIENT_SECRET']),
-#     )
+        try:
+            # verify the integrity of the ID token and return the user info
+            token = credentials.get('id_token')
+            user_info = id_token.verify_oauth2_token(
+                token, grequests.Request(), CLIENT_ID)
+        except Exception as e:
+            flash(e, 'info')
+            return render_template('close_window.html')
 
-#     # Parse the tokens!
-#     client.parse_request_body_response(json.dumps(token_response.json()))
-
-#     # Now that you have tokens let's find and hit the URL
-#     # from Google that gives you the user's profile information,
-#     # including their Google profile image and email
-#     userinfo_endpoint = google_provider_cfg['userinfo_endpoint']
-#     uri, headers, body = client.add_token(userinfo_endpoint)
-#     userinfo_response = requests.get(uri, headers=headers, data=body)
-
-#     # You want to make sure their email is verified.
-#     # The user authenticated with Google, authorized your
-#     # app, and now you've verified their email through Google!
-#     if userinfo_response.json().get('email_verified'):
-#         unique_id = userinfo_response.json()['sub']
-#         email = userinfo_response.json()['email']
-#         picture = userinfo_response.json()['picture']
-#         username = userinfo_response.json()['given_name']
-#     else:
-#         flash('User email not available or not verified by Google.', 'info')
-#         return redirect(url_for('main.home'))
-
-#     # search for this user in the database by email
-#     user = User.query.filter_by(email=email).first()
-
-#     # Can't find it? Add it to the database.
-#     if not user:
-#         # Create a user with the information provided by Google
-#         user = User(username=username, email=email)
-#         # add this new user to the database
-#         db.session.add(user)
-#         db.session.commit()
-
-#     # Begin user session by logging the user in
-#     login_user(user)
-#     flash('You are now logged in!', 'success')
-
-#     # Send user back to homepage
-#     return redirect(url_for('main.home'))
+        user_ready(user_info)
+        return render_template('close_window.html')
 
 
 @users.route('/logout/')
