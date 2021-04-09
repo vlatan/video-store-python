@@ -1,3 +1,4 @@
+import json
 from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
@@ -13,8 +14,13 @@ posts = Blueprint('posts', __name__)
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data,
-                    content=form.content.data, author=current_user)
+        if not form.title.data:
+            form.title.data = form.content.data['title']
+        post = Post(provider=form.content.data['provider_name'],
+                    video_id=form.content.data['id'],
+                    title=form.title.data,
+                    content=json.dumps(form.content.data),
+                    author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -26,7 +32,9 @@ def new_post():
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post)
+    return render_template('post.html',
+                           post=post,
+                           video_data=json.loads(post.content))
 
 
 @posts.route('/post/<int:post_id>/update/', methods=['GET', 'POST'])
