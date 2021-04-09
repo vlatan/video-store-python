@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
   <article class="media content-section">
-    <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
+    {% if post.author.picture == 'default.jpg' %}
+      <img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" class="rounded-circle mt-1" width="35" height="35" alt="">
+    {% else %}
+      <img src="{{ post.author.picture }}" class="rounded-circle mt-1" width="35" height="35" alt="">
+    {% endif %}
     <div class="media-body">
       <div class="article-metadata">
         <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
@@ -14,7 +18,13 @@
         {% endif %}
       </div>
       <h2 class="article-title">{{ post.title }}</h2>
-      <p class="article-content">{{ post.content }}</p>
+      <p class="article-content">
+        {% if post.provider == 'Vimeo' %}
+          <iframe src="https://player.vimeo.com/video/{{ post.video_id }}?title=0&byline=0&portrait=0" width="640" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        {% else %}
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ post.video_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        {% endif %}
+      </p>
     </div>
   </article>
   <!-- Modal -->
