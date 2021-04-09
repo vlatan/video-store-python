@@ -1,7 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import current_app, session, url_for
+from flask import current_app
 from flask_login import login_user
 from doxapp import db
 from doxapp.models import User
@@ -25,22 +25,25 @@ def user_ready(user_info):
     if user_info.get('email_verified'):
         openid = user_info.get('sub')
         email = user_info.get('email')
-        username = user_info.get('given_name')
-        picture = user_info.get('picture')
-
-        if not username:
-            username = 'Guest'
-        session['username'] = username
-
-        if not picture:
-            picture = url_for('static', filename='profile_pics/default.jpg')
-        session['picture'] = picture
+        username = user_info.get('given_name', 'Guest')
+        picture = user_info.get('picture', 'default.jpg')
 
         # search for this user in the database by openid
         user = User.query.filter_by(openid=openid).first()
-        # if there isn't one create the user
-        if not user:
-            user = User(openid=openid, email=email)
+
+        # if user exists
+        if user:
+            # update mutable info for this user if necessary
+            user.email = email
+            if username != 'Guest' and user.username != username:
+                user.username = username
+            if picture != 'default.jpg' and user.picture != picture:
+                user.picture = picture
+            db.session.commit()
+        # if there isn't one create new user
+        else:
+            user = User(openid=openid, email=email,
+                        username=username, picture=picture)
             db.session.add(user)
             db.session.commit()
 
