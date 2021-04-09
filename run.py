@@ -22,6 +22,8 @@
 # https://stackoverflow.com/questions/51601915/how-to-use-the-google-api-without-checking-a-client-secret-json-into-version-con
 # https://developers.google.com/identity/protocols/oauth2/web-server
 
+# https://stackoverflow.com/questions/21214270/how-to-schedule-a-function-to-run-every-hour-on-flask
+
 import os
 from doxapp import create_app
 
