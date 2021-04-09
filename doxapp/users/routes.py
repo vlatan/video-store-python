@@ -21,7 +21,7 @@ def onetap():
 
     csrf_token_body = request.form.get('g_csrf_token')
     csrf_token_cookie = request.cookies.get('g_csrf_token')
-    if not (csrf_token_body and csrf_token_cookie and csrf_token_body == csrf_token_cookie):
+    if not (csrf_token_body and csrf_token_body == csrf_token_cookie):
         # log this instead of flashing
         flash('Failed to verify double submit cookie.', 'info')
         return redirect(url_for('main.home'))
@@ -37,6 +37,7 @@ def onetap():
         flash(e, 'info')
         return redirect(url_for('main.home'))
 
+    # login user
     user_ready(user_info)
     return redirect(url_for('main.home'))
 
@@ -44,14 +45,14 @@ def onetap():
 @users.route('/oauth')
 def oauth():
     if current_user.is_authenticated:
-        return render_template('close_window.html')
+        return render_template('close_oauth.html')
 
     try:
         DISCOVERY_URL = current_app.config['GOOGLE_DISCOVERY_URL']
         PROVIDER = requests.get(DISCOVERY_URL).json()
     # log this error
     except Exception:
-        return render_template('close_window.html')
+        return render_template('close_oauth.html')
 
     CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
     CLIENT_SECRET = current_app.config['GOOGLE_OAUTH_CLIENT_SECRET']
@@ -75,10 +76,10 @@ def oauth():
     else:
         # check if the anti-forgery unique session token is valid
         if request.args.get('state') != session['state']:
-            return render_template('close_window.html')
+            return render_template('close_oauth.html')
         # get the code Google sent us
         auth_code = request.args.get('code')
-        # construct the payload for getting the token
+        # construct the payload for getting the credentials
         data = {'code': auth_code,
                 'client_id': CLIENT_ID,
                 'client_secret': CLIENT_SECRET,
@@ -89,7 +90,7 @@ def oauth():
             credentials = requests.post(TOKEN_ENDPOINT, data=data).json()
         except Exception as e:
             flash(e, "info")
-            return render_template('close_window.html')
+            return render_template('close_oauth.html')
 
         try:
             # verify the integrity of the ID token and return the user info
@@ -98,10 +99,11 @@ def oauth():
                 token, grequests.Request(), CLIENT_ID)
         except Exception as e:
             flash(e, 'info')
-            return render_template('close_window.html')
+            return render_template('close_oauth.html')
 
+        # login user
         user_ready(user_info)
-        return render_template('close_window.html')
+        return render_template('close_oauth.html')
 
 
 @users.route('/logout/')
