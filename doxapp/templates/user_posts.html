@@ -13,7 +13,11 @@
               <a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
               <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
             </div>
-            <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+            {% if post.user_title %}
+              <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.user_title }}</a></h2>
+            {% else %}
+              <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.provider_title }}</a></h2>            
+            {% endif %}            
             <p class="article-content">
               {% if post.provider == 'Vimeo' %}
                 <iframe src="https://player.vimeo.com/video/{{ post.video_id }}?title=0&byline=0&portrait=0" width="640" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
