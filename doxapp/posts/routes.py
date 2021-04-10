@@ -14,12 +14,11 @@ posts = Blueprint('posts', __name__)
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        if not form.title.data:
-            form.title.data = form.content.data['title']
         post = Post(provider=form.content.data['provider_name'],
                     video_id=form.content.data['id'],
-                    title=form.title.data,
-                    content=json.dumps(form.content.data),
+                    user_title=form.title.data,
+                    provider_title=form.content.data['provider_title'],
+                    thumbnail=form.content.data['thumbnail'],
                     author=current_user)
         db.session.add(post)
         db.session.commit()
@@ -32,9 +31,7 @@ def new_post():
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html',
-                           post=post,
-                           video_data=json.loads(post.content))
+    return render_template('post.html', post=post)
 
 
 @posts.route('/post/<int:post_id>/update/', methods=['GET', 'POST'])
