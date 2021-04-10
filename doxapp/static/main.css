@@ -42,7 +42,7 @@ a.article-title:hover {
 }
 
 .article-content {
-  white-space: pre-line;
+  /*white-space: pre-line;*/
 }
 
 .article-img {
