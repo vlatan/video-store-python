@@ -54,10 +54,14 @@ def fetch_youtube_data(video_id):
                 raise ValidationError(
                     'Video too short. Minimum length 30 minutes.')
             else:
+                for size in ['maxres', 'standard', 'high']:
+                    thumb = resp['snippet']['thumbnails'].get(size)
+                    if thumb:
+                        break
                 return {'id': resp['id'],
                         'upload_date': resp['snippet']['publishedAt'],
-                        'title': resp['snippet']['title'],
-                        'thumbnails': resp['snippet']['thumbnails'],
+                        'provider_title': resp['snippet']['title'],
+                        'thumbnail': thumb['url'],
                         'duration': duration,
                         'provider_name': 'YouTube'}
         except ValidationError:
@@ -91,8 +95,8 @@ def fetch_vimeo_data(video_id):
                     'Video too short. Minimum length 30 minutes.')
             return {'id': video_data['video_id'],
                     'upload_date': video_data['upload_date'],
-                    'title': video_data['title'],
-                    'thumbnails': video_data['thumbnail_url'],
+                    'provider_title': video_data['title'],
+                    'thumbnail': video_data['thumbnail_url'],
                     'duration': video_data['duration'],
                     'provider_name': 'Vimeo'}
         else:
