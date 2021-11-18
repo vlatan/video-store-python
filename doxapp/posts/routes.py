@@ -17,9 +17,10 @@ def new_post():
         post = Post(provider=form.content.data['provider_name'],
                     video_id=form.content.data['id'],
                     user_title=form.title.data,
-                    provider_title=form.content.data['provider_title'],
-                    thumbnail=form.content.data['thumbnail'],
-                    author=current_user)
+                    provider_title=form.content.data['provider_title'].split(' | ')[
+            0],
+            thumbnail=form.content.data['thumbnail'],
+            author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
