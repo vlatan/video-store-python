@@ -8,10 +8,11 @@
 		<iframe src="https://player.vimeo.com/video/{{ post.video_id }}?title=0&byline=0&portrait=0" width="640"
 			height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
 		{% else %}
-		<iframe width="560" height="315" src="https://www.youtube.com/embed/{{ post.video_id }}"
+		<img src="{{ post.thumbnails['medium']['url'] }}" alt="">
+		<!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ post.video_id }}"
 			title="YouTube video player" frameborder="0"
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-			allowfullscreen></iframe>
+			allowfullscreen></iframe> -->
 		{% endif %}
 	</div>
 

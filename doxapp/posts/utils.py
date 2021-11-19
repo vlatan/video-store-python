@@ -1,5 +1,7 @@
 import re
+import json
 import requests
+from datetime import datetime
 from urllib.parse import urlparse, parse_qs, quote_plus
 from googleapiclient.discovery import build
 from flask import current_app
@@ -50,7 +52,7 @@ def fetch_youtube_data(video_id):
                     'Video is too short. Minimum length 30 minutes.')
 
             return {'id': resp['id'],
-                    'upload_date': resp['snippet']['publishedAt'],
+                    'upload_date': datetime.strptime(resp['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%SZ'),
                     'provider_title': resp['snippet']['title'],
                     'thumbnails': resp['snippet']['thumbnails'],
                     'duration': duration,
