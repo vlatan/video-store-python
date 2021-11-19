@@ -19,7 +19,8 @@ def new_post():
                     user_title=form.title.data,
                     provider_title=form.content.data['provider_title'].split(' | ')[
             0],
-            thumbnail=form.content.data['thumbnail'],
+            thumbnails=form.content.data['thumbnails'],
+            upload_date=form.content.data['upload_date'],
             author=current_user)
         db.session.add(post)
         db.session.commit()

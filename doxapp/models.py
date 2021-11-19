@@ -24,12 +24,13 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), nullable=False)
     video_id = db.Column(db.String(20), nullable=False)
-    user_title = db.Column(db.String(256))
+    user_itle = db.Column(db.String(256), nullable=False)
     provider_title = db.Column(db.String(256), nullable=False)
-    thumbnail = db.Column(db.String(256), nullable=False)
+    thumbnails = db.Column(db.String(1024), nullable=False)
+    upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False,
                             default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), default=0)
 
     # def __repr__(self):
     #     return f"Post('{self.title}', '{self.date_posted}')"
