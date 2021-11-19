@@ -35,35 +35,27 @@ def fetch_youtube_data(video_id):
             req = youtube.videos().list(id=video_id, part=part)
             # get response (execute request)
             resp = req.execute()['items'][0]
-            # this is a boolean value
-            embeddable = resp['status']['embeddable']
-            # None if no region restrictions
-            restricted = resp['contentDetails'].get(
-                'regionRestriction')
+            # if video not embeddable (this is a boolean value)
+            if not resp['status']['embeddable']:
+                raise ValidationError('Video is not embeddable.')
+            # if video geo-restricted (None if no region restrictions)
+            if resp['contentDetails'].get('regionRestriction'):
+                raise ValidationError('Video is region restricted')
             # duration of the video
             duration = resp['contentDetails']['duration']
             duration = convert_video_duration(duration)
-            # if video not embeddable
-            if not embeddable:
-                raise ValidationError('Video not embeddable.')
-            # if video geo restricted
-            elif restricted:
-                raise ValidationError('Video is geo restricted')
             # if duration of the video is less than 30 minutes
-            elif duration < 1800:
+            if duration < 1800:
                 raise ValidationError(
-                    'Video too short. Minimum length 30 minutes.')
-            else:
-                for size in ['maxres', 'standard', 'high']:
-                    thumb = resp['snippet']['thumbnails'].get(size)
-                    if thumb:
-                        break
-                return {'id': resp['id'],
-                        'upload_date': resp['snippet']['publishedAt'],
-                        'provider_title': resp['snippet']['title'],
-                        'thumbnail': thumb['url'],
-                        'duration': duration,
-                        'provider_name': 'YouTube'}
+                    'Video is too short. Minimum length 30 minutes.')
+
+            return {'id': resp['id'],
+                    'upload_date': resp['snippet']['publishedAt'],
+                    'provider_title': resp['snippet']['title'],
+                    'thumbnails': resp['snippet']['thumbnails'],
+                    'duration': duration,
+                    'provider_name': 'YouTube'}
+
         except ValidationError:
             raise
         except Exception:
@@ -92,7 +84,7 @@ def fetch_vimeo_data(video_id):
             video_data = response.json()
             if video_data['duration'] < 1800:
                 raise ValidationError(
-                    'Video too short. Minimum length 30 minutes.')
+                    'Video is too short. Minimum length 30 minutes.')
             return {'id': video_data['video_id'],
                     'upload_date': video_data['upload_date'],
                     'provider_title': video_data['title'],
