@@ -1,0 +1,17 @@
+a.home-video-thumb {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+img.home-video-img {
+    width: 100%;
+    height: auto;
+}
+
+h2.home-video-title {
+    font-size: .9rem;
+    /* font-weight: 500; */
+    color: black;
+}
