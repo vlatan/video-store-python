@@ -1,7 +1,7 @@
 /* ################# variables ################# */
 
 :root {
-    --content-width: 1130px;
+    --content-width: 1200px;
     --main-font-family: 'Roboto', sans-serif;
     --content-padding: 2rem;
 }
@@ -28,7 +28,7 @@ ul, li {
 
 .site-wrap {
     display: grid;
-    gap: 2rem;
+    row-gap: 2rem;
     grid-template-columns: 1fr;
     max-width: var(--content-width);
     margin: auto;
@@ -74,20 +74,20 @@ a.nav-item:hover {
     background-color: rgb(225, 225, 225);
 }
 
-a.username {
+a.nav-item.username {
     gap: .5rem;
 }
 
-img.username-image {
+.nav-item img.username-image {
     border-radius: 50%;
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2rem;
-    padding-right: 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(50px, 320px));
+    /* grid-template-rows: repeat(auto, 1fr); */
+    justify-content: space-between;
+    gap: 1.5rem;
 }
 
 .sidebar {

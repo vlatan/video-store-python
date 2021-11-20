@@ -1,28 +1,36 @@
 {% extends "layout.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+{% endblock css %}
+
 {% block content %}
-
 {% for post in posts.items %}
-<article class="media content-section">
-	<div class="video">
-		{% if post.provider == 'Vimeo' %}
-		<iframe src="https://player.vimeo.com/video/{{ post.video_id }}?title=0&byline=0&portrait=0" width="640"
-			height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+<article>
+	<a class="home-video-thumb" href="{{ url_for('posts.post', post_id=post.id) }}" title="{{ post.provider_title }}">
+		<img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
+			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
+			alt="{{ post.provider_title }}">
+
+		{% if post.user_title %}
+		<h2 class="home-video-title">
+			{% if post.user_title|length > 70 %}
+			{{ post.user_title[:70] }}...
+			{% else %}
+			{{ post.user_title }}
+			{% endif %}
+		</h2>
 		{% else %}
-		<img src="{{ post.thumbnails['medium']['url'] }}" alt="">
-		<!-- <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ post.video_id }}"
-			title="YouTube video player" frameborder="0"
-			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-			allowfullscreen></iframe> -->
+		<h2 class="home-video-title">
+			{% if post.provider_title|length > 70 %}
+			{{ post.provider_title[:70] }}...
+			{% else %}
+			{{ post.provider_title }}
+			{% endif %}
+		</h2>
 		{% endif %}
-	</div>
+	</a>
 
-	{% if post.user_title %}
-	<h2><a class="video-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.user_title }}</a></h2>
-	{% else %}
-	<h2><a class="video-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.provider_title }}</a></h2>
-	{% endif %}
-
-	<div class="video-metadata">
+	<!-- <div class="video-metadata">
 		{% if post.author.picture == 'default.jpg' %}
 		<img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" class="rounded-circle mt-1" width="35"
 			height="35" alt="">
@@ -32,7 +40,7 @@
 		<a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username
 			}}</a>
 		<small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-	</div>
+	</div> -->
 </article>
 {% endfor %}
 
