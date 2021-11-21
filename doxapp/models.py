@@ -3,6 +3,13 @@ from doxapp import db, login_manager
 from flask_login import UserMixin
 
 
+def dump_datetime(value):
+    """ Deserialize datetime object into string form for JSON processing. """
+    if value is None:
+        return None
+    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -31,6 +38,21 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, nullable=False,
                             default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), default=0)
+
+    @property
+    def serialize(self):
+        """ Return object data in easily serializable format. """
+        return {
+            'id': self.id,
+            'provider': self.provider,
+            'video_id': self.video_id,
+            'user_title': self.user_title,
+            'provider_title': self.provider_title,
+            'thumbnails': self.thumbnails,
+            'upload_date': dump_datetime(self.upload_date),
+            'date_posted': dump_datetime(self.date_posted),
+            'user_id': self.user_id
+        }
 
     # def __repr__(self):
     #     return f"Post('{self.title}', '{self.date_posted}')"

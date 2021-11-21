@@ -4,55 +4,105 @@
 {% endblock css %}
 
 {% block content %}
-{% for post in posts.items %}
-<article>
-	<a class="home-video-thumb" href="{{ url_for('posts.post', post_id=post.id) }}" title="{{ post.provider_title }}">
-		<img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
-			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-			alt="{{ post.provider_title }}">
 
-		{% if post.user_title %}
-		<h2 class="home-video-title">
-			{% if post.user_title|length > 70 %}
-			{{ post.user_title[:70] }}...
-			{% else %}
-			{{ post.user_title }}
-			{% endif %}
-		</h2>
-		{% else %}
-		<h2 class="home-video-title">
-			{% if post.provider_title|length > 70 %}
-			{{ post.provider_title[:70] }}...
-			{% else %}
-			{{ post.provider_title }}
-			{% endif %}
-		</h2>
-		{% endif %}
-	</a>
+<!-- div to contain the content -->
+<div id="scroller" class="home-content">
 
-	<!-- <div class="video-metadata">
-		{% if post.author.picture == 'default.jpg' %}
-		<img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" class="rounded-circle mt-1" width="35"
-			height="35" alt="">
-		{% else %}
-		<img src="{{ post.author.picture }}" class="rounded-circle mt-1" width="35" height="35" alt="">
-		{% endif %}
-		<a class="mr-2" href="{{ url_for('users.user_posts', username=post.author.username) }}">{{ post.author.username
-			}}</a>
-		<small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-	</div> -->
-</article>
-{% endfor %}
+	<!-- template schema, hidden from the dom -->
+	<template id="post_template">
 
-{% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-{% if page_num %}
-{% if posts.page == page_num %}
-<a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
-{% else %}
-<a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
-{% endif %}
-{% else %}
-...
-{% endif %}
-{% endfor %}
+		<!-- template content -->
+		<a id="post-url" class="home-video-thumb" href="#">
+			<img id="thumb" class="home-video-img" src="#" width="320" height="280">
+			<h2 id="title" class="home-video-title"></h2>
+		</a>
+
+	</template>
+
+</div>
+
+<!-- element to trigger the IntersectionObserver -->
+<div class="d-flex justify-content-center mb-3" id="sentinel">
+	<div class="spinner-border" role="status"></div>
+</div>
+
+<script>
+	// Get references to the dom elements
+	var scroller = document.querySelector("#scroller");
+	var template = document.querySelector('#post_template');
+	// var loaded = document.querySelector("#loaded");
+	var sentinel = document.querySelector('#sentinel');
+
+	// Set a counter to count the items loaded
+	var counter = 0;
+
+	// Function to request new items and render to the dom
+	function loadItems() {
+
+		// Use fetch to request data and pass the counter value in the QS
+		fetch(`/load?c=${counter}`).then((response) => {
+
+			// Convert the response data to JSON
+			response.json().then((data) => {
+
+				// If empty JSON, exit the function
+				if (!data.length) {
+
+					// Replace the spinner with "No more posts"
+					sentinel.innerHTML = "No more posts";
+					return;
+				}
+
+				// Iterate over the items in the response
+				for (var i = 0; i < data.length; i++) {
+
+					// Clone the HTML template
+					let template_clone = template.content.cloneNode(true);
+
+					// Query & update the template content
+					template_clone.querySelector("#post-url").href = `/post/${data[i]['id']}`;
+					let thumb = template_clone.querySelector("#thumb");
+					thumb.src = data[i]['thumbnails']['medium']['url'];
+					thumb.alt = data[i]['provider_title'];
+					template_clone.querySelector("#title").innerHTML = data[i]['provider_title'];
+
+					// Append template to dom
+					scroller.appendChild(template_clone);
+
+					// Increment the counter
+					counter += 1;
+
+					// Update the counter in the navbar
+					// loaded.innerText = `${counter} items loaded`;
+
+				}
+			})
+		})
+	}
+
+	// Create a new IntersectionObserver instance
+	var intersectionObserver = new IntersectionObserver(entries => {
+
+		// Uncomment below to see the entry.intersectionRatio when
+		// the sentinel comes into view
+
+		entries.forEach(entry => {
+			console.log(entry.intersectionRatio);
+		})
+
+		// If intersectionRatio is 0, the sentinel is out of view
+		// and we don't need to do anything. Exit the function
+		if (entries[0].intersectionRatio <= 0) {
+			return;
+		}
+
+		// Call the loadItems function
+		loadItems();
+
+	});
+
+	// Instruct the IntersectionObserver to watch the sentinel
+	intersectionObserver.observe(sentinel);
+</script>
+
 {% endblock content %}
