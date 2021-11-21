@@ -35,6 +35,8 @@
 
 	// Set a counter to count the items loaded
 	var counter = 0;
+	// There are still posts to be fetched
+	var the_end = false;
 
 	// Function to request new items and render to the dom
 	function loadItems() {
@@ -45,11 +47,15 @@
 			// Convert the response data to JSON
 			response.json().then((data) => {
 
+				console.log('Backend called');
+
 				// If empty JSON, exit the function
 				if (!data.length) {
 
 					// Replace the spinner with "No more posts"
 					sentinel.innerHTML = "No more posts";
+					// We got to the end, no more posts
+					the_end = true;
 					return;
 				}
 
@@ -91,14 +97,14 @@
 		})
 
 		// If intersectionRatio is 0, the sentinel is out of view
-		// and we don't need to do anything. Exit the function
-		if (entries[0].intersectionRatio <= 0) {
+		// or if we reached the end of the database
+		// we don't need to do anything. Exit the function
+		if (entries[0].intersectionRatio <= 0 || the_end == true) {
 			return;
 		}
 
 		// Call the loadItems function
 		loadItems();
-
 	});
 
 	// Instruct the IntersectionObserver to watch the sentinel
