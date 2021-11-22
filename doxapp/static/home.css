@@ -23,3 +23,8 @@ h2.home-video-title {
     /* font-weight: 500; */
     color: black;
 }
+
+.sentinel {
+    margin: 4rem auto;
+    font-weight: 700;
+}

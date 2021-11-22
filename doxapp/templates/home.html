@@ -8,21 +8,29 @@
 <!-- div to contain the content -->
 <div id="scroller" class="home-content">
 
-	<!-- template schema, hidden from the dom -->
-	<template id="post_template">
+	{% for post in posts %}
 
+	<a class="home-video-thumb" href="{{ url_for('posts.post', post_id=post.id) }}">
+		<img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
+			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
+			alt="{{ post.provider_title }}">
+		<h2 class="home-video-title">{{ post.provider_title }}</h2>
+	</a>
+
+	{% endfor %}
+
+	<template id="post_template">
 		<!-- template content -->
 		<a id="post-url" class="home-video-thumb" href="#">
-			<img id="thumb" class="home-video-img" src="#" width="320" height="280">
+			<img id="thumb" class="home-video-img" src="#">
 			<h2 id="title" class="home-video-title"></h2>
 		</a>
-
 	</template>
 
 </div>
 
 <!-- element to trigger the IntersectionObserver -->
-<div class="d-flex justify-content-center mb-3" id="sentinel">
+<div class="sentinel" id="sentinel">
 	<div class="spinner-border" role="status"></div>
 </div>
 
@@ -34,7 +42,7 @@
 	var sentinel = document.querySelector('#sentinel');
 
 	// Set a counter to count the items loaded
-	var counter = 0;
+	var counter = parseInt("{{ quantity }}");
 	// There are still posts to be fetched
 	var the_end = false;
 
@@ -42,12 +50,13 @@
 	function loadItems() {
 
 		// Use fetch to request data and pass the counter value in the QS
-		fetch(`/load?c=${counter}`).then((response) => {
+		fetch(`/?c=${counter}`).then((response) => {
 
 			// Convert the response data to JSON
 			response.json().then((data) => {
 
 				console.log('Backend called');
+				console.log(`${data.length} posts fetched`);
 
 				// If empty JSON, exit the function
 				if (!data.length) {
@@ -56,6 +65,7 @@
 					sentinel.innerHTML = "No more posts";
 					// We got to the end, no more posts
 					the_end = true;
+					console.log('No more posts');
 					return;
 				}
 
