@@ -6,7 +6,7 @@
     gap: 1.5rem;
 }
 
-a.home-video-thumb {
+a.home-video-link {
     display: flex;
     flex-direction: column;
     gap: 1rem;

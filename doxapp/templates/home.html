@@ -10,7 +10,7 @@
 
 	{% for post in posts %}
 
-	<a class="home-video-thumb" href="{{ url_for('posts.post', post_id=post.id) }}">
+	<a class="home-video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
 		<img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
 			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
 			alt="{{ post.provider_title }}">
@@ -19,11 +19,11 @@
 
 	{% endfor %}
 
-	<template id="post_template">
+	<template id="post_template" data-value="{{ quantity }}">
 		<!-- template content -->
-		<a id="post-url" class="home-video-thumb" href="#">
-			<img id="thumb" class="home-video-img" src="#">
-			<h2 id="title" class="home-video-title"></h2>
+		<a class="home-video-link" href="#">
+			<img class="home-video-img" src="#">
+			<h2 class="home-video-title"></h2>
 		</a>
 	</template>
 
@@ -38,11 +38,10 @@
 	// Get references to the dom elements
 	var scroller = document.querySelector("#scroller");
 	var template = document.querySelector('#post_template');
-	// var loaded = document.querySelector("#loaded");
 	var sentinel = document.querySelector('#sentinel');
 
 	// Set a counter to count the items loaded
-	var counter = parseInt("{{ quantity }}");
+	var counter = parseInt(template.getAttribute('data-value'));
 	// There are still posts to be fetched
 	var the_end = false;
 
@@ -55,6 +54,7 @@
 			// Convert the response data to JSON
 			response.json().then((data) => {
 
+				// log to console if there's call to backend
 				console.log('Backend called');
 				console.log(`${data.length} posts fetched`);
 
@@ -65,6 +65,7 @@
 					sentinel.innerHTML = "No more posts";
 					// We got to the end, no more posts
 					the_end = true;
+					// log to console if there are no more posts
 					console.log('No more posts');
 					return;
 				}
@@ -76,21 +77,17 @@
 					let template_clone = template.content.cloneNode(true);
 
 					// Query & update the template content
-					template_clone.querySelector("#post-url").href = `/post/${data[i]['id']}`;
-					let thumb = template_clone.querySelector("#thumb");
+					template_clone.querySelector('.home-video-link').href = `/post/${data[i]['id']}`;
+					let thumb = template_clone.querySelector('.home-video-img');
 					thumb.src = data[i]['thumbnails']['medium']['url'];
 					thumb.alt = data[i]['provider_title'];
-					template_clone.querySelector("#title").innerHTML = data[i]['provider_title'];
+					template_clone.querySelector('.home-video-title').innerHTML = data[i]['provider_title'];
 
 					// Append template to dom
 					scroller.appendChild(template_clone);
 
 					// Increment the counter
 					counter += 1;
-
-					// Update the counter in the navbar
-					// loaded.innerText = `${counter} items loaded`;
-
 				}
 			})
 		})
@@ -101,7 +98,6 @@
 
 		// Uncomment below to see the entry.intersectionRatio when
 		// the sentinel comes into view
-
 		entries.forEach(entry => {
 			console.log(entry.intersectionRatio);
 		})
