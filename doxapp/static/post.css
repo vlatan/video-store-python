@@ -1,0 +1,68 @@
+.media-content {
+    display: grid;
+    grid-template-columns: auto 33%;
+    column-gap: 2rem;
+    /* justify-content: space-between; */
+}
+
+.player {
+    position: relative;
+    padding-bottom: 56.23%;     /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+}
+
+.player img {
+    bottom: 0;
+    display: block;
+    left: 0;
+    margin: auto;
+    max-width: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    border: none;
+    height: auto;
+    cursor: pointer;
+    transition: .4s all;
+}
+
+.player img:hover {
+	filter: brightness(80%);
+}
+
+.player .play {
+    height: 81px;
+    width: 81px;
+    left: 50%;
+    top: 50%;
+    margin-left: -36px;
+    margin-top: -36px;
+    position: absolute;
+    background: url(/wp-content/themes/topdocs/images/play-button-v1.png) no-repeat;
+    cursor: pointer;
+}
+
+.player iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+	background: transparent;
+}
+
+.metadata {
+    background-color: rgb(230, 230, 230);
+    border: 1px solid rgb(210, 210, 210);
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+.video-title {
+    font-size: 2rem;
+}
