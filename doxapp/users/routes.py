@@ -17,14 +17,14 @@ users = Blueprint('users', __name__)
 @users.route('/oauth/onetap', methods=['POST'])
 def onetap():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(request.referrer)
 
     csrf_token_body = request.form.get('g_csrf_token')
     csrf_token_cookie = request.cookies.get('g_csrf_token')
     if not (csrf_token_body and csrf_token_body == csrf_token_cookie):
         # log this instead of flashing
         flash('Failed to verify double submit cookie.', 'info')
-        return redirect(url_for('main.home'))
+        return redirect(request.referrer)
 
     try:
         # verify the integrity of the ID token and get the user info
@@ -35,11 +35,11 @@ def onetap():
     except Exception as e:
         # in production log this error instead of flashing it
         flash(e, 'info')
-        return redirect(url_for('main.home'))
+        return redirect(request.referrer)
 
     # login user
     user_ready(user_info)
-    return redirect(url_for('main.home'))
+    return redirect(request.referrer)
 
 
 @users.route('/oauth')
@@ -110,7 +110,10 @@ def oauth():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.home'))
+    referrer = request.referrer
+    if referrer == url_for('users.account', _external=True):
+        return redirect(url_for('main.home'))
+    return redirect(referrer)
 
 
 @users.route('/account/', methods=['GET', 'POST'])
