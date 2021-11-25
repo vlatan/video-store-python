@@ -3,7 +3,8 @@
 :root {
     --content-width: 1200px;
     --main-font-family: 'Roboto', sans-serif;
-    --content-padding: 2rem;
+    --content-padding: 1.5rem;
+    --main-color: rgb(210, 210, 210);
 }
 
 
@@ -28,7 +29,7 @@ ul, li {
 
 .site-wrap {
     display: grid;
-    row-gap: 2rem;
+    row-gap: var(--content-padding);
     grid-template-columns: 1fr;
     max-width: var(--content-width);
     margin: auto;
@@ -39,7 +40,7 @@ ul, li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 5px solid rgb(235, 235, 235);
+    border-bottom: 5px solid var(--main-color);
     min-height: 5rem;
 }
 
@@ -65,7 +66,7 @@ a.nav-item {
     font-weight: 400;
     text-decoration: none;
     color: black;
-    background-color: rgb(235, 235, 235);
+    background-color: var(--main-color);
     border-radius: .5rem;
     padding: .5rem 1rem;
 }
@@ -83,6 +84,6 @@ a.nav-item.username {
 }
 
 .sidebar {
-    border-left: 5px solid rgb(235, 235, 235);
-    padding-left: 2rem;
+    border-left: 5px solid var(--main-color);
+    padding-left: var(--content-padding);
 }

@@ -3,7 +3,7 @@
     grid-template-columns: repeat(4, minmax(50px, 320px));
     /* grid-template-rows: repeat(auto, 1fr); */
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: var(--content-padding);
 }
 
 a.home-video-link {

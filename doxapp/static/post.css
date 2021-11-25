@@ -1,13 +1,12 @@
 .media-content {
     display: grid;
-    grid-template-columns: auto 33%;
-    column-gap: 2rem;
-    /* justify-content: space-between; */
+    grid-template-columns: auto 30%;
+    column-gap: var(--content-padding);
 }
 
 .player {
     position: relative;
-    padding-bottom: 56.23%;     /* 16:9 */
+    padding-bottom: 56.25%;     /* 16:9 */
     height: 0;
     overflow: hidden;
     max-width: 100%;
@@ -15,17 +14,17 @@
 }
 
 .player img {
-    bottom: 0;
+    position: absolute;
     display: block;
+    top: 0;
+    bottom: 0;
     left: 0;
+    right: 0;
     margin: auto;
     max-width: 100%;
     width: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    border: none;
     height: auto;
+    border: none;
     cursor: pointer;
     transition: .4s all;
 }
@@ -42,7 +41,7 @@
     margin-left: -36px;
     margin-top: -36px;
     position: absolute;
-    background: url(/wp-content/themes/topdocs/images/play-button-v1.png) no-repeat;
+    background: url(https://topdocumentaryfilms.com/wp-content/themes/topdocs/images/play-button-v1.png) no-repeat;
     cursor: pointer;
 }
 
@@ -57,12 +56,12 @@
 }
 
 .metadata {
-    background-color: rgb(230, 230, 230);
-    border: 1px solid rgb(210, 210, 210);
+    background-color: var(--main-color);
+    border: 1px solid rgb(200, 200, 200);
     border-radius: 1rem;
-    padding: 2rem;
+    padding: var(--content-padding);
 }
 
 .video-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
