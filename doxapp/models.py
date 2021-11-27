@@ -1,13 +1,7 @@
 from datetime import datetime
 from doxapp import db, login_manager
 from flask_login import UserMixin
-
-
-def dump_datetime(value):
-    """ Deserialize datetime object into string form for JSON processing. """
-    if value is None:
-        return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+from doxapp.utils import dump_datetime
 
 
 @login_manager.user_loader
@@ -31,6 +25,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), nullable=False)
     video_id = db.Column(db.String(20), nullable=False)
+    # chanel_id = db.Column(db.String(30), nullable=False)
     user_title = db.Column(db.String(256))
     provider_title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
