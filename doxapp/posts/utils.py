@@ -9,76 +9,6 @@ from wtforms.validators import ValidationError
 from threading import Timer, Lock
 
 
-def get_channel_videos(chanel_id, already_posted):
-    videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
-
-    # construct youtube API service
-    with build('youtube', 'v3', developerKey=api_key) as youtube:
-        try:
-            # get channel's details
-            res = youtube.channels().list(id=chanel_id, part='contentDetails').execute()
-            # retrieve the Uploads' playlist id
-            uploads_playlist_id = res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-
-            # first page token is None
-            next_page_token = None
-
-            # iterate through all the items in the Uploads playlist
-            while True:
-                # get the first 50 items
-                uploads = youtube.playlistItems().list(playlistId=uploads_playlist_id,
-                                                       part='contentDetails',
-                                                       maxResults=50,
-                                                       pageToken=next_page_token).execute()
-                # loop through the videos
-                for video in uploads['items']:
-                    try:
-                        # get the video id
-                        video_id = video['contentDetails']['videoId']
-
-                        if video_id in already_posted:
-                            return videos
-
-                        # the scope we want per video
-                        part = ['status', 'snippet', 'contentDetails']
-                        # construct the request
-                        req = youtube.videos().list(id=video_id, part=part)
-                        # get response (execute request)
-                        res = req.execute()['items'][0]
-
-                        embeddable = res['status']['embeddable']
-                        restricted = res['contentDetails'].get(
-                            'regionRestriction')
-                        # duration of the video
-                        duration = res['contentDetails']['duration']
-                        duration = convert_video_duration(duration)
-
-                        # if the video is embeddable and not region restricted
-                        # and longer than 30 minutes
-                        if embeddable and not restricted and duration > 1800:
-                            video_metadata = {'video_id': res['id'],
-                                              'chanel_id': res['snippet']['channelId'],
-                                              'upload_date': res['snippet']['publishedAt'],
-                                              'title': res['snippet']['title'].split(' | ')[0],
-                                              'thumbnails': res['snippet']['thumbnails'],
-                                              'description': res['snippet']['description'],
-                                              'duration': duration}
-                            videos.append(video_metadata)
-                    except Exception:
-                        continue
-
-                # update the next page token
-                next_page_token = uploads.get('nextPageToken')
-
-                # if no more pages break the while loop
-                if next_page_token is None:
-                    break
-        except Exception:
-            pass
-
-    return videos
-
-
 class Periodic(object):
     """ A periodic task running in threading.Timers """
     # https://stackoverflow.com/a/18906292
@@ -111,6 +41,87 @@ class Periodic(object):
         self._stopped = True
         self._timer.cancel()
         self._lock.release()
+
+
+def get_playlist_id(chanel_id, playlist_name, youtube):
+    try:
+        # get channel's details
+        res = youtube.channels().list(id=chanel_id, part='contentDetails').execute()
+        # retrieve the Uploads' playlist id
+        return res['items'][0]['contentDetails']['relatedPlaylists'][playlist_name]
+    except Exception:
+        return None
+
+
+def get_video_metadata(video_id, youtube):
+    # the scope we want per video
+    part = ['status', 'snippet', 'contentDetails']
+    # construct the request
+    req = youtube.videos().list(id=video_id, part=part)
+    # get response (execute request)
+    res = req.execute()['items'][0]
+
+    embeddable = res['status']['embeddable']
+    restricted = res['contentDetails'].get('regionRestriction')
+    # duration of the video
+    duration = res['contentDetails']['duration']
+    duration = convert_video_duration(duration)
+
+    # if the video is embeddable and not region restricted
+    # and longer than 30 minutes
+    # CHECK FOR PRIVACY HERE TOO
+    if embeddable and not restricted and duration > 1800:
+        return {'video_id': res['id'],
+                'chanel_id': res['snippet']['channelId'],
+                'upload_date': res['snippet']['publishedAt'],
+                'title': res['snippet']['title'].split(' | ')[0],
+                'thumbnails': res['snippet']['thumbnails'],
+                'description': res['snippet']['description'],
+                'duration': duration}
+
+
+def get_channel_videos(chanel_id, already_posted):
+    # videos epmty list and youtube API key
+    videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
+
+    # construct youtube API service
+    with build('youtube', 'v3', developerKey=api_key) as youtube:
+        # get uploads playlist id
+        uploads_id = get_playlist_id(chanel_id, 'uploads', youtube)
+        # first page token is None
+        next_page_token = None
+
+        # iterate through all the items in the Uploads playlist
+        while True:
+            try:
+                # get 50 items
+                uploads = youtube.playlistItems().list(playlistId=uploads_id,
+                                                       part='contentDetails',
+                                                       maxResults=50,
+                                                       pageToken=next_page_token).execute()
+            except Exception:
+                return videos
+
+            # loop through this batch of videos
+            for video in uploads['items']:
+                try:
+                    # get the video id
+                    video_id = video['contentDetails']['videoId']
+                    # if video is NOT in our DB
+                    if video_id not in already_posted:
+                        metadata = get_video_metadata(video_id, youtube)
+                        if metadata:
+                            videos.append(metadata)
+                except Exception:
+                    continue
+
+            # update the next page token
+            next_page_token = uploads.get('nextPageToken')
+
+            # if no more pages break the while loop
+            if next_page_token is None:
+                break
+    return videos
 
 
 def extract_video_id(url):
