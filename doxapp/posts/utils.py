@@ -71,13 +71,14 @@ def get_video_metadata(video_id, youtube):
     # and longer than 30 minutes
     # CHECK FOR PRIVACY HERE TOO
     if embeddable and not restricted and duration > 1800:
-        return {'video_id': res['id'],
+        return {'provider': 'YouTube',
+                'video_id': res['id'],
                 'chanel_id': res['snippet']['channelId'],
-                'upload_date': res['snippet']['publishedAt'],
                 'title': res['snippet']['title'].split(' | ')[0],
                 'thumbnails': res['snippet']['thumbnails'],
                 'description': res['snippet']['description'],
-                'duration': duration}
+                'duration': duration,
+                'upload_date': res['snippet']['publishedAt']}
 
 
 def get_channel_videos(chanel_id, already_posted):
@@ -167,7 +168,7 @@ def fetch_youtube_data(video_id):
                 raise ValidationError(
                     'Video is too short. Minimum length 30 minutes.')
 
-            return {'id': resp['id'],
+            return {'video_id': resp['id'],
                     'upload_date': datetime.strptime(resp['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%SZ'),
                     'provider_title': resp['snippet']['title'],
                     'thumbnails': resp['snippet']['thumbnails'],
