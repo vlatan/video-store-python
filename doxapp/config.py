@@ -12,3 +12,4 @@ class Config:
     GOOGLE_OAUTH_SCOPES = os.environ.get('GOOGLE_SCOPES')
     GOOGLE_DISCOVERY_URL = os.environ.get('GOOGLE_DISCOVERY_URL')
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
+    ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
