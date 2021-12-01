@@ -15,24 +15,30 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(120), nullable=False)
     picture = db.Column(db.String(256), nullable=False)
-    posts = db.relationship('Post', backref='author', lazy=True)
+    posts = db.relationship('Post', backref='post_author', lazy=True)
+    chanels = db.relationship('Chanel', backref='chanel_author', lazy=True)
 
-    # def __repr__(self):
-    #     return f"User('{self.username}', '{self.email}', {self.image_file})"
+
+class Chanel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    chanel_id = db.Column(db.String(30), nullable=False)
+    posts = db.relationship('Post', backref='chanel', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    provider = db.Column(db.String(7), nullable=False)
+    provider = db.Column(db.String(7), default='YouTube')
     video_id = db.Column(db.String(20), nullable=False)
-    # chanel_id = db.Column(db.String(30), nullable=False)
-    user_title = db.Column(db.String(256))
-    provider_title = db.Column(db.String(256), nullable=False)
+    chanel_id = db.Column(db.String(30), nullable=False)
+    title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    duration = db.Column(db.Integer, nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
-    date_posted = db.Column(db.DateTime, nullable=False,
-                            default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), default=0)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    chanel_db_id = db.Column(db.Integer, db.ForeignKey(Chanel.id))
 
     @property
     def serialize(self):
@@ -41,13 +47,13 @@ class Post(db.Model):
             'id': self.id,
             'provider': self.provider,
             'video_id': self.video_id,
-            'user_title': self.user_title,
-            'provider_title': self.provider_title,
+            'chanel_id': self.chanel_id,
+            'title': self.title,
             'thumbnails': self.thumbnails,
+            'description': self.description,
+            'duration': self.duration,
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
-            'user_id': self.user_id
+            'user_id': self.user_id,
+            'chanel_db_id': self.chanel_db_id
         }
-
-    # def __repr__(self):
-    #     return f"Post('{self.title}', '{self.date_posted}')"
