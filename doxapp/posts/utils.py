@@ -7,6 +7,7 @@ from googleapiclient.discovery import build
 from flask import current_app
 from wtforms.validators import ValidationError
 from threading import Timer, Lock
+from doxapp.models import Post
 
 
 class Periodic(object):
@@ -43,6 +44,55 @@ class Periodic(object):
         self._lock.release()
 
 
+def get_video_metadata(video_id, youtube):
+    try:
+        # if video is already posted
+        if Post.query.filter_by(video_id=video_id).first():
+            raise ValidationError('Video already posted')
+
+        # the scope
+        part = ['status', 'snippet', 'contentDetails']
+        # construct the request for YouTube
+        req = youtube.videos().list(id=video_id, part=part)
+        # call YouTube API, get response (execute request)
+        res = req.execute()['items'][0]
+
+        # if video is not public
+        if res['status']['privacyStatus'] != 'public':
+            raise ValidationError('Video is not public.')
+        # if video is not embeddable (boolean value)
+        if not res['status']['embeddable']:
+            raise ValidationError('Video is not embeddable.')
+        # if video is geo-restricted (None if no region restrictions)
+        if res['contentDetails'].get('regionRestriction'):
+            raise ValidationError('Video is region restricted')
+        # duration of the video
+        duration = convert_video_duration(res['contentDetails']['duration'])
+        # if duration of the video is less than 30 minutes
+        if duration < 1800:
+            raise ValidationError(
+                'Video is too short. Minimum length 30 minutes.')
+
+        # convert upload date into Python datetime object
+        upload_date = res['snippet']['publishedAt']
+        upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
+
+        return {'provider': 'YouTube',
+                'video_id': res['id'],
+                'chanel_id': res['snippet']['channelId'],
+                'title': res['snippet']['title'].split(' | ')[0],
+                'thumbnails': res['snippet']['thumbnails'],
+                'description': res['snippet']['description'],
+                'duration': duration,
+                'upload_date': upload_date}
+
+    except ValidationError:
+        raise
+    except Exception:
+        # you would want to log this error
+        raise ValidationError('Unable to fetch the video.')
+
+
 def get_playlist_id(chanel_id, playlist_name, youtube):
     try:
         # get channel's details
@@ -53,35 +103,7 @@ def get_playlist_id(chanel_id, playlist_name, youtube):
         return None
 
 
-def get_video_metadata(video_id, youtube):
-    # the scope we want per video
-    part = ['status', 'snippet', 'contentDetails']
-    # construct the request
-    req = youtube.videos().list(id=video_id, part=part)
-    # get response (execute request)
-    res = req.execute()['items'][0]
-
-    embeddable = res['status']['embeddable']
-    restricted = res['contentDetails'].get('regionRestriction')
-    # duration of the video
-    duration = res['contentDetails']['duration']
-    duration = convert_video_duration(duration)
-
-    # if the video is embeddable and not region restricted
-    # and longer than 30 minutes
-    # CHECK FOR PRIVACY HERE TOO
-    if embeddable and not restricted and duration > 1800:
-        return {'provider': 'YouTube',
-                'video_id': res['id'],
-                'chanel_id': res['snippet']['channelId'],
-                'title': res['snippet']['title'].split(' | ')[0],
-                'thumbnails': res['snippet']['thumbnails'],
-                'description': res['snippet']['description'],
-                'duration': duration,
-                'upload_date': res['snippet']['publishedAt']}
-
-
-def get_channel_videos(chanel_id, already_posted):
+def get_channel_videos(chanel_id):
     # videos epmty list and youtube API key
     videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
 
@@ -108,11 +130,9 @@ def get_channel_videos(chanel_id, already_posted):
                 try:
                     # get the video id
                     video_id = video['contentDetails']['videoId']
-                    # if video is NOT in our DB
-                    if video_id not in already_posted:
-                        metadata = get_video_metadata(video_id, youtube)
-                        if metadata:
-                            videos.append(metadata)
+                    # get video metadata
+                    video_metadata = get_video_metadata(video_id, youtube)
+                    videos.append(video_metadata)
                 except Exception:
                     continue
 
@@ -141,45 +161,6 @@ def extract_video_id(url):
             return ('youtube', query.path.split('/')[2])
     elif query.hostname in {'www.vimeo.com', 'vimeo.com'}:
         return ('vimeo', query.path.lstrip('/'))
-
-
-def fetch_youtube_data(video_id):
-    api_key = current_app.config['YOUTUBE_API_KEY']
-    # construct service
-    with build('youtube', 'v3', developerKey=api_key) as youtube:
-        try:
-            # the scope
-            part = ['status', 'snippet', 'contentDetails']
-            # construct the request for YouTube
-            req = youtube.videos().list(id=video_id, part=part)
-            # get response (execute request)
-            resp = req.execute()['items'][0]
-            # if video not embeddable (this is a boolean value)
-            if not resp['status']['embeddable']:
-                raise ValidationError('Video is not embeddable.')
-            # if video geo-restricted (None if no region restrictions)
-            if resp['contentDetails'].get('regionRestriction'):
-                raise ValidationError('Video is region restricted')
-            # duration of the video
-            duration = resp['contentDetails']['duration']
-            duration = convert_video_duration(duration)
-            # if duration of the video is less than 30 minutes
-            if duration < 1800:
-                raise ValidationError(
-                    'Video is too short. Minimum length 30 minutes.')
-
-            return {'video_id': resp['id'],
-                    'upload_date': datetime.strptime(resp['snippet']['publishedAt'], '%Y-%m-%dT%H:%M:%SZ'),
-                    'provider_title': resp['snippet']['title'],
-                    'thumbnails': resp['snippet']['thumbnails'],
-                    'duration': duration,
-                    'provider_name': 'YouTube'}
-
-        except ValidationError:
-            raise
-        except Exception:
-            # you would want to log this error
-            raise ValidationError('Unable to fetch the video.')
 
 
 def convert_video_duration(duration):
