@@ -3,7 +3,7 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, current_app)
 from flask_login import current_user, login_required
 from doxapp import db
-from doxapp.models import Post
+from doxapp.models import Post, Chanel
 from doxapp.posts.forms import PostForm
 from functools import wraps
 
@@ -13,8 +13,9 @@ posts = Blueprint('posts', __name__)
 def admin_required(func):
     @wraps(func)
     def only_admin(*args, **kwargs):
-        admin_openid = current_app.config['ADMIN_OPENID']
-        if current_user.openid != admin_openid:
+        admin_email = current_app.config['ADMIN_EMAIL']
+        if current_user.email != admin_email:
+            flash('You need to be admin to access that page!', 'info')
             return redirect(url_for('main.home'))
         return func(*args, **kwargs)
     return only_admin
@@ -26,17 +27,22 @@ def admin_required(func):
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(provider=form.content.data['provider_name'],
-                    video_id=form.content.data['video_id'],
-                    chanel_id=form.content.data['chanel_id'],
-                    title=form.content.data['title'],
-                    thumbnails=form.content.data['thumbnails'],
-                    upload_date=form.content.data['upload_date'],
-                    post_author=current_user)
+        # create object from Model
+        # form.content.data is a dict, just unpack to transform into kwargs
+        post = Post(**form.content.data, post_author=current_user)
+
+        # check if this video belongs to one of our preselected chanels
+        chanel_id = form.content.data['chanel_id']
+        chanel = Chanel.query.filter_by(chanel_id=chanel_id).first()
+        if chanel:
+            # if so add the relationship
+            post.chanel = chanel
+
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
         return redirect(url_for('main.home'))
+
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
 
