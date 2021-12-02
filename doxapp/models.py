@@ -1,6 +1,7 @@
 from datetime import datetime
 from doxapp import db, login_manager
 from flask_login import UserMixin
+from flask import current_app
 from doxapp.utils import dump_datetime
 
 
@@ -18,10 +19,17 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='post_author', lazy=True)
     chanels = db.relationship('Chanel', backref='chanel_author', lazy=True)
 
+    @property
+    def is_admin(self):
+        admin_email = current_app.config['ADMIN_EMAIL']
+        if self.email == admin_email:
+            return True
+        return False
+
 
 class Chanel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    chanel_id = db.Column(db.String(30), nullable=False)
+    chanel_id = db.Column(db.String(30), unique=True, nullable=False)
     posts = db.relationship('Post', backref='chanel', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
@@ -29,8 +37,8 @@ class Chanel(db.Model):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
-    video_id = db.Column(db.String(20), nullable=False)
-    chanel_id = db.Column(db.String(30), nullable=False)
+    video_id = db.Column(db.String(20), unique=True, nullable=False)
+    chanel_id = db.Column(db.String(30), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text, nullable=False)
