@@ -1,8 +1,10 @@
+from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
 from doxapp.posts.utils import (extract_video_id,
-                                fetch_youtube_data, fetch_vimeo_data)
+                                get_video_metadata, fetch_vimeo_data)
+from googleapiclient.discovery import build
 
 
 class PostForm(FlaskForm):
@@ -19,9 +21,14 @@ class PostForm(FlaskForm):
             raise ValidationError('Unable to parse the URL')
         # if it's a YouTube video
         if video_id[0] == 'youtube':
-            video_data = fetch_youtube_data(video_id[1])
+            # construct youtube API service
+            api_key = current_app.config['YOUTUBE_API_KEY']
+            with build('youtube', 'v3', developerKey=api_key) as youtube:
+                # get the video metadata
+                # this will raise ValidationError if unable to fetch
+                video_metadata = get_video_metadata(video_id[1], youtube)
         # if it's a Vimeo video
         else:
-            video_data = fetch_vimeo_data(video_id[1])
+            video_metadata = fetch_vimeo_data(video_id[1])
         # transform the form input
-        content.data = video_data
+        content.data = video_metadata
