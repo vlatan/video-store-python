@@ -29,7 +29,8 @@ def create_app(config_class=Config):
     app.register_blueprint(errors)
 
     # when you want to create the tables for the first time
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        pass
+        # db.create_all()
 
     return app
