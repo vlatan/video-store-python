@@ -4,7 +4,7 @@
 {% endblock css %}
 
 {% block title %}
-<title>{{ post.provider_title }} | Doxder</title>
+<title>{{ post.title }} | Doxder</title>
 {% endblock title %}
 
 {% block content %}
@@ -12,12 +12,12 @@
 <article class="media-content">
 	<div class="player">
 		<div class="player-content" id="{{ post.video_id }}">
-			<img alt="{{ post.provider_title }}" src="{{ post.thumbnails['standard']['url'] }}">
+			<img alt="{{ post.title }}" src="{{ post.thumbnails['standard']['url'] }}">
 			<div class="play"></div>
 		</div>
 	</div>
 	<div class="metadata">
-		<h1 class="video-title">{{ post.provider_title }}</h1>
+		<h1 class="video-title">{{ post.title }}</h1>
 	</div>
 </article>
 
