@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(120), nullable=False)
     picture = db.Column(db.String(256), nullable=False)
     posts = db.relationship('Post', backref='post_author', lazy=True)
-    channels = db.relationship('channel', backref='channel_author', lazy=True)
+    channels = db.relationship('Channel', backref='channel_author', lazy=True)
 
     @property
     def is_admin(self):
