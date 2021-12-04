@@ -44,7 +44,7 @@ def get_video_metadata(video_id, youtube):
 
         return {'provider': 'YouTube',
                 'video_id': res['id'],
-                'chanel_id': res['snippet']['channelId'],
+                'channel_id': res['snippet']['channelId'],
                 'title': res['snippet']['title'].split(' | ')[0],
                 'thumbnails': res['snippet']['thumbnails'],
                 'description': res['snippet']['description'],
@@ -58,24 +58,24 @@ def get_video_metadata(video_id, youtube):
         raise ValidationError('Unable to fetch the video.')
 
 
-def get_playlist_id(chanel_id, playlist_name, youtube):
+def get_playlist_id(channel_id, playlist_name, youtube):
     try:
         # get channel's details
-        res = youtube.channels().list(id=chanel_id, part='contentDetails').execute()
+        res = youtube.channels().list(id=channel_id, part='contentDetails').execute()
         # retrieve the Uploads' playlist id
         return res['items'][0]['contentDetails']['relatedPlaylists'][playlist_name]
     except Exception:
         return None
 
 
-def get_channel_videos(chanel_id):
+def get_channel_videos(channel_id):
     # videos epmty list and youtube API key
     videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
 
     # construct youtube API service
     with build('youtube', 'v3', developerKey=api_key) as youtube:
         # get uploads playlist id
-        uploads_id = get_playlist_id(chanel_id, 'uploads', youtube)
+        uploads_id = get_playlist_id(channel_id, 'uploads', youtube)
         # first page token is None
         next_page_token = None
 

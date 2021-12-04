@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(120), nullable=False)
     picture = db.Column(db.String(256), nullable=False)
     posts = db.relationship('Post', backref='post_author', lazy=True)
-    chanels = db.relationship('Chanel', backref='chanel_author', lazy=True)
+    channels = db.relationship('channel', backref='channel_author', lazy=True)
 
     @property
     def is_admin(self):
@@ -27,10 +27,10 @@ class User(db.Model, UserMixin):
         return False
 
 
-class Chanel(db.Model):
+class Channel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    chanel_id = db.Column(db.String(30), unique=True, nullable=False)
-    posts = db.relationship('Post', backref='chanel', lazy=True)
+    channel_id = db.Column(db.String(30), unique=True, nullable=False)
+    posts = db.relationship('Post', backref='channel', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
 
@@ -38,7 +38,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
     video_id = db.Column(db.String(20), unique=True, nullable=False)
-    chanel_id = db.Column(db.String(30), unique=True, nullable=False)
+    channel_id = db.Column(db.String(30), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -46,7 +46,7 @@ class Post(db.Model):
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    chanel_db_id = db.Column(db.Integer, db.ForeignKey(Chanel.id))
+    channel_db_id = db.Column(db.Integer, db.ForeignKey(Channel.id))
 
     @property
     def serialize(self):
@@ -55,7 +55,7 @@ class Post(db.Model):
             'id': self.id,
             'provider': self.provider,
             'video_id': self.video_id,
-            'chanel_id': self.chanel_id,
+            'channel_id': self.channel_id,
             'title': self.title,
             'thumbnails': self.thumbnails,
             'description': self.description,
@@ -63,5 +63,5 @@ class Post(db.Model):
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
             'user_id': self.user_id,
-            'chanel_db_id': self.chanel_db_id
+            'channel_db_id': self.channel_db_id
         }

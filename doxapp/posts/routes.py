@@ -1,24 +1,12 @@
-import json
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, Blueprint, current_app)
+                   redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from doxapp import db
-from doxapp.models import Post, Chanel
+from doxapp.utils import admin_required
+from doxapp.models import Post, Channel
 from doxapp.posts.forms import PostForm
-from functools import wraps
 
 posts = Blueprint('posts', __name__)
-
-
-def admin_required(func):
-    @wraps(func)
-    def only_admin(*args, **kwargs):
-        admin_email = current_app.config['ADMIN_EMAIL']
-        if current_user.email != admin_email:
-            flash('You need to be admin to access that page!', 'info')
-            return redirect(url_for('main.home'))
-        return func(*args, **kwargs)
-    return only_admin
 
 
 @posts.route('/post/new/', methods=['GET', 'POST'])
@@ -31,12 +19,12 @@ def new_post():
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.content.data, post_author=current_user)
 
-        # check if this video belongs to one of our preselected chanels
-        chanel_id = form.content.data['chanel_id']
-        chanel = Chanel.query.filter_by(chanel_id=chanel_id).first()
-        if chanel:
+        # check if this video belongs to one of our preselected channels
+        channel_id = form.content.data['channel_id']
+        channel = Channel.query.filter_by(channel_id=channel_id).first()
+        if channel:
             # if so add the relationship
-            post.chanel = chanel
+            post.channel = channel
 
         db.session.add(post)
         db.session.commit()
