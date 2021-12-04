@@ -37,9 +37,9 @@ def home():
 
 @main.route('/pingapi')
 def cron():
-    """ Route to fetch videos from the YT chanels called.
+    """ Route to fetch videos from the YT chanels.
         This view is called from CRON.
-        Check basis authentication to secure this view.
+        Check basic authentication to secure this view.
         https://stackoverflow.com/a/55740595 """
 
     def test_function():
