@@ -1,10 +1,11 @@
-from flask import (render_template, url_for, flash,
-                   redirect, abort, Blueprint)
+from flask import (render_template, url_for, flash, jsonify, make_response,
+                   redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from doxapp import db
 from doxapp.utils import admin_required
 from doxapp.models import Post, Channel
 from doxapp.posts.forms import PostForm, ChannelForm
+import time
 
 posts = Blueprint('posts', __name__)
 
@@ -70,10 +71,39 @@ def new_channel():
         db.session.commit()
 
         flash('Your channel has been added to the database!', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('posts.channels'))
 
     return render_template('add_channel.html', title='New Channel',
                            form=form, legend='New Channel')
+
+
+@posts.route('/channels')
+def channels():
+    """ Route to return the posts """
+
+    quantity = 12    # number of posts to fetch per load
+    # Query the Post table by descending date
+    channels = Channel.query.order_by(Channel.date_posted.desc())
+
+    # If there's a query string in the request
+    if request.args.get("c"):
+        # Get the 'counter' value sent in the query string
+        counter = int(request.args.get("c"))
+        # Get a coresponding slice of the query
+        posts = channels.slice(counter, counter + quantity)
+        # Serialize and jsonify the posts to be read by JavaScript
+        posts = jsonify([post.serialize for post in posts])
+
+        time.sleep(0.2)     # Simulate delay
+
+        # print(f"Returning posts {counter} to {counter + quantity}")
+        return make_response(posts, 200)
+
+    # Get posts for the first load
+    channels = channels.limit(quantity)
+
+    return render_template('channels.html', posts=channels,
+                           quantity=quantity, title='Channels')
 
 
 @posts.route('/post/<int:post_id>/delete/', methods=['POST'])
