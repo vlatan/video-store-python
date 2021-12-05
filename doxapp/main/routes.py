@@ -1,8 +1,13 @@
 import time
+from doxapp import db
 from flask import (render_template, request, redirect,
                    url_for, Blueprint, jsonify, make_response)
-from doxapp.models import Post
+from flask_login import login_required
+from doxapp.models import Post, Channel
+from doxapp.utils import admin_required
+from doxapp.posts.utils import get_channel_videos
 import threading
+import random
 
 main = Blueprint('main', __name__)
 
@@ -36,21 +41,29 @@ def home():
 
 
 @main.route('/pingapi')
+@login_required
+@admin_required
 def cron():
     """ Route to fetch videos from the YT chanels.
         This view is called from CRON.
         Check basic authentication to secure this view.
         https://stackoverflow.com/a/55740595 """
 
-    def test_function():
-        print('YouTube thread started runing for 30 seconds...')
-        time.sleep(30)
+    def post_videos():
+        channels, videos = Channel.query.all(), []
+        for ch in channels:
+            videos += get_channel_videos(ch.uploads_id)
+            time.sleep(20)
+        random.shuffle(videos)
+        for video in videos:
+            post = Post(**video)
+            # add to db
+            db.session.add(post)
+            db.session.commit()
 
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
-        thread = threading.Thread(target=test_function, name='YouTube')
+        thread = threading.Thread(target=post_videos, name='YouTube')
         thread.start()
-    else:
-        print('Previous YouTube thread is still running!')
 
     return redirect(url_for('main.home'))
 
