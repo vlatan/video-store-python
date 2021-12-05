@@ -95,7 +95,7 @@ def get_channel_info(video_id, youtube):
 
 def get_channel_videos(uploads_id):
     # videos epmty list and youtube API key
-    videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
+    api_key, videos = current_app.config['YOUTUBE_API_KEY'], []
 
     # construct youtube API service
     with build('youtube', 'v3', developerKey=api_key) as youtube:
