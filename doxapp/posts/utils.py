@@ -128,7 +128,7 @@ def get_channel_videos(uploads_id):
     return videos
 
 
-def extract_video_id(url):
+def get_video_id(url):
     # Examples:
     # - https://youtu.be/SA2iWivDJiE
     # - https://www.youtube.com/watch?v=_oPAwA_Udwc&feature=feedu
@@ -140,7 +140,7 @@ def extract_video_id(url):
     elif query.hostname in {'www.youtube.com', 'youtube.com'}:
         if query.path == '/watch':
             return parse_qs(query.query)['v'][0]
-        if query.path[:7] == '/embed/':
+        elif query.path[:7] == '/embed/':
             return query.path.split('/')[2]
 
 
