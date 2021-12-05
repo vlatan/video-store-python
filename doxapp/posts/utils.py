@@ -9,7 +9,7 @@ from wtforms.validators import ValidationError
 from doxapp.models import Post
 
 
-def get_video_metadata(video_id, youtube):
+def get_video_info(video_id, youtube):
     try:
         # if video is already posted
         if Post.query.filter_by(video_id=video_id).first():
@@ -59,6 +59,10 @@ def get_video_metadata(video_id, youtube):
         raise ValidationError('Unable to fetch the video.')
 
 
+def get_channel_info(video_id, youtube):
+    pass
+
+
 def get_playlist_id(channel_id, playlist_name, youtube):
     try:
         # get channel's details
@@ -97,8 +101,8 @@ def get_channel_videos(channel_id):
                     # get the video id
                     video_id = video['contentDetails']['videoId']
                     # get video metadata
-                    video_metadata = get_video_metadata(video_id, youtube)
-                    videos.append(video_metadata)
+                    video_info = get_video_info(video_id, youtube)
+                    videos.append(video_info)
                 except Exception:
                     continue
 
