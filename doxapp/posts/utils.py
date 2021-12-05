@@ -2,11 +2,11 @@ import re
 import json
 import requests
 from datetime import datetime
-from urllib.parse import urlparse, parse_qs, quote_plus
+from urllib.parse import urlparse, parse_qs
 from googleapiclient.discovery import build
 from flask import current_app
 from wtforms.validators import ValidationError
-from doxapp.models import Post
+from doxapp.models import Post, Channel
 
 
 def get_video_info(video_id, youtube):
@@ -60,47 +60,60 @@ def get_video_info(video_id, youtube):
 
 
 def get_channel_info(video_id, youtube):
-    pass
-
-
-def get_playlist_id(channel_id, playlist_name, youtube):
     try:
+        req = youtube.videos().list(id=video_id, part='snippet')
+        res = req.execute()['items'][0]
+        channel_id = res['snippet']['channelId']
+
+        # if the channel is already in our db
+        if Channel.query.filter_by(channel_id=channel_id).first():
+            raise ValidationError('Channel already in the database')
+
         # get channel's details
-        res = youtube.channels().list(id=channel_id, part='contentDetails').execute()
-        # retrieve the Uploads' playlist id
-        return res['items'][0]['contentDetails']['relatedPlaylists'][playlist_name]
+        part = ['snippet', 'contentDetails']
+        req = youtube.channels().list(id=channel_id, part=part)
+        res = req.execute()['items'][0]
+
+        return {'channel_id': channel_id,
+                'uploads_id': res['contentDetails']['relatedPlaylists']['uploads'],
+                'title': res['snippet']['title'],
+                'thumbnails': res['snippet']['thumbnails'],
+                'description': res['snippet']['description']}
+    except ValidationError:
+        raise
     except Exception:
-        return None
+        # you would want to log this error
+        raise ValidationError('Unable to fetch the channel info.')
 
 
-def get_channel_videos(channel_id):
+def get_channel_videos(uploads_id):
     # videos epmty list and youtube API key
     videos, api_key = current_app.config['YOUTUBE_API_KEY'], []
 
     # construct youtube API service
     with build('youtube', 'v3', developerKey=api_key) as youtube:
-        # get uploads playlist id
-        uploads_id = get_playlist_id(channel_id, 'uploads', youtube)
+
         # first page token is None
         next_page_token = None
 
         # iterate through all the items in the Uploads playlist
         while True:
             try:
-                # get 50 items
-                uploads = youtube.playlistItems().list(playlistId=uploads_id,
-                                                       part='contentDetails',
-                                                       maxResults=50,
-                                                       pageToken=next_page_token).execute()
+                scope = {'playlistId': uploads_id, 'part': 'contentDetails',
+                         'maxResults': 50, 'pageToken': next_page_token}
+                # every time it loops it gets the next 50 videos
+                uploads = youtube.playlistItems().list(**scope).execute()
             except Exception:
+                # unable to fetch the next 50 videos,
+                # exit with what we got so far
                 return videos
 
             # loop through this batch of videos
             for video in uploads['items']:
                 try:
-                    # get the video id
                     video_id = video['contentDetails']['videoId']
-                    # get video metadata
+                    # this will raise exception
+                    # if unable to fetch or already posted
                     video_info = get_video_info(video_id, youtube)
                     videos.append(video_info)
                 except Exception:
