@@ -48,6 +48,7 @@ def get_video_metadata(video_id, youtube):
                 'title': res['snippet']['title'].split(' | ')[0],
                 'thumbnails': res['snippet']['thumbnails'],
                 'description': res['snippet']['description'],
+                'tags': res['snippet']['tags'],
                 'duration': duration,
                 'upload_date': upload_date}
 

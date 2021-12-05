@@ -43,6 +43,7 @@ class Post(db.Model):
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text, nullable=False)
+    tags = db.Column(db.PickleType, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
@@ -60,6 +61,7 @@ class Post(db.Model):
             'title': self.title,
             'thumbnails': self.thumbnails,
             'description': self.description,
+            'tags': self.tags,
             'duration': self.duration,
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
