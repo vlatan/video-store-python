@@ -9,6 +9,12 @@ from doxapp.posts.forms import PostForm, ChannelForm
 posts = Blueprint('posts', __name__)
 
 
+@posts.route('/post/<int:post_id>/')
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    return render_template('post.html', post=post)
+
+
 @posts.route('/post/new/', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -68,12 +74,6 @@ def new_channel():
 
     return render_template('add_channel.html', title='New Channel',
                            form=form, legend='New Channel')
-
-
-@posts.route('/post/<int:post_id>/')
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
-    return render_template('post.html', post=post)
 
 
 @posts.route('/post/<int:post_id>/delete/', methods=['POST'])
