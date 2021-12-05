@@ -32,6 +32,8 @@ class Channel(db.Model):
     channel_id = db.Column(db.String(30), unique=True, nullable=False)
     uploads_id = db.Column(db.String(30), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
+    thumbnails = db.Column(db.PickleType, nullable=False)
+    description = db.Column(db.Text, nullable=False)
     posts = db.relationship('Post', backref='channel', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
