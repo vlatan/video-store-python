@@ -23,6 +23,7 @@
 			<nav class="navbar">
 				{% if current_user.is_authenticated %}
 				{% if current_user.is_admin %}
+				<a class="nav-item" href="{{ url_for('posts.channels') }}">Channels</a>
 				<a class="nav-item" href="{{ url_for('posts.new_channel') }}">New Channel</a>
 				<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
 				{% endif %}
