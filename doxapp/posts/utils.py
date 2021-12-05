@@ -1,6 +1,4 @@
 import re
-import json
-import requests
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from googleapiclient.discovery import build
@@ -42,15 +40,24 @@ def get_video_info(video_id, youtube):
         upload_date = res['snippet']['publishedAt']
         upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
 
-        return {'provider': 'YouTube',
-                'video_id': res['id'],
-                'channel_id': res['snippet']['channelId'],
-                'title': res['snippet']['title'].split(' | ')[0],
-                'thumbnails': res['snippet']['thumbnails'],
-                'description': res['snippet']['description'],
-                'tags': res['snippet']['tags'],
-                'duration': duration,
-                'upload_date': upload_date}
+        metadata = {'provider': 'YouTube',
+                    'video_id': res['id'],
+                    'channel_id': res['snippet']['channelId'],
+                    'title': res['snippet']['title'].split(' | ')[0],
+                    'thumbnails': res['snippet']['thumbnails'],
+                    'description': res['snippet']['description'],
+                    'tags': res['snippet']['tags'],
+                    'duration': duration,
+                    'upload_date': upload_date}
+
+        # check if this video belongs to a channel in our db
+        channel_id = metadata['channel_id']
+        channel = Channel.query.filter_by(channel_id=channel_id).first()
+        if channel:
+            # if so add the relationship to metadata
+            metadata['channel'] = channel
+
+        return metadata
 
     except ValidationError:
         raise

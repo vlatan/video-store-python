@@ -28,13 +28,6 @@ def new_post():
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.content.data, post_author=current_user)
 
-        # check if this video belongs to one of the channels in the db
-        channel_id = form.content.data['channel_id']
-        channel = Channel.query.filter_by(channel_id=channel_id).first()
-        if channel:
-            # if so add the relationship
-            post.channel = channel
-
         # add to db
         db.session.add(post)
         db.session.commit()
