@@ -118,14 +118,12 @@ def extract_video_id(url):
     # - https://vimeo.com/534502421
     query = urlparse(url)
     if query.hostname == 'youtu.be':
-        return ('youtube', query.path[1:])
+        return query.path[1:]
     elif query.hostname in {'www.youtube.com', 'youtube.com'}:
         if query.path == '/watch':
-            return ('youtube', parse_qs(query.query)['v'][0])
+            return parse_qs(query.query)['v'][0]
         if query.path[:7] == '/embed/':
-            return ('youtube', query.path.split('/')[2])
-    elif query.hostname in {'www.vimeo.com', 'vimeo.com'}:
-        return ('vimeo', query.path.lstrip('/'))
+            return query.path.split('/')[2]
 
 
 def convert_video_duration(duration):
@@ -138,27 +136,3 @@ def convert_video_duration(duration):
     s = int(seconds.group(1)) if seconds else 0
 
     return (h * 3600) + (m * 60) + s
-
-
-def fetch_vimeo_data(video_id):
-    url = quote_plus(f'https://vimeo.com/{video_id}')
-    oembed = f'https://vimeo.com/api/oembed.json?url={url}&width=1280'
-    try:
-        response = requests.get(oembed)
-        if response.ok:
-            video_data = response.json()
-            if video_data['duration'] < 1800:
-                raise ValidationError(
-                    'Video is too short. Minimum length 30 minutes.')
-            return {'id': video_data['video_id'],
-                    'upload_date': video_data['upload_date'],
-                    'provider_title': video_data['title'],
-                    'thumbnail': video_data['thumbnail_url'],
-                    'duration': video_data['duration'],
-                    'provider_name': 'Vimeo'}
-        else:
-            raise ValidationError('Unable to fetch the video.')
-    except ValidationError:
-        raise
-    except Exception:
-        raise ValidationError('Unable to fetch the video.')
