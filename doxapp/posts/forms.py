@@ -22,6 +22,7 @@ class PostForm(FlaskForm):
         with build('youtube', 'v3', developerKey=api_key) as youtube:
             # get the video metadata
             # this will raise ValidationError if unable to fetch data
+            # or if the video is already in the database
             video_info = get_video_info(video_id, youtube)
         # transform the form input
         content.data = video_info
@@ -43,6 +44,7 @@ class ChannelForm(FlaskForm):
         with build('youtube', 'v3', developerKey=api_key) as youtube:
             # get the channel metadata
             # this will raise ValidationError if unable to fetch data
+            # or if the channel is already in the database
             channel_info = get_channel_info(video_id, youtube)
         # transform the form input
         content.data = channel_info

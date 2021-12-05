@@ -28,8 +28,10 @@ def new_post():
             # if so add the relationship
             post.channel = channel
 
+        # add to db
         db.session.add(post)
         db.session.commit()
+
         flash('Your post has been created!', 'success')
         return redirect(url_for('main.home'))
 
