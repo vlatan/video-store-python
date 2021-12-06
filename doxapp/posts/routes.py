@@ -13,7 +13,8 @@ posts = Blueprint('posts', __name__)
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', post=post)
+    thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
+    return render_template('post.html', post=post, thumb=thumb['url'])
 
 
 @posts.route('/post/new/', methods=['GET', 'POST'])
