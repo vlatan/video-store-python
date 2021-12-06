@@ -41,7 +41,7 @@
     margin-left: -36px;
     margin-top: -36px;
     position: absolute;
-    background: url(https://topdocumentaryfilms.com/wp-content/themes/topdocs/images/play-button-v1.png) no-repeat;
+    background: url(/static/images/play-button-v1.png) no-repeat;
     cursor: pointer;
 }
 
