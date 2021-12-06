@@ -5,7 +5,7 @@ from flask import url_for, Blueprint, jsonify, make_response
 from flask_login import login_required
 from doxapp.models import Post, Channel
 from doxapp.utils import admin_required
-from doxapp.posts.utils import get_channel_videos
+from doxapp.posts.utils import get_playlist_videos
 import threading
 import random
 
@@ -75,8 +75,8 @@ def cron():
             print('Going through the channels...')
             for ch in channels:
                 print(f'Processing a channel... {ch.title}')
-                videos += get_channel_videos(ch.uploads_id,
-                                             youtube, session=session)
+                videos += get_playlist_videos(ch.uploads_id,
+                                              youtube, session=session)
                 print(f'Channel "{ch.title}" processed...')
         random.shuffle(videos)
         print('Videos shuffled...')
