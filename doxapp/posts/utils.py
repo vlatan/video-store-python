@@ -7,13 +7,19 @@ from wtforms.validators import ValidationError
 from doxapp.models import Post, Channel
 
 
-def get_video_info(video_id, youtube):
+def get_video_info(video_id, youtube, session=None):
     try:
-        # if video is already posted
-        if Post.query.filter_by(video_id=video_id).first():
+        if session:
+            # we're working with a scopped session
+            query = session.query(Post).filter_by(video_id=video_id).first()
+        else:
+            # we're working with Flask-SQLAlchemy within the app context
+            query = Post.query.filter_by(video_id=video_id).first()
+        if query:
+            # video is already posted
             raise ValidationError('Video already posted')
 
-        # the scope
+        # the scope for YouTube API
         part = ['status', 'snippet', 'contentDetails']
         # construct the request for YouTube
         req = youtube.videos().list(id=video_id, part=part)
@@ -50,9 +56,15 @@ def get_video_info(video_id, youtube):
                     'duration': duration,
                     'upload_date': upload_date}
 
-        # check if this video belongs to a channel in our db
         channel_id = metadata['channel_id']
-        channel = Channel.query.filter_by(channel_id=channel_id).first()
+
+        # check if this video belongs to a channel already in our db
+        if session:
+            channel = session.query(Channel).filter_by(
+                channel_id=channel_id).first()
+        else:
+            channel = Channel.query.filter_by(channel_id=channel_id).first()
+
         if channel:
             # if so add the relationship to metadata
             metadata['channel'] = channel
@@ -66,14 +78,20 @@ def get_video_info(video_id, youtube):
         raise ValidationError('Unable to fetch the video.')
 
 
-def get_channel_info(video_id, youtube):
+def get_channel_info(video_id, youtube, session=None):
     try:
         req = youtube.videos().list(id=video_id, part='snippet')
         res = req.execute()['items'][0]
         channel_id = res['snippet']['channelId']
 
-        # if the channel is already in our db
-        if Channel.query.filter_by(channel_id=channel_id).first():
+        if session:
+            query = session.query(Channel).filter_by(
+                channel_id=channel_id).first()
+        else:
+            query = Channel.query.filter_by(channel_id=channel_id).first()
+
+        if query:
+            # the channel is already in our db
             raise ValidationError('Channel already in the database')
 
         # get channel's details
@@ -93,45 +111,40 @@ def get_channel_info(video_id, youtube):
         raise ValidationError('Unable to fetch the channel info.')
 
 
-def get_channel_videos(uploads_id):
-    # videos epmty list and youtube API key
-    api_key, videos = current_app.config['YOUTUBE_API_KEY'], []
+def get_playlist_videos(playlist_id, youtube, session=None):
+    # videos epmty list and first page token is None
+    videos, next_page_token = [], None
 
-    # construct youtube API service
-    with build('youtube', 'v3', developerKey=api_key) as youtube:
+    # iterate through all the items in the Uploads playlist
+    while True:
+        try:
+            scope = {'playlistId': playlist_id, 'part': 'contentDetails',
+                     'maxResults': 50, 'pageToken': next_page_token}
+            # every time it loops it gets the next 50 videos
+            uploads = youtube.playlistItems().list(**scope).execute()
+        except Exception:
+            # unable to fetch the next 50 videos,
+            # exit with what we got so far
+            return videos
 
-        # first page token is None
-        next_page_token = None
-
-        # iterate through all the items in the Uploads playlist
-        while True:
+        # loop through this batch of videos
+        for video in uploads['items']:
             try:
-                scope = {'playlistId': uploads_id, 'part': 'contentDetails',
-                         'maxResults': 50, 'pageToken': next_page_token}
-                # every time it loops it gets the next 50 videos
-                uploads = youtube.playlistItems().list(**scope).execute()
+                video_id = video['contentDetails']['videoId']
+                # this will raise exception
+                # if unable to fetch or already posted
+                video_info = get_video_info(
+                    video_id, youtube, session=session)
+                videos.append(video_info)
             except Exception:
-                # unable to fetch the next 50 videos,
-                # exit with what we got so far
-                return videos
+                continue
 
-            # loop through this batch of videos
-            for video in uploads['items']:
-                try:
-                    video_id = video['contentDetails']['videoId']
-                    # this will raise exception
-                    # if unable to fetch or already posted
-                    video_info = get_video_info(video_id, youtube)
-                    videos.append(video_info)
-                except Exception:
-                    continue
+        # update the next page token
+        next_page_token = uploads.get('nextPageToken')
 
-            # update the next page token
-            next_page_token = uploads.get('nextPageToken')
-
-            # if no more pages break the while loop
-            if next_page_token is None:
-                break
+        # if no more pages break the while loop
+        if next_page_token is None:
+            break
     return videos
 
 
