@@ -17,7 +17,7 @@
 	<a class="home-video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
 		<img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
 			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-			alt="{{ post.provider_title }}">
+			alt="{{ post.title }}">
 		<h2 class="home-video-title">{{ post.title }}</h2>
 	</a>
 
@@ -84,8 +84,8 @@
 					template_clone.querySelector('.home-video-link').href = `/post/${data[i]['id']}`;
 					let thumb = template_clone.querySelector('.home-video-img');
 					thumb.src = data[i]['thumbnails']['medium']['url'];
-					thumb.alt = data[i]['provider_title'];
-					template_clone.querySelector('.home-video-title').innerHTML = data[i]['provider_title'];
+					thumb.alt = data[i]['title'];
+					template_clone.querySelector('.home-video-title').innerHTML = data[i]['title'];
 
 					// Append template to dom
 					scroller.appendChild(template_clone);
