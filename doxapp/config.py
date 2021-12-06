@@ -6,6 +6,7 @@ class Config:
     load_dotenv()
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    SCOPPED_SESSION_DB_URI = os.environ.get('SCOPPED_SESSION_DB_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
