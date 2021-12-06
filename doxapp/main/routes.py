@@ -1,13 +1,18 @@
 import time
-from doxapp import db
-from flask import (render_template, request, redirect,
-                   url_for, Blueprint, jsonify, make_response)
+from googleapiclient.discovery import build
+from flask import render_template, request, redirect, current_app
+from flask import url_for, Blueprint, jsonify, make_response
 from flask_login import login_required
 from doxapp.models import Post, Channel
 from doxapp.utils import admin_required
 from doxapp.posts.utils import get_channel_videos
 import threading
 import random
+
+# for setting up a scoped_session so we can query the DB in a thread
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 main = Blueprint('main', __name__)
 
@@ -49,17 +54,44 @@ def cron():
         Check basic authentication to secure this view.
         https://stackoverflow.com/a/55740595 """
 
+    API_KEY = current_app.config['YOUTUBE_API_KEY']
+    # we need one dir up in the db uri,
+    # so we can properly create the engine from db
+    DB = current_app.config['SCOPPED_SESSION_DB_URI']
+    engine = create_engine(DB)
+    session_factory = sessionmaker(bind=engine)
+
     def post_videos():
-        channels, videos = Channel.query.all(), []
-        for ch in channels:
-            videos += get_channel_videos(ch.uploads_id)
-            time.sleep(20)
+        # nall calls to Session() will create a thread-local session
+        Session = scoped_session(session_factory)
+        session = Session()
+        print('Querying channels...')
+        channels = session.query(Channel).all()
+        videos = []
+        print('Constructing YouTube API service...')
+        # construct youtube API service
+        with build('youtube', 'v3', developerKey=API_KEY) as youtube:
+            print('Constructed YouTube API service...')
+            print('Going through the channels...')
+            for ch in channels:
+                print(f'Processing a channel... {ch.title}')
+                videos += get_channel_videos(ch.uploads_id,
+                                             youtube, session=session)
+                print(f'Channel "{ch.title}" processed...')
         random.shuffle(videos)
+        print('Videos shuffled...')
+        print('Going through the videos...')
         for video in videos:
             post = Post(**video)
-            # add to db
-            db.session.add(post)
-            db.session.commit()
+            # add post to db
+            session.add(post)
+            print(f'Video "{post.title}" added to DB...')
+        # commit changes to DB
+        session.commit()
+        print('Changes to DB commited...')
+        # you must close the Session when you're finished!
+        Session.remove()
+        print('Done...')
 
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
         thread = threading.Thread(target=post_videos, name='YouTube')
