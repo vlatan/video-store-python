@@ -73,31 +73,12 @@ def new_channel():
 
 @posts.route('/channels')
 def channels():
-    """ Route to return the posts """
+    """ Route to return the channels """
 
-    quantity = 12    # number of posts to fetch per load
-    # Query the Post table by descending date
-    channels = Channel.query.order_by(Channel.date_posted.desc())
+    # Query the Channel table
+    channels = Channel.query.order_by(Channel.id.desc())
 
-    # If there's a query string in the request
-    if request.args.get("c"):
-        # Get the 'counter' value sent in the query string
-        counter = int(request.args.get("c"))
-        # Get a coresponding slice of the query
-        posts = channels.slice(counter, counter + quantity)
-        # Serialize and jsonify the posts to be read by JavaScript
-        posts = jsonify([post.serialize for post in posts])
-
-        time.sleep(0.2)     # Simulate delay
-
-        # print(f"Returning posts {counter} to {counter + quantity}")
-        return make_response(posts, 200)
-
-    # Get posts for the first load
-    channels = channels.limit(quantity)
-
-    return render_template('channels.html', posts=channels,
-                           quantity=quantity, title='Channels')
+    return render_template('channels.html', posts=channels, title='Channels')
 
 
 @posts.route('/post/<int:post_id>/delete/', methods=['POST'])
