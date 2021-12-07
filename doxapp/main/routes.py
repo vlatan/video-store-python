@@ -23,20 +23,18 @@ def home():
 
     quantity = 12    # number of posts to fetch per load
     # Query the Post table by descending date
-    posts = Post.query.order_by(Post.date_posted.desc())
+    posts = Post.query.order_by(Post.id.desc())
 
     # If there's a query string in the request
     if request.args.get("c"):
         # Get the 'counter' value sent in the query string
         counter = int(request.args.get("c"))
-        # Get a coresponding slice of the query
+        # Get a coresponding slice of the posts query
         posts = posts.slice(counter, counter + quantity)
         # Serialize and jsonify the posts to be read by JavaScript
         posts = jsonify([post.serialize for post in posts])
 
-        time.sleep(0.2)     # Simulate delay
-
-        # print(f"Returning posts {counter} to {counter + quantity}")
+        time.sleep(0.4)     # Simulate delay
         return make_response(posts, 200)
 
     # Get posts for the first load
@@ -55,15 +53,16 @@ def cron():
         https://stackoverflow.com/a/55740595 """
 
     API_KEY = current_app.config['YOUTUBE_API_KEY']
-    # we need one dir up in the db uri,
-    # so we can properly create the engine from db
+    # we need the full DB uri relative to the app
+    # so we can properly create the engine
     DB = current_app.config['SCOPPED_SESSION_DB_URI']
     engine = create_engine(DB)
     session_factory = sessionmaker(bind=engine)
 
     def post_videos():
-        # nall calls to Session() will create a thread-local session
+        # all calls to Session() will create a thread-local session
         Session = scoped_session(session_factory)
+        # create a session
         session = Session()
         print('Querying channels...')
         channels = session.query(Channel).all()
