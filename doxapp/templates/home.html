@@ -43,7 +43,6 @@
 	var scroller = document.querySelector("#scroller");
 	var template = document.querySelector('#post_template');
 	var sentinel = document.querySelector('#sentinel');
-
 	// Set a counter to count the items loaded
 	var counter = parseInt(template.getAttribute('data-value'));
 	// There are still posts to be fetched
@@ -58,10 +57,6 @@
 			// Convert the response data to JSON
 			response.json().then((data) => {
 
-				// log to console if there's call to backend
-				console.log('Backend called');
-				console.log(`${data.length} posts fetched`);
-
 				// If empty JSON, exit the function
 				if (!data.length) {
 
@@ -69,8 +64,7 @@
 					sentinel.innerHTML = "No more posts";
 					// We got to the end, no more posts
 					the_end = true;
-					// log to console if there are no more posts
-					console.log('No more posts');
+
 					return;
 				}
 
@@ -97,28 +91,22 @@
 		})
 	}
 
-	// Create a new IntersectionObserver instance
-	var intersectionObserver = new IntersectionObserver(entries => {
+	if ('IntersectionObserver' in window) {
+		// Create a new IntersectionObserver instance
+		let intersectionObserver = new IntersectionObserver(entry => {
+			// If the entry is intersecting or there are still posts
+			if (entry.isIntersecting || the_end == false) {
+				// Call the loadItems function
+				loadItems();
+				// Unobserve the entry
+				intersectionObserver.unobserve(entry);
+			}
+			// add root margin for better intersection detecetion
+		}, { rootMargin: "100px 0px" });
 
-		// Uncomment below to see the entry.intersectionRatio when
-		// the sentinel comes into view
-		entries.forEach(entry => {
-			console.log(entry.intersectionRatio);
-		})
-
-		// If intersectionRatio is 0, the sentinel is out of view
-		// or if we reached the end of the database
-		// we don't need to do anything. Exit the function
-		if (entries[0].intersectionRatio <= 0 || the_end == true) {
-			return;
-		}
-
-		// Call the loadItems function
-		loadItems();
-	});
-
-	// Instruct the IntersectionObserver to watch the sentinel
-	intersectionObserver.observe(sentinel);
+		// Instruct the IntersectionObserver to watch the sentinel
+		intersectionObserver.observe(sentinel);
+	}
 </script>
 
 {% endblock content %}
