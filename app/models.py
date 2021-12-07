@@ -1,8 +1,8 @@
 from datetime import datetime
-from doxapp import db, login_manager
+from app import db, login_manager
 from flask_login import UserMixin
 from flask import current_app
-from doxapp.utils import dump_datetime
+from app.utils import dump_datetime
 
 
 @login_manager.user_loader

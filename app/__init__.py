@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from doxapp.config import Config
+from app.config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
@@ -19,10 +19,10 @@ def create_app(config_class=Config):
     db.init_app(app)
     login_manager.init_app(app)
 
-    from doxapp.users.routes import users
-    from doxapp.posts.routes import posts
-    from doxapp.main.routes import main
-    from doxapp.errors.handlers import errors
+    from app.users.routes import users
+    from app.posts.routes import posts
+    from app.main.routes import main
+    from app.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)

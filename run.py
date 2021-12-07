@@ -25,7 +25,7 @@
 # https://stackoverflow.com/questions/21214270/how-to-schedule-a-function-to-run-every-hour-on-flask
 
 import os
-from doxapp import create_app
+from app import create_app
 
 app = create_app()
 

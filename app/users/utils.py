@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import current_app
 from flask_login import login_user
-from doxapp import db
-from doxapp.models import User
+from app import db
+from app.models import User
 
 
 def save_picture(form_picture):

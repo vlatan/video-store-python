@@ -6,10 +6,10 @@ from google.auth.transport import requests as grequests
 from flask import (render_template, url_for, flash, session,
                    redirect, request, Blueprint, current_app)
 from flask_login import current_user, logout_user, login_required
-from doxapp import db
-from doxapp.models import User, Post
-from doxapp.users.forms import UpdateAccountForm
-from doxapp.users.utils import save_picture, user_ready
+from app import db
+from app.models import User, Post
+from app.users.forms import UpdateAccountForm
+from app.users.utils import save_picture, user_ready
 
 users = Blueprint('users', __name__)
 

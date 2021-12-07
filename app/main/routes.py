@@ -3,9 +3,9 @@ from googleapiclient.discovery import build
 from flask import render_template, request, redirect, current_app
 from flask import url_for, Blueprint, jsonify, make_response
 from flask_login import login_required
-from doxapp.models import Post, Channel
-from doxapp.utils import admin_required
-from doxapp.posts.utils import get_playlist_videos
+from app.models import Post, Channel
+from app.utils import admin_required
+from app.posts.utils import get_playlist_videos
 import threading
 import random
 
@@ -77,6 +77,7 @@ def cron():
                 videos += get_playlist_videos(ch.uploads_id,
                                               youtube, session=session)
                 print(f'Channel "{ch.title}" processed...')
+        print(f'Fetched {len(videos)} in total...')
         random.shuffle(videos)
         print('Videos shuffled...')
         print('Going through the videos...')

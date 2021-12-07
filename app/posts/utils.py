@@ -4,7 +4,7 @@ from urllib.parse import urlparse, parse_qs
 from googleapiclient.discovery import build
 from flask import current_app
 from wtforms.validators import ValidationError
-from doxapp.models import Post, Channel
+from app.models import Post, Channel
 
 
 def get_video_info(video_id, youtube, session=None):

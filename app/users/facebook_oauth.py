@@ -4,7 +4,7 @@ from flask_dance.contrib.facebook import make_facebook_blueprint
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from sqlalchemy.orm.exc import NoResultFound
-from doxapp.models import db, User, OAuth
+from app.models import db, User, OAuth
 
 
 facebook_bp = make_facebook_blueprint(
