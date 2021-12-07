@@ -1,11 +1,10 @@
-from flask import (render_template, url_for, flash, jsonify, make_response,
-                   redirect, request, abort, Blueprint)
+from flask import render_template, url_for, flash
+from flask import redirect, abort, Blueprint
 from flask_login import current_user, login_required
 from app import db
 from app.utils import admin_required
 from app.models import Post, Channel
 from app.posts.forms import PostForm, ChannelForm
-import time
 
 posts = Blueprint('posts', __name__)
 

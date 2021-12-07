@@ -1,8 +1,6 @@
 import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
-from googleapiclient.discovery import build
-from flask import current_app
 from wtforms.validators import ValidationError
 from app.models import Post, Channel
 

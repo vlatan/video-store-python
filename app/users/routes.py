@@ -3,13 +3,13 @@ import hashlib
 import requests
 from google.oauth2 import id_token
 from google.auth.transport import requests as grequests
-from flask import (render_template, url_for, flash, session,
-                   redirect, request, Blueprint, current_app)
+from flask import render_template, url_for, flash, session
+from flask import redirect, request, Blueprint, current_app
 from flask_login import current_user, logout_user, login_required
 from app import db
 from app.models import User, Post
 from app.users.forms import UpdateAccountForm
-from app.users.utils import save_picture, user_ready
+from app.users.utils import user_ready
 
 users = Blueprint('users', __name__)
 
