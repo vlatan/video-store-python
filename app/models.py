@@ -2,7 +2,7 @@ from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
 from flask import current_app
-from app.utils import dump_datetime
+from app.helpers import dump_datetime
 
 
 @login_manager.user_loader

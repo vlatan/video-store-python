@@ -4,8 +4,8 @@ from flask import render_template, request, redirect, current_app
 from flask import url_for, Blueprint, jsonify, make_response
 from flask_login import login_required
 from app.models import Post, Channel
-from app.utils import admin_required
-from app.posts.utils import get_playlist_videos
+from app.helpers import admin_required
+from app.posts.helpers import get_playlist_videos
 import threading
 import random
 

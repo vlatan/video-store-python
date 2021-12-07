@@ -2,7 +2,7 @@ from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
-from app.posts.utils import get_video_id, get_video_info, get_channel_info
+from app.posts.helpers import get_video_id, get_video_info, get_channel_info
 from googleapiclient.discovery import build
 
 

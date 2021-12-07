@@ -9,7 +9,7 @@ from flask_login import current_user, logout_user, login_required
 from app import db
 from app.models import User, Post
 from app.users.forms import UpdateAccountForm
-from app.users.utils import user_ready
+from app.users.helpers import user_ready
 
 users = Blueprint('users', __name__)
 
