@@ -29,15 +29,27 @@ def get_video_info(video_id, youtube, session=None):
         # if video is not public
         if res['status']['privacyStatus'] != 'public':
             raise ValidationError('Video is not public.')
+
         # if video is not embeddable (boolean value)
         if not res['status']['embeddable']:
             raise ValidationError('Video is not embeddable.')
+
         # if video is geo-restricted (None if no region restrictions)
         if res['contentDetails'].get('regionRestriction'):
             raise ValidationError('Video is region restricted')
-        # duration of the video
+
+        # if text is NOT in English
+        text_language = res['snippet'].get('defaultLanguage')
+        if text_language and text_language != 'en':
+            raise ValidationError('Video\'s title/desc is not in English')
+
+        # if audio is NOT in English
+        audio_language = res['snippet'].get('defaultAudioLanguage')
+        if audio_language and audio_language != 'en':
+            raise ValidationError('Audio is not in English')
+
+        # if duration of the video is < 30
         duration = convert_video_duration(res['contentDetails']['duration'])
-        # if duration of the video is less than 30 minutes
         if duration < 1800:
             raise ValidationError(
                 'Video is too short. Minimum length 30 minutes.')
@@ -58,7 +70,7 @@ def get_video_info(video_id, youtube, session=None):
 
         channel_id = metadata['channel_id']
 
-        # check if this video belongs to a channel already in our db
+        # check if this video belongs to a channel that is already in our db
         if session:
             channel = session.query(Channel).filter_by(
                 channel_id=channel_id).first()
