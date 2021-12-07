@@ -1,0 +1,25 @@
+.channels-content {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(88px, 240px));
+    /* grid-template-rows: repeat(auto, 1fr); */
+    justify-content: space-between;
+    gap: var(--content-padding);
+}
+
+a.channel-link {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    text-decoration: none;
+}
+
+img.channel-img {
+    width: 100%;
+    height: auto;
+}
+
+h2.channel-title {
+    font-size: .9rem;
+    /* font-weight: 500; */
+    color: black;
+}
