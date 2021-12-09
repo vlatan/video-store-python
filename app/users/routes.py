@@ -106,7 +106,7 @@ def oauth():
         return render_template('close_oauth.html')
 
 
-@users.route('/logout/')
+@users.route('/logout')
 @login_required
 def logout():
     logout_user()
@@ -119,7 +119,7 @@ def logout():
     return redirect(referrer)
 
 
-@users.route('/account/', methods=['GET', 'POST'])
+@users.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
