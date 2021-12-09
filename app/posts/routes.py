@@ -16,9 +16,9 @@ def post(post_id):
     post = Post.query.get_or_404(post_id)
 
     # if there 3 days passed from the last checked date
-    if post.last_checked + timedelta(days=3) < datetime.utcnow:
+    if post.last_checked + timedelta(days=3) < datetime.utcnow():
         # update last checked
-        post.last_checked = datetime.utcnow
+        post.last_checked = datetime.utcnow()
         # check if the video is still alive on YouTube
         API_KEY = current_app.config['YOUTUBE_API_KEY']
         with build('youtube', 'v3', developerKey=API_KEY) as youtube:
