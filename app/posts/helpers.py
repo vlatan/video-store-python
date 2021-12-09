@@ -8,10 +8,10 @@ from app.models import Post, Channel
 def get_video_info(video_id, youtube, session=None):
     try:
         if session:
-            # we're working with a scopped session
+            # we're working with a scopped session (in a thread)
             query = session.query(Post).filter_by(video_id=video_id).first()
         else:
-            # we're working with Flask-SQLAlchemy within the app context
+            # we're working within the app context
             query = Post.query.filter_by(video_id=video_id).first()
         if query:
             # video is already posted
@@ -46,7 +46,7 @@ def get_video_info(video_id, youtube, session=None):
         if audio_language and audio_language != 'en':
             raise ValidationError('Audio is not in English')
 
-        # if duration of the video is < 30
+        # if the duration of the video is < 30 minutes
         duration = convert_video_duration(res['contentDetails']['duration'])
         if duration < 1800:
             raise ValidationError(
@@ -132,9 +132,10 @@ def get_playlist_videos(playlist_id, youtube, session=None):
                      'maxResults': 50, 'pageToken': next_page_token}
             # every time it loops it gets the next 50 videos
             uploads = youtube.playlistItems().list(**scope).execute()
-        except Exception:
+        except Exception as err:
             # unable to fetch the next 50 videos,
             # exit with what we got so far
+            print(err.args)
             return videos
 
         # loop through this batch of videos
