@@ -72,11 +72,19 @@ def cron():
         with build('youtube', 'v3', developerKey=API_KEY) as youtube:
             print('Constructed YouTube API service...')
             print('Going through the channels...')
-            for ch in channels:
-                print(f'Processing a channel... {ch.title}')
-                videos += get_playlist_videos(ch.uploads_id,
-                                              youtube, session=session)
-                print(f'Channel "{ch.title}" processed...')
+            for channel in channels:
+                print(f'Processing a channel... "{channel.title}"')
+                channel_videos = get_playlist_videos(
+                    channel.uploads_id, youtube, session=session)
+                if channel.title == 'National Geographic':
+                    nat_geo_videos = []
+                    for video in channel_videos:
+                        if 'Full Episode' in video['title']:
+                            nat_geo_videos.append(video)
+                    videos += nat_geo_videos
+                else:
+                    videos += channel_videos
+                print(f'Channel "{channel.title}" processed...')
         print(f'Fetched {len(videos)} in total...')
         random.shuffle(videos)
         print('Videos shuffled...')
@@ -100,6 +108,6 @@ def cron():
     return redirect(url_for('main.home'))
 
 
-@main.route('/about/')
+@main.route('/about')
 def about():
     return render_template('about.html', title='About')
