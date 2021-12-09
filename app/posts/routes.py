@@ -1,10 +1,12 @@
 from flask import render_template, url_for, flash
-from flask import redirect, abort, Blueprint
+from flask import redirect, abort, Blueprint, current_app
 from flask_login import current_user, login_required
 from app import db
 from app.helpers import admin_required
 from app.models import Post, Channel
 from app.posts.forms import PostForm, ChannelForm
+from googleapiclient.discovery import build
+from datetime import datetime, timedelta
 
 posts = Blueprint('posts', __name__)
 
@@ -12,6 +14,24 @@ posts = Blueprint('posts', __name__)
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
+
+    # if there 3 days passed from the last checked date
+    if post.last_checked + timedelta(days=3) < datetime.utcnow:
+        # update last checked
+        post.last_checked = datetime.utcnow
+        # check if the video is still alive on YouTube
+        API_KEY = current_app.config['YOUTUBE_API_KEY']
+        with build('youtube', 'v3', developerKey=API_KEY) as youtube:
+            try:
+                req = youtube.videos().list(id=post.video_id, part='id', fields='pageInfo')
+                if req.execute()['pageInfo'] == 0:
+                    db.session.delete(post)
+                    db.session.commit()
+                    abort(404)
+            except Exception as err:
+                # log this
+                print(err.args)
+
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
     return render_template('post.html', post=post, thumb=thumb['url'])
 
@@ -80,7 +100,7 @@ def channels():
     return render_template('channels.html', posts=channels, title='Channels')
 
 
-@posts.route('/post/<int:post_id>/delete/', methods=['POST'])
+@posts.route('/post/<int:post_id>/delete', methods=['POST'])
 @login_required
 @admin_required
 def delete_post(post_id):
