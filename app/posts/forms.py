@@ -46,5 +46,5 @@ class ChannelForm(FlaskForm):
             # this will raise ValidationError if unable to fetch data
             # or if the channel is already in the database
             channel_info = get_channel_info(video_id, youtube)
-        # transform the form input
+        # transform the form data
         content.data = channel_info
