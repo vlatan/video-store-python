@@ -55,14 +55,13 @@ def validate_video(response, session=None):
                 'duration': duration,
                 'upload_date': upload_date}
 
-    channel_id = metadata['channel_id']
-
     # check if this video belongs to a channel that is already in our db
     if session:
         channel = session.query(Channel).filter_by(
-            channel_id=channel_id).first()
+            channel_id=metadata['channel_id']).first()
     else:
-        channel = Channel.query.filter_by(channel_id=channel_id).first()
+        channel = Channel.query.filter_by(
+            channel_id=metadata['channel_id']).first()
 
     if channel:
         # if so add the relationship to metadata
@@ -111,42 +110,44 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
     # iterate through all the items in the Uploads playlist
     while True:
         try:
+            # scope for creating a batch of 50 from the playlist
             scope = {'playlistId': playlist_id, 'part': 'contentDetails',
                      'maxResults': 50, 'pageToken': next_page_token}
             # every time it loops it gets the next 50 videos
             uploads = youtube_service.playlistItems().list(**scope).execute()
-        except Exception as err:
-            # unable to fetch the next 50 videos,
-            # exit with what we got so far
-            print(err.args)
-            break
 
-        # video ids
-        ids = [item['contentDetails']['videoId'] for item in uploads['items']]
-        # the scope
-        part = ['status', 'snippet', 'contentDetails']
-        # request for YouTube for detailed info about this batch of videos
-        req = youtube_service.videos().list(id=ids, part=part)
-        # response from YouTube
-        res = req.execute()
+            # scope for detalied info about each video in this batch
+            scope = {'id': [item['contentDetails']['videoId']
+                            for item in uploads['items']],
+                     'part': ['status', 'snippet', 'contentDetails']}
+            # response from YouTube
+            res = youtube_service.videos().list(**scope).execute()
+        except Exception:
+            # unable to fetch this batch,
+            # thus next_page_token is unavailable
+            # so we're unable to proceed
+            # log this error
+            break
 
         # loop through this batch of videos
         for item in res['items']:
             try:
                 # this will raise exception
-                # if unable to fetch or already posted
+                # if invalid or already posted
                 video_info = validate_video(item, session=session)
                 videos.append(video_info)
-            except Exception:
-                # continue with this for loop
+            except ValidationError:
+                # video not validated
+                # continue, try the next video
                 continue
 
         # update the next page token
         next_page_token = uploads.get('nextPageToken')
 
-        # if no more pages break the while loop
+        # if no more pages break the while loop, we're done
         if next_page_token is None:
             break
+
     return videos
 
 
