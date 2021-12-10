@@ -5,87 +5,70 @@ from wtforms.validators import ValidationError
 from app.models import Post, Channel
 
 
-def get_video_info(video_id, youtube, session=None):
-    try:
-        if session:
-            # we're working with a scopped session (in a thread)
-            query = session.query(Post).filter_by(video_id=video_id).first()
-        else:
-            # we're working within the app context
-            query = Post.query.filter_by(video_id=video_id).first()
-        if query:
-            # video is already posted
-            raise ValidationError('Video already posted')
+def validate_video(response, session=None):
+    video_id = response['id']
 
-        # the scope for YouTube API
-        part = ['status', 'snippet', 'contentDetails']
-        # construct the request for YouTube
-        req = youtube.videos().list(id=video_id, part=part)
-        # call YouTube API, get response (execute request)
-        res = req.execute()['items'][0]
+    if session:
+        # we're working with a scopped session (in a thread)
+        query = session.query(Post).filter_by(video_id=video_id).first()
+    else:
+        # we're working within the app context
+        query = Post.query.filter_by(video_id=video_id).first()
 
-        # if video is not public
-        if res['status']['privacyStatus'] != 'public':
-            raise ValidationError('Video is not public.')
+    if query:
+        raise ValidationError('Video already posted')
 
-        # if video is not embeddable (boolean value)
-        if not res['status']['embeddable']:
-            raise ValidationError('Video is not embeddable.')
+    if response['status']['privacyStatus'] != 'public':
+        raise ValidationError('Video is not public.')
 
-        # if video is geo-restricted (None if no region restrictions)
-        if res['contentDetails'].get('regionRestriction'):
-            raise ValidationError('Video is region restricted')
+    if not response['status']['embeddable']:
+        raise ValidationError('Video is not embeddable.')
 
-        # if text is NOT in English
-        text_language = res['snippet'].get('defaultLanguage')
-        if text_language and text_language != 'en':
-            raise ValidationError('Video\'s title/desc is not in English')
+    if response['contentDetails'].get('regionRestriction'):
+        raise ValidationError('Video is region restricted')
 
-        # if audio is NOT in English
-        audio_language = res['snippet'].get('defaultAudioLanguage')
-        if audio_language and audio_language != 'en':
-            raise ValidationError('Audio is not in English')
+    text_language = response['snippet'].get('defaultLanguage')
+    if text_language and text_language != 'en':
+        raise ValidationError('Video\'s title/desc is not in English')
 
-        # if the duration of the video is < 30 minutes
-        duration = convert_video_duration(res['contentDetails']['duration'])
-        if duration < 1800:
-            raise ValidationError(
-                'Video is too short. Minimum length 30 minutes.')
+    audio_language = response['snippet'].get('defaultAudioLanguage')
+    if audio_language and audio_language != 'en':
+        raise ValidationError('Audio is not in English')
 
-        # convert upload date into Python datetime object
-        upload_date = res['snippet']['publishedAt']
-        upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
+    duration = convert_video_duration(
+        response['contentDetails']['duration'])
+    if duration < 1800:
+        raise ValidationError(
+            'Video is too short. Minimum length 30 minutes.')
 
-        metadata = {'provider': 'YouTube',
-                    'video_id': res['id'],
-                    'channel_id': res['snippet']['channelId'],
-                    'title': res['snippet']['title'].split(' | ')[0],
-                    'thumbnails': res['snippet']['thumbnails'],
-                    'description': res['snippet']['description'],
-                    'tags': res['snippet']['tags'],
-                    'duration': duration,
-                    'upload_date': upload_date}
+    # convert upload date into Python datetime object
+    upload_date = response['snippet']['publishedAt']
+    upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
 
-        channel_id = metadata['channel_id']
+    metadata = {'provider': 'YouTube',
+                'video_id': video_id,
+                'channel_id': response['snippet']['channelId'],
+                'title': response['snippet']['title'].split(' | ')[0],
+                'thumbnails': response['snippet']['thumbnails'],
+                'description': response['snippet']['description'],
+                'tags': response['snippet']['tags'],
+                'duration': duration,
+                'upload_date': upload_date}
 
-        # check if this video belongs to a channel that is already in our db
-        if session:
-            channel = session.query(Channel).filter_by(
-                channel_id=channel_id).first()
-        else:
-            channel = Channel.query.filter_by(channel_id=channel_id).first()
+    channel_id = metadata['channel_id']
 
-        if channel:
-            # if so add the relationship to metadata
-            metadata['channel'] = channel
+    # check if this video belongs to a channel that is already in our db
+    if session:
+        channel = session.query(Channel).filter_by(
+            channel_id=channel_id).first()
+    else:
+        channel = Channel.query.filter_by(channel_id=channel_id).first()
 
-        return metadata
+    if channel:
+        # if so add the relationship to metadata
+        metadata['channel'] = channel
 
-    except ValidationError:
-        raise
-    except Exception:
-        # you would want to log this error
-        raise ValidationError('Unable to fetch the video.')
+    return metadata
 
 
 def get_channel_info(video_id, youtube, session=None):
@@ -121,7 +104,7 @@ def get_channel_info(video_id, youtube, session=None):
         raise ValidationError('Unable to fetch the channel info.')
 
 
-def get_playlist_videos(playlist_id, youtube, session=None):
+def get_playlist_videos(playlist_id, youtube_service, session=None):
     # videos epmty list and first page token is None
     videos, next_page_token = [], None
 
@@ -131,23 +114,31 @@ def get_playlist_videos(playlist_id, youtube, session=None):
             scope = {'playlistId': playlist_id, 'part': 'contentDetails',
                      'maxResults': 50, 'pageToken': next_page_token}
             # every time it loops it gets the next 50 videos
-            uploads = youtube.playlistItems().list(**scope).execute()
+            uploads = youtube_service.playlistItems().list(**scope).execute()
         except Exception as err:
             # unable to fetch the next 50 videos,
             # exit with what we got so far
             print(err.args)
-            return videos
+            break
+
+        # video ids
+        ids = [item['contentDetails']['videoId'] for item in uploads['items']]
+        # the scope
+        part = ['status', 'snippet', 'contentDetails']
+        # request for YouTube for detailed info about this batch of videos
+        req = youtube_service.videos().list(id=ids, part=part)
+        # response from YouTube
+        res = req.execute()
 
         # loop through this batch of videos
-        for video in uploads['items']:
+        for item in res['items']:
             try:
-                video_id = video['contentDetails']['videoId']
                 # this will raise exception
                 # if unable to fetch or already posted
-                video_info = get_video_info(
-                    video_id, youtube, session=session)
+                video_info = validate_video(item, session=session)
                 videos.append(video_info)
             except Exception:
+                # continue with this for loop
                 continue
 
         # update the next page token
