@@ -33,7 +33,7 @@ class Channel(db.Model):
     uploads_id = db.Column(db.String(30), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text, nullable=False)
+    description = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='channel', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
@@ -46,8 +46,8 @@ class Post(db.Model):
     channel_id = db.Column(db.String(30), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    tags = db.Column(db.PickleType, nullable=False)
+    description = db.Column(db.Text)
+    tags = db.Column(db.PickleType)
     duration = db.Column(db.Integer, nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
@@ -70,6 +70,7 @@ class Post(db.Model):
             'duration': self.duration,
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
+            'last_checked': dump_datetime(self.last_checked),
             'user_id': self.user_id,
             'channel_db_id': self.channel_db_id
         }

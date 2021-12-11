@@ -28,11 +28,11 @@ def validate_video(response, session=None):
         raise ValidationError('Video is region restricted')
 
     text_language = response['snippet'].get('defaultLanguage')
-    if text_language and text_language != 'en':
+    if text_language and text_language not in ['en', 'en-US']:
         raise ValidationError('Video\'s title/desc is not in English')
 
     audio_language = response['snippet'].get('defaultAudioLanguage')
-    if audio_language and audio_language != 'en':
+    if audio_language and audio_language not in ['en', 'en-US']:
         raise ValidationError('Audio is not in English')
 
     duration = convert_video_duration(
@@ -50,8 +50,8 @@ def validate_video(response, session=None):
                 'channel_id': response['snippet']['channelId'],
                 'title': response['snippet']['title'].split(' | ')[0],
                 'thumbnails': response['snippet']['thumbnails'],
-                'description': response['snippet']['description'],
-                'tags': response['snippet']['tags'],
+                'description': response['snippet'].get('description'),
+                'tags': response['snippet'].get('tags'),
                 'duration': duration,
                 'upload_date': upload_date}
 
