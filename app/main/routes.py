@@ -64,42 +64,45 @@ def cron():
         Session = scoped_session(session_factory)
         # create a session
         session = Session()
-        print('Querying channels...')
-        channels = session.query(Channel).all()
-        videos = []
-        print('Constructing YouTube API service...')
-        # construct youtube API service
-        with build('youtube', 'v3', developerKey=API_KEY) as youtube:
-            print('Constructed YouTube API service...')
-            print('Going through the channels...')
-            for channel in channels:
-                print(f'Processing a channel... "{channel.title}"')
-                channel_videos = get_playlist_videos(
-                    channel.uploads_id, youtube, session=session)
-                if channel.title == 'National Geographic':
-                    nat_geo_videos = []
-                    for video in channel_videos:
-                        if 'Full Episode' in video['title']:
-                            nat_geo_videos.append(video)
-                    videos += nat_geo_videos
-                else:
-                    videos += channel_videos
-                print(f'Channel "{channel.title}" processed...')
-        print(f'Fetched {len(videos)} in total...')
-        random.shuffle(videos)
-        print('Videos shuffled...')
-        print('Going through the videos...')
-        for video in videos:
-            post = Post(**video)
-            # add post to db
-            session.add(post)
-            print(f'Video "{post.title}" added to DB...')
-        # commit changes to DB
-        session.commit()
-        print('Changes to DB commited...')
-        # you must close the Session when you're finished!
-        Session.remove()
-        print('Done...')
+        try:
+            print('Querying channels...')
+            channels = session.query(Channel).all()
+            videos = []
+            print('Constructing YouTube API service...')
+            # construct youtube API service
+            with build('youtube', 'v3', developerKey=API_KEY) as youtube:
+                print('Constructed YouTube API service...')
+                print('Going through the channels...')
+                for channel in channels:
+                    print(f'Processing a channel... "{channel.title}"')
+                    channel_videos = get_playlist_videos(
+                        channel.uploads_id, youtube, session=session)
+                    if channel.title == 'National Geographic':
+                        nat_geo_videos = []
+                        for video in channel_videos:
+                            if 'Full Episode' in video['title']:
+                                nat_geo_videos.append(video)
+                        videos += nat_geo_videos
+                    else:
+                        videos += channel_videos
+                    print(f'Channel "{channel.title}" processed...')
+            print(f'Fetched {len(videos)} in total...')
+            random.shuffle(videos)
+            print('Videos shuffled...')
+            print('Going through the videos...')
+            for video in videos:
+                post = Post(**video)
+                # add post to db
+                session.add(post)
+                print(f'Video "{post.title}" added to DB...')
+            # commit changes to DB
+            session.commit()
+            print('Changes to DB commited...')
+            print(f'{len(videos)} posted.')
+            print('Done...')
+        finally:
+            # you must remove the Session when you're finished!
+            Session.remove()
 
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
         thread = threading.Thread(target=post_videos, name='YouTube')
