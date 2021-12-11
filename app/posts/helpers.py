@@ -2,10 +2,10 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
-from app.models import Post, Channel
+from app.models import Post, Playlist
 
 
-def validate_video(response, session=None):
+def validate_video(response, playlist_id=None, session=None):
     video_id = response['id']
 
     if session:
@@ -28,11 +28,11 @@ def validate_video(response, session=None):
         raise ValidationError('Video is region restricted')
 
     text_language = response['snippet'].get('defaultLanguage')
-    if text_language and text_language not in ['en', 'en-US']:
+    if text_language and text_language not in ['en', 'en-US', 'en-GB']:
         raise ValidationError('Video\'s title/desc is not in English')
 
     audio_language = response['snippet'].get('defaultAudioLanguage')
-    if audio_language and audio_language not in ['en', 'en-US']:
+    if audio_language and audio_language not in ['en', 'en-US', 'en-GB']:
         raise ValidationError('Audio is not in English')
 
     duration = convert_video_duration(
@@ -47,7 +47,7 @@ def validate_video(response, session=None):
 
     metadata = {'provider': 'YouTube',
                 'video_id': video_id,
-                'channel_id': response['snippet']['channelId'],
+                'playlist_id': playlist_id,
                 'title': response['snippet']['title'].split(' | ')[0],
                 'thumbnails': response['snippet']['thumbnails'],
                 'description': response['snippet'].get('description'),
@@ -55,52 +55,45 @@ def validate_video(response, session=None):
                 'duration': duration,
                 'upload_date': upload_date}
 
-    # check if this video belongs to a channel that is already in our db
+    # check if this video belongs to a playlist that is already in our db
     if session:
-        channel = session.query(Channel).filter_by(
-            channel_id=metadata['channel_id']).first()
+        playlist = session.query(Playlist).filter_by(
+            playlist_id=playlist_id).first()
     else:
-        channel = Channel.query.filter_by(
-            channel_id=metadata['channel_id']).first()
+        playlist = Playlist.query.filter_by(
+            playlist_id=playlist_id).first()
 
-    if channel:
+    if playlist:
         # if so add the relationship to metadata
-        metadata['channel'] = channel
+        metadata['playlist'] = playlist
 
     return metadata
 
 
-def get_channel_info(video_id, youtube, session=None):
+def get_playlist_info(playlist_id, youtube, session=None):
+
+    if session:
+        playlist = session.query(Playlist).filter_by(
+            playlist_id=playlist_id).first()
+    else:
+        playlist = Playlist.query.filter_by(playlist_id=playlist_id).first()
+
+    if playlist:
+        raise ValidationError('Playlist already in the database')
+
     try:
-        req = youtube.videos().list(id=video_id, part='snippet')
-        res = req.execute()['items'][0]
-        channel_id = res['snippet']['channelId']
+        scope = {'id': playlist_id, 'part': 'snippet'}
+        res = youtube.playlists().list(**scope).execute()['items'][0]
 
-        if session:
-            query = session.query(Channel).filter_by(
-                channel_id=channel_id).first()
-        else:
-            query = Channel.query.filter_by(channel_id=channel_id).first()
+        # get playtlists' details
 
-        if query:
-            # the channel is already in our db
-            raise ValidationError('Channel already in the database')
-
-        # get channel's details
-        part = ['snippet', 'contentDetails']
-        req = youtube.channels().list(id=channel_id, part=part)
-        res = req.execute()['items'][0]
-
-        return {'channel_id': channel_id,
-                'uploads_id': res['contentDetails']['relatedPlaylists']['uploads'],
+        return {'playlist_id': playlist_id,
                 'title': res['snippet']['title'],
                 'thumbnails': res['snippet']['thumbnails'],
                 'description': res['snippet']['description']}
-    except ValidationError:
-        raise
     except Exception:
         # you would want to log this error
-        raise ValidationError('Unable to fetch the channel info.')
+        raise ValidationError('Unable to fetch the playlist.')
 
 
 def get_playlist_videos(playlist_id, youtube_service, session=None):
@@ -134,7 +127,8 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
             try:
                 # this will raise exception
                 # if invalid or already posted
-                video_info = validate_video(item, session=session)
+                video_info = validate_video(
+                    item, playlist_id=playlist_id, session=session)
                 videos.append(video_info)
             except ValidationError:
                 # video not validated

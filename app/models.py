@@ -27,15 +27,14 @@ class User(db.Model, UserMixin):
         return False
 
 
-class Channel(db.Model):
+class Playlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    channel_id = db.Column(db.String(30), unique=True, nullable=False)
-    uploads_id = db.Column(db.String(30), unique=True, nullable=False)
+    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='channel', lazy=True)
+    posts = db.relationship('Post', backref='playlist', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
 
@@ -53,7 +52,7 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    channel_db_id = db.Column(db.Integer, db.ForeignKey(Channel.id))
+    playlist_db_id = db.Column(db.Integer, db.ForeignKey(Playlist.id))
 
     @property
     def serialize(self):
