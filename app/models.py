@@ -64,7 +64,7 @@ class Post(db.Model):
             'id': self.id,
             'provider': self.provider,
             'video_id': self.video_id,
-            'playlist_id': self.channel_id,
+            'playlist_id': self.playlist_id,
             'title': self.title,
             'thumbnails': self.thumbnails,
             'description': self.description,
@@ -74,5 +74,5 @@ class Post(db.Model):
             'date_posted': dump_datetime(self.date_posted),
             'last_checked': dump_datetime(self.last_checked),
             'user_id': self.user_id,
-            'channel_db_id': self.channel_db_id
+            'playlist_db_id': self.playlist_db_id
         }

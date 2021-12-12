@@ -2,22 +2,10 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
-from app.models import Post, Playlist
+from app.models import Playlist
 
 
 def validate_video(response, playlist_id=None, session=None):
-    video_id = response['id']
-
-    if session:
-        # we're working with a scopped session (in a thread)
-        query = session.query(Post).filter_by(video_id=video_id).first()
-    else:
-        # we're working within the app context
-        query = Post.query.filter_by(video_id=video_id).first()
-
-    if query:
-        raise ValidationError('Video already posted')
-
     if response['status']['privacyStatus'] != 'public':
         raise ValidationError('Video is not public.')
 
@@ -46,7 +34,7 @@ def validate_video(response, playlist_id=None, session=None):
     upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
 
     metadata = {'provider': 'YouTube',
-                'video_id': video_id,
+                'video_id': response['id'],
                 'playlist_id': playlist_id,
                 'title': response['snippet']['title'].split(' | ')[0],
                 'thumbnails': response['snippet']['thumbnails'],
@@ -70,23 +58,14 @@ def validate_video(response, playlist_id=None, session=None):
     return metadata
 
 
-def validate_playlist(playlist_id, youtube, session=None):
-
-    if session:
-        playlist = session.query(Playlist).filter_by(
-            playlist_id=playlist_id).first()
-    else:
-        playlist = Playlist.query.filter_by(playlist_id=playlist_id).first()
-
-    if playlist:
-        raise ValidationError('Playlist already in the database')
-
+def validate_playlist(playlist_id, youtube):
     try:
         scope = {'id': playlist_id, 'part': 'snippet'}
         res = youtube.playlists().list(**scope).execute()['items'][0]
 
         channel_id = res['snippet']['channelId']
-        ch = youtube.channels().list(id=channel_id, part='snippet').execute()
+        scope = {'id': channel_id, 'part': 'snippet'}
+        ch = youtube.channels().list(**scope).execute()['items'][0]
 
         return {'playlist_id': playlist_id,
                 'channel_id': channel_id,

@@ -3,7 +3,7 @@ from googleapiclient.discovery import build
 from flask import render_template, request, redirect, current_app
 from flask import url_for, Blueprint, jsonify, make_response
 from flask_login import login_required
-from app.models import Post, Channel
+from app.models import Post, Playlist
 from app.helpers import admin_required
 from app.posts.helpers import get_playlist_videos
 import threading
@@ -65,39 +65,31 @@ def cron():
         # create a session
         session = Session()
         try:
-            print('Querying channels...')
-            channels = session.query(Channel).all()
+            print('Querying playlists...')
+            playlists = session.query(Playlist).all()
             videos = []
             print('Constructing YouTube API service...')
             # construct youtube API service
             with build('youtube', 'v3', developerKey=API_KEY) as youtube:
                 print('Constructed YouTube API service...')
-                print('Going through the channels...')
-                for channel in channels:
-                    print(f'Processing a channel... "{channel.title}"')
-                    channel_videos = get_playlist_videos(
-                        channel.uploads_id, youtube, session=session)
-                    if channel.title == 'National Geographic':
-                        nat_geo_videos = []
-                        for video in channel_videos:
-                            if 'Full Episode' in video['title']:
-                                nat_geo_videos.append(video)
-                        videos += nat_geo_videos
-                    else:
-                        videos += channel_videos
-                    print(f'Channel "{channel.title}" processed...')
+                print('Going through the playlists...')
+                for playlist in playlists:
+                    print(f'Processing a playlist... "{playlist.title}"')
+                    playlist_videos = get_playlist_videos(
+                        playlist.playlist_id, youtube, session=session)
+                    videos += playlist_videos
+                    print(f'Channel "{playlist.title}" processed...')
             print(f'Fetched {len(videos)} in total...')
             random.shuffle(videos)
             print('Videos shuffled...')
             print('Going through the videos...')
             for video in videos:
-                post = Post(**video)
-                # add post to db
-                session.add(post)
-                print(f'Video "{post.title}" added to DB...')
-            # commit changes to DB
-            session.commit()
-            print('Changes to DB commited...')
+                # check if vthe video is already posted
+                if not session.query(Post).filter_by(video_id=video['video_id']).first():
+                    post = Post(**video)
+                    session.add(post)
+                    session.commit()
+                    print(f'Video "{post.title}" added to DB...')
             print(f'{len(videos)} posted.')
             print('Done...')
         finally:

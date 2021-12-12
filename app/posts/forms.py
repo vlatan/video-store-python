@@ -2,6 +2,7 @@ from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
+from app.models import Post, Playlist
 from app.posts.helpers import parse_video, validate_video
 from app.posts.helpers import parse_playlist, validate_playlist
 from googleapiclient.discovery import build
@@ -15,6 +16,11 @@ class PostForm(FlaskForm):
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
         video_id = parse_video(content.data)
+
+        # check if the video is already posted
+        if Post.query.filter_by(video_id=video_id).first():
+            raise ValidationError('Video already posted')
+
         # construct youtube API service
         api_key = current_app.config['YOUTUBE_API_KEY']
         with build('youtube', 'v3', developerKey=api_key) as youtube:
@@ -25,8 +31,7 @@ class PostForm(FlaskForm):
             # call YouTube API, get response (execute request)
             res = req.execute()['items'][0]
             try:
-                # this will raise exception
-                # if unable to fetch or already posted
+                # this will raise exception if unable to fetch
                 video_info = validate_video(res)
             except ValidationError:
                 raise
@@ -45,12 +50,16 @@ class PlaylistForm(FlaskForm):
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
         playlist_id = parse_playlist(content.data)
+
+        # check if the playlits is already posted
+        if Playlist.query.filter_by(playlist_id=playlist_id).first():
+            raise ValidationError('Playlist already in the database')
+
         # construct youtube API service
         api_key = current_app.config['YOUTUBE_API_KEY']
         with build('youtube', 'v3', developerKey=api_key) as youtube:
             # get the channel metadata
             # this will raise ValidationError if unable to fetch data
-            # or if the channel is already in the database
             playlist_info = validate_playlist(playlist_id, youtube)
         # transform the form data
         content.data = playlist_info
