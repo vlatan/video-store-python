@@ -2,32 +2,36 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
+from googleapiclient.errors import HttpError
 from app.models import Playlist
 
 
 def validate_video(response, playlist_id=None, session=None):
     if response['status']['privacyStatus'] != 'public':
-        raise ValidationError('Video is not public.')
+        raise ValidationError('This video is not public.')
+
+    if not response['status']['madeForKids']:
+        raise ValidationError('This video is age-restricted.')
 
     if not response['status']['embeddable']:
-        raise ValidationError('Video is not embeddable.')
+        raise ValidationError('This video is not embeddable.')
 
     if response['contentDetails'].get('regionRestriction'):
-        raise ValidationError('Video is region restricted')
+        raise ValidationError('This video is region-restricted')
 
     text_language = response['snippet'].get('defaultLanguage')
     if text_language and text_language not in ['en', 'en-US', 'en-GB']:
-        raise ValidationError('Video\'s title/desc is not in English')
+        raise ValidationError('This video\'s title/desc is not in English')
 
     audio_language = response['snippet'].get('defaultAudioLanguage')
     if audio_language and audio_language not in ['en', 'en-US', 'en-GB']:
-        raise ValidationError('Audio is not in English')
+        raise ValidationError('This video\'s audio is not in English')
 
     duration = convert_video_duration(
         response['contentDetails']['duration'])
     if duration < 1800:
         raise ValidationError(
-            'Video is too short. Minimum length 30 minutes.')
+            'This video is too short. Minimum length 30 minutes.')
 
     # convert upload date into Python datetime object
     upload_date = response['snippet']['publishedAt']
@@ -43,19 +47,16 @@ def validate_video(response, playlist_id=None, session=None):
                 'duration': duration,
                 'upload_date': upload_date}
 
-    # check if this video belongs to a playlist that is already in our db
+    return metadata
+
+
+def lookup_playlist(playlist_id, session=None):
     if session:
         playlist = session.query(Playlist).filter_by(
             playlist_id=playlist_id).first()
     else:
-        playlist = Playlist.query.filter_by(
-            playlist_id=playlist_id).first()
-
-    if playlist:
-        # if so add the relationship to metadata
-        metadata['playlist'] = playlist
-
-    return metadata
+        playlist = Playlist.query.filter_by(playlist_id=playlist_id).first()
+    return playlist
 
 
 def validate_playlist(playlist_id, youtube):
@@ -73,8 +74,10 @@ def validate_playlist(playlist_id, youtube):
                 'thumbnails': res['snippet']['thumbnails'],
                 'channel_thumbnails': ch['snippet']['thumbnails'],
                 'description': res['snippet'].get('description')}
-    except Exception:
-        # you would want to log this error
+
+    # could not connect to YT API (HttpError)
+    # or the playlist doesn't exist (IndexError)
+    except (HttpError, IndexError):
         raise ValidationError('Unable to fetch the playlist.')
 
 
@@ -97,20 +100,25 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
                      'part': ['status', 'snippet', 'contentDetails']}
             # response from YouTube
             res = youtube_service.videos().list(**scope).execute()
-        except Exception:
-            # unable to fetch this batch,
-            # thus next_page_token is unavailable
-            # so we're unable to proceed
-            # log this error
+        except HttpError:
+            # failed to connect to YT API
+            # we abandon further operation
+            # because we don't have the next token
             break
 
         # loop through this batch of videos
+        # if there are no videos res['items'] will be empty list
         for item in res['items']:
             try:
-                # this will raise exception
-                # if invalid or already posted
+                # this will raise exception if video's invalid
                 video_info = validate_video(
                     item, playlist_id=playlist_id, session=session)
+                # lookup playlist in our db
+                playlist = lookup_playlist(playlist_id, session=session)
+                # if it exists
+                if playlist:
+                    # add this relationship to the video metadata
+                    video_info['playlist'] = playlist
                 videos.append(video_info)
             except ValidationError:
                 # video not validated
