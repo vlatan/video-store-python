@@ -70,7 +70,7 @@ def validate_video(response, playlist_id=None, session=None):
     return metadata
 
 
-def get_playlist_info(playlist_id, youtube, session=None):
+def validate_playlist(playlist_id, youtube, session=None):
 
     if session:
         playlist = session.query(Playlist).filter_by(
@@ -85,12 +85,15 @@ def get_playlist_info(playlist_id, youtube, session=None):
         scope = {'id': playlist_id, 'part': 'snippet'}
         res = youtube.playlists().list(**scope).execute()['items'][0]
 
-        # get playtlists' details
+        channel_id = res['snippet']['channelId']
+        ch = youtube.channels().list(id=channel_id, part='snippet').execute()
 
         return {'playlist_id': playlist_id,
+                'channel_id': channel_id,
                 'title': res['snippet']['title'],
                 'thumbnails': res['snippet']['thumbnails'],
-                'description': res['snippet']['description']}
+                'channel_thumbnails': ch['snippet']['thumbnails'],
+                'description': res['snippet'].get('description')}
     except Exception:
         # you would want to log this error
         raise ValidationError('Unable to fetch the playlist.')
@@ -145,20 +148,26 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
     return videos
 
 
-def get_video_id(url):
-    # Examples:
-    # - https://youtu.be/SA2iWivDJiE
-    # - https://www.youtube.com/watch?v=_oPAwA_Udwc&feature=feedu
-    # - https://www.youtube.com/embed/SA2iWivDJiE
-    # - https://vimeo.com/534502421
-    query = urlparse(url)
-    if query.hostname == 'youtu.be':
-        return query.path[1:]
-    elif query.hostname in {'www.youtube.com', 'youtube.com'}:
-        if query.path == '/watch':
-            return parse_qs(query.query)['v'][0]
-        elif query.path[:7] == '/embed/':
-            return query.path.split('/')[2]
+def parse_video(url):
+    parsed = urlparse(url)
+    if parsed.hostname == 'youtu.be':
+        return parsed.path[1:]
+    elif parsed.hostname in {'www.youtube.com', 'youtube.com'}:
+        if parsed.path == '/watch':
+            query = parse_qs(parsed.query).get('v')
+            if query:
+                return query[0]
+        elif parsed.path[:7] == '/embed/':
+            return parsed.path.split('/')[2]
+    raise ValidationError('Unable to parse the URL')
+
+
+def parse_playlist(url):
+    parsed = urlparse(url)
+    query = parse_qs(parsed.query).get('list')
+    if query:
+        return query[0]
+    raise ValidationError('Unable to parse the URL')
 
 
 def convert_video_duration(duration):

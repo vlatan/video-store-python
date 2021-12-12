@@ -3,8 +3,8 @@ from flask import redirect, abort, Blueprint, current_app
 from flask_login import current_user, login_required
 from app import db
 from app.helpers import admin_required
-from app.models import Post, Channel
-from app.posts.forms import PostForm, ChannelForm
+from app.models import Post, Playlist
+from app.posts.forms import PostForm, PlaylistForm
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 
@@ -59,45 +59,43 @@ def new_post():
                            form=form, legend='New Post')
 
 
-@posts.route('/channel/new/', methods=['GET', 'POST'])
+@posts.route('/playlist/new/', methods=['GET', 'POST'])
 @login_required
 @admin_required
-def new_channel():
-    form = ChannelForm()
+def new_playlist():
+    form = PlaylistForm()
     # the form will not validate if the channel is already in the database,
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
-        channel = Channel(**form.content.data, channel_author=current_user)
+        playlist = Playlist(**form.content.data, playlist_poster=current_user)
 
-        # check if there are videos alrady posted from this channel
-        channel_id = form.content.data['channel_id']
-        videos = Post.query.filter_by(channel_id=channel_id).all()
+        # check if there are videos alrady posted from this playlist
+        playlist_id = form.content.data['playlist_id']
+        videos = Post.query.filter_by(playlist_id=playlist_id).all()
         if videos:
             for video in videos:
                 # if so add the relationship
-                video.channel = channel
+                video.playlist = playlist
 
         # add to db
-        db.session.add(channel)
+        db.session.add(playlist)
         db.session.commit()
 
-        flash('Your channel has been added to the database!', 'success')
-        return redirect(url_for('posts.channels'))
+        flash('Playlist has been added to the database!', 'success')
+        return redirect(url_for('posts.playlists'))
 
-    return render_template('add_channel.html', title='New Channel',
-                           form=form, legend='New Channel')
+    return render_template('add_playlist.html', title='New Playlist',
+                           form=form, legend='New Playlist')
 
 
-@posts.route('/channels')
-def channels():
+@posts.route('/playlists')
+def playlists():
     """ Route to return the channels """
-
-    # Query the Channel table
-    channels = Channel.query.order_by(Channel.id.desc())
-
-    return render_template('channels.html', posts=channels, title='Channels')
+    # Query the Playlist table
+    playlists = Playlist.query.order_by(Playlist.id.desc())
+    return render_template('playlists.html', posts=playlists, title='Playlists')
 
 
 @posts.route('/post/<int:post_id>/delete', methods=['POST'])

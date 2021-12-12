@@ -1,4 +1,4 @@
-.channels-content {
+.playlists-content {
     display: grid;
     grid-template-columns: repeat(5, minmax(88px, 240px));
     /* grid-template-rows: repeat(auto, 1fr); */
@@ -6,7 +6,7 @@
     gap: var(--content-padding);
 }
 
-a.channel-link {
+a.playlist-link {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -18,7 +18,7 @@ img.channel-img {
     height: auto;
 }
 
-h2.channel-title {
+h2.playlist-title {
     font-size: .9rem;
     /* font-weight: 500; */
     color: black;

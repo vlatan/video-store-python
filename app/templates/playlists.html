@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/playlists.css') }}">
+{% endblock css %}
+
+{% block title %}
+<title>{{ title }}</title>
+{% endblock title %}
+
+{% block content %}
+
+<!-- div to contain the content -->
+<div class="playlists-content">
+
+    {% for post in posts %}
+
+    <a class="playlist-link" href="#">
+        <img class="channel-img" src="{{ post.channel_thumbnails['medium']['url'] }}"
+            width="{{ post.channel_thumbnails['medium']['width'] }}"
+            height="{{ post.channel_thumbnails['medium']['height'] }}" alt="{{ post.title }}">
+        <h2 class="playlist-title">{{ post.title }}</h2>
+    </a>
+
+    {% endfor %}
+
+</div>
+
+{% endblock content %}

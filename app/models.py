@@ -16,8 +16,9 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(120), nullable=False)
     picture = db.Column(db.String(256), nullable=False)
-    posts = db.relationship('Post', backref='post_author', lazy=True)
-    channels = db.relationship('Channel', backref='channel_author', lazy=True)
+    posts = db.relationship('Post', backref='video_poster', lazy=True)
+    playlists = db.relationship(
+        'Playlist', backref='playlist_poster', lazy=True)
 
     @property
     def is_admin(self):
@@ -30,8 +31,10 @@ class User(db.Model, UserMixin):
 class Playlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.String(50), unique=True, nullable=False)
+    channel_id = db.Column(db.String(50), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
+    channel_thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='playlist', lazy=True)
@@ -42,7 +45,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
     video_id = db.Column(db.String(20), unique=True, nullable=False)
-    channel_id = db.Column(db.String(30), nullable=False)
+    playlist_id = db.Column(db.String(50), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
@@ -61,7 +64,7 @@ class Post(db.Model):
             'id': self.id,
             'provider': self.provider,
             'video_id': self.video_id,
-            'channel_id': self.channel_id,
+            'playlist_id': self.channel_id,
             'title': self.title,
             'thumbnails': self.thumbnails,
             'description': self.description,
