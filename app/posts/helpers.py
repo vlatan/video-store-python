@@ -10,7 +10,8 @@ def validate_video(response, playlist_id=None, session=None):
     if response['status']['privacyStatus'] != 'public':
         raise ValidationError('This video is not public.')
 
-    if not response['status']['madeForKids']:
+    rating = response['contentDetails'].get('contentRating')
+    if rating and rating.get('ytRating') == 'ytAgeRestricted':
         raise ValidationError('This video is age-restricted.')
 
     if not response['status']['embeddable']:
