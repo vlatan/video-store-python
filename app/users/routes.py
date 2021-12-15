@@ -112,7 +112,7 @@ def logout():
     logout_user()
     login_needed = [url_for('users.account', _external=True),
                     url_for('posts.new_post', _external=True),
-                    url_for('posts.new_channel', _external=True)]
+                    url_for('posts.new_playlist', _external=True)]
     referrer = request.referrer
     if referrer in login_needed:
         return redirect(url_for('main.home'))
