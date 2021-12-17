@@ -18,6 +18,12 @@
 	</div>
 	<div class="metadata">
 		<h1 class="video-title">{{ post.title }}</h1>
+		<div class="video-description">
+			{{ post.description[:200] }}...
+		</div>
+		<div class="video-duration">
+			Duration: {{ duration }}
+		</div>
 	</div>
 </article>
 

@@ -7,7 +7,7 @@ from app import db
 from app.helpers import admin_required
 from app.models import Post, Playlist
 from app.posts.forms import PostForm, PlaylistForm
-from app.posts.helpers import validate_video, lookup_playlist
+from app.posts.helpers import validate_video, lookup_playlist, convertDuration
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 
@@ -45,7 +45,11 @@ def post(post_id):
                 pass
 
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
-    return render_template('post.html', post=post, thumb=thumb['url'])
+    duration = convertDuration(post.duration)
+    return render_template('post.html',
+                           post=post,
+                           thumb=thumb['url'],
+                           duration=duration.human)
 
 
 @posts.route('/post/new/', methods=['GET', 'POST'])
@@ -58,7 +62,7 @@ def new_post():
     if form.validate_on_submit():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(**form.content.data, post_author=current_user)
+        post = Post(**form.content.data, video_poster=current_user)
 
         # lookup playlist in our db
         playlist = lookup_playlist(post.playlist_id)

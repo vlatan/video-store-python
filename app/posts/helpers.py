@@ -28,9 +28,8 @@ def validate_video(response, playlist_id=None, session=None):
     if audio_language and audio_language not in ['en', 'en-US', 'en-GB']:
         raise ValidationError('This video\'s audio is not in English')
 
-    duration = convert_video_duration(
-        response['contentDetails']['duration'])
-    if duration < 1800:
+    duration = convertDuration(response['contentDetails']['duration'])
+    if duration.seconds < 1800:
         raise ValidationError(
             'This video is too short. Minimum length 30 minutes.')
 
@@ -45,7 +44,7 @@ def validate_video(response, playlist_id=None, session=None):
                 'thumbnails': response['snippet']['thumbnails'],
                 'description': response['snippet'].get('description'),
                 'tags': response['snippet'].get('tags'),
-                'duration': duration,
+                'duration': response['contentDetails']['duration'],
                 'upload_date': upload_date}
 
     return metadata
@@ -158,13 +157,29 @@ def parse_playlist(url):
     raise ValidationError('Unable to parse the URL')
 
 
-def convert_video_duration(duration):
-    hours = re.compile(r'(\d+)H').search(duration)
-    minutes = re.compile(r'(\d+)M').search(duration)
-    seconds = re.compile(r'(\d+)S').search(duration)
+class convertDuration(object):
+    def __init__(self, iso_duration):
+        self.iso = iso_duration
 
-    h = int(hours.group(1)) if hours else 0
-    m = int(minutes.group(1)) if minutes else 0
-    s = int(seconds.group(1)) if seconds else 0
+    def _compile(self):
+        hours = re.compile(r'(\d+)H').search(self.iso)
+        minutes = re.compile(r'(\d+)M').search(self.iso)
+        seconds = re.compile(r'(\d+)S').search(self.iso)
 
-    return (h * 3600) + (m * 60) + s
+        h = int(hours.group(1)) if hours else 0
+        m = int(minutes.group(1)) if minutes else 0
+        s = int(seconds.group(1)) if seconds else 0
+
+        return {'h': h, 'm': m, 's': s}
+
+    @property
+    def seconds(self):
+        d = self._compile()
+        return (d['h'] * 3600) + (d['m'] * 60) + d['s']
+
+    @property
+    def human(self):
+        d = self._compile()
+        h = f"{d['h']:02d}:" if d['h'] else ''
+        m, s = f"{d['m']:02d}", f":{d['s']:02d}"
+        return h + m + s
