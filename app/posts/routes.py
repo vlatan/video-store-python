@@ -7,7 +7,7 @@ from app import db
 from app.helpers import admin_required
 from app.models import Post, Playlist
 from app.posts.forms import PostForm, PlaylistForm
-from app.posts.helpers import validate_video, lookup_playlist, convertDuration
+from app.posts.helpers import validate_video, convertDuration
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 
@@ -52,7 +52,7 @@ def post(post_id):
                            duration=duration.human)
 
 
-@posts.route('/post/new/', methods=['GET', 'POST'])
+@posts.route('/post/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def new_post():
@@ -63,13 +63,6 @@ def new_post():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.content.data, video_poster=current_user)
-
-        # lookup playlist in our db
-        playlist = lookup_playlist(post.playlist_id)
-        # if it exists
-        if playlist:
-            # add this relationship to the video
-            post.playlist = playlist
 
         # add to db
         db.session.add(post)
@@ -82,7 +75,7 @@ def new_post():
                            form=form, legend='New Post')
 
 
-@posts.route('/playlist/new/', methods=['GET', 'POST'])
+@posts.route('/playlist/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def new_playlist():
@@ -93,14 +86,6 @@ def new_playlist():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
         playlist = Playlist(**form.content.data, playlist_poster=current_user)
-
-        # check if there are videos alrady posted from this playlist
-        playlist_id = form.content.data['playlist_id']
-        videos = Post.query.filter_by(playlist_id=playlist_id).all()
-        if videos:
-            for video in videos:
-                # if so add the relationship
-                video.playlist = playlist
 
         # add to db
         db.session.add(playlist)

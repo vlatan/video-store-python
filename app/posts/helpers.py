@@ -6,7 +6,7 @@ from googleapiclient.errors import HttpError
 from app.models import Playlist
 
 
-def validate_video(response, playlist_id=None, session=None):
+def validate_video(response, playlist_id=None):
     if response['status']['privacyStatus'] != 'public':
         raise ValidationError('This video is not public.')
 
@@ -50,15 +50,6 @@ def validate_video(response, playlist_id=None, session=None):
     return metadata
 
 
-def lookup_playlist(playlist_id, session=None):
-    if session:
-        playlist = session.query(Playlist).filter_by(
-            playlist_id=playlist_id).first()
-    else:
-        playlist = Playlist.query.filter_by(playlist_id=playlist_id).first()
-    return playlist
-
-
 def validate_playlist(playlist_id, youtube):
     try:
         scope = {'id': playlist_id, 'part': 'snippet'}
@@ -81,7 +72,7 @@ def validate_playlist(playlist_id, youtube):
         raise ValidationError('Unable to fetch the playlist.')
 
 
-def get_playlist_videos(playlist_id, youtube_service, session=None):
+def get_playlist_videos(playlist_id, youtube, session):
     # videos epmty list and first page token is None
     videos, next_page_token = [], None
 
@@ -92,14 +83,14 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
             scope = {'playlistId': playlist_id, 'part': 'contentDetails',
                      'maxResults': 50, 'pageToken': next_page_token}
             # every time it loops it gets the next 50 videos
-            uploads = youtube_service.playlistItems().list(**scope).execute()
+            uploads = youtube.playlistItems().list(**scope).execute()
 
             # scope for detalied info about each video in this batch
             scope = {'id': [item['contentDetails']['videoId']
                             for item in uploads['items']],
                      'part': ['status', 'snippet', 'contentDetails']}
             # response from YouTube
-            res = youtube_service.videos().list(**scope).execute()
+            res = youtube.videos().list(**scope).execute()
         except HttpError:
             # failed to connect to YT API
             # we abandon further operation
@@ -110,15 +101,8 @@ def get_playlist_videos(playlist_id, youtube_service, session=None):
         # if there are no videos res['items'] will be empty list
         for item in res['items']:
             try:
-                # this will raise exception if video's invalid
-                video_info = validate_video(
-                    item, playlist_id=playlist_id, session=session)
-                # lookup playlist in our db
-                playlist = lookup_playlist(playlist_id, session=session)
-                # if it exists
-                if playlist:
-                    # add this relationship to the video metadata
-                    video_info['playlist'] = playlist
+                # this will raise ValidationError if video's invalid
+                video_info = validate_video(item, playlist_id=playlist_id)
                 videos.append(video_info)
             except ValidationError:
                 # video not validated

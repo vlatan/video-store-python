@@ -77,6 +77,8 @@ def cron():
                     print(f'Processing a playlist... "{playlist.title}"')
                     playlist_videos = get_playlist_videos(
                         playlist.playlist_id, youtube, session=session)
+                    for video in playlist_videos:
+                        video['playlist'] = playlist
                     videos += playlist_videos
                     print(f'Channel "{playlist.title}" processed...')
             print(f'Fetched {len(videos)} in total...')
@@ -84,10 +86,24 @@ def cron():
             print('Videos shuffled...')
             print('Going through the videos...')
             for video in videos:
-                # check if vthe video is already posted
-                if not session.query(Post).filter_by(video_id=video['video_id']).first():
+                posted = session.query(Post).filter_by(
+                    video_id=video['video_id']).first()
+                # if video is posted
+                if posted:
+                    # if it doesn't have playlist id
+                    if not posted.playlist_id:
+                        # add playlist id
+                        posted.playlist_id = video['playlist_id']
+                        # asscoiate with existing playlist in our db
+                        posted.playlist = video['playlist']
+                        # commit
+                        session.commit()
+                else:
+                    # create model object
                     post = Post(**video)
+                    # addto database
                     session.add(post)
+                    # commit
                     session.commit()
                     print(f'Video "{post.title}" added to DB...')
             print(f'{len(videos)} posted.')
