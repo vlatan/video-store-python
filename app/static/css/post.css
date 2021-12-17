@@ -56,12 +56,20 @@
 }
 
 .metadata {
-    background-color: var(--main-color);
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-padding);
+    /* background-color: var(--main-color); */
     border: 1px solid rgb(200, 200, 200);
+    box-shadow: 5px 5px 5px 2px rgb(224, 224, 224);
     border-radius: 1rem;
     padding: var(--content-padding);
 }
 
 .video-title {
     font-size: 1.5rem;
+}
+
+.video-description {
+    line-height: 1.5;
 }
