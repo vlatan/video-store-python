@@ -28,9 +28,8 @@ def create_app(config_class=Config):
     app.register_blueprint(main)
     app.register_blueprint(errors)
 
-    # when you want to create the tables for the first time
+    # create tables if non-existent
     with app.app_context():
-        # pass
         db.create_all()
 
     return app
