@@ -10,6 +10,7 @@ from app.posts.forms import PostForm, PlaylistForm
 from app.posts.helpers import validate_video, convertDuration
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
+import re
 
 posts = Blueprint('posts', __name__)
 
@@ -46,10 +47,12 @@ def post(post_id):
 
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
     duration = convertDuration(post.duration)
+    description = re.sub(r'http\S+', '', post.description, flags=re.MULTILINE)
     return render_template('post.html',
                            post=post,
                            thumb=thumb['url'],
-                           duration=duration.human)
+                           duration=duration.human,
+                           description=description)
 
 
 @posts.route('/post/new', methods=['GET', 'POST'])
