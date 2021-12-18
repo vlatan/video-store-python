@@ -20,6 +20,10 @@ html, button, input {
     font-family: var(--main-font-family);
 }
 
+body {
+    min-height: 100vh;
+}
+
 ul, li {
     list-style: none;
 }
@@ -83,7 +87,6 @@ a.nav-item.username {
     border-radius: 50%;
 }
 
-.sidebar {
-    border-left: 5px solid var(--main-color);
-    padding-left: var(--content-padding);
-}
+/* .content-wrap {
+    min-height: 100%;
+} */

@@ -47,7 +47,7 @@ def post(post_id):
 
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
     duration = convertDuration(post.duration)
-    description = re.sub(r'http\S+', '', post.description, flags=re.MULTILINE)
+    description = re.sub(r'http\S+', '', post.description)
     return render_template('post.html',
                            post=post,
                            thumb=thumb['url'],
@@ -74,8 +74,8 @@ def new_post():
         flash('Your post has been created!', 'success')
         return redirect(url_for('main.home'))
 
-    return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
+    return render_template('form.html', title='Suggest Documentary',
+                           form=form, legend='Suggest Documentary')
 
 
 @posts.route('/playlist/new', methods=['GET', 'POST'])
@@ -97,8 +97,8 @@ def new_playlist():
         flash('Playlist has been added to the database!', 'success')
         return redirect(url_for('posts.playlists'))
 
-    return render_template('add_playlist.html', title='New Playlist',
-                           form=form, legend='New Playlist')
+    return render_template('form.html', title='Suggest Playlist',
+                           form=form, legend='Suggest YouTube Playlist')
 
 
 @posts.route('/playlists')

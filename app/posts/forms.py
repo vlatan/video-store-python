@@ -10,9 +10,9 @@ from googleapiclient.discovery import build
 
 
 class PostForm(FlaskForm):
-    content = StringField('Post YouTube video URL',
+    content = StringField('Post YouTube Video URL',
                           validators=[DataRequired(), URL()])
-    submit = SubmitField('Post')
+    submit = SubmitField('Submit')
 
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
@@ -49,7 +49,7 @@ class PostForm(FlaskForm):
 class PlaylistForm(FlaskForm):
     content = StringField('Post YouTube Playlist URL',
                           validators=[DataRequired(), URL()])
-    submit = SubmitField('Post')
+    submit = SubmitField('Submit')
 
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
