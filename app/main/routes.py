@@ -60,32 +60,35 @@ def cron():
     session_factory = sessionmaker(bind=engine)
 
     def post_videos():
+
         # all calls to Session() will create a thread-local session
         Session = scoped_session(session_factory)
         # create a session
         session = Session()
+
         try:
-            print('Querying playlists...')
-            playlists = session.query(Playlist).all()
-            videos = []
-            print('Constructing YouTube API service...')
+            # get all playlists from db
+            playlists, all_videos = session.query(Playlist).all(), []
             # construct youtube API service
             with build('youtube', 'v3', developerKey=API_KEY) as youtube:
-                print('Constructed YouTube API service...')
-                print('Going through the playlists...')
+                # loop through the playlists
                 for playlist in playlists:
-                    print(f'Processing a playlist... "{playlist.title}"')
+                    # get playlist videos from YT
                     playlist_videos = get_playlist_videos(
                         playlist.playlist_id, youtube, session=session)
+                    # loop through the videos in this playlist
                     for video in playlist_videos:
+                        # add relationship with this playlist to the video metadata
                         video['playlist'] = playlist
-                    videos += playlist_videos
-                    print(f'Channel "{playlist.title}" processed...')
-            print(f'Fetched {len(videos)} in total...')
-            random.shuffle(videos)
-            print('Videos shuffled...')
-            print('Going through the videos...')
-            for video in videos:
+                    # add this batch of videos to the total list of videos
+                    all_videos += playlist_videos
+
+            # shuffle videos so the don't get posted uniformly
+            random.shuffle(all_videos)
+
+            # loop through total number of videos
+            for video in all_videos:
+                # check if already posted
                 posted = session.query(Post).filter_by(
                     video_id=video['video_id']).first()
                 # if video is posted
@@ -101,21 +104,20 @@ def cron():
                 else:
                     # create model object
                     post = Post(**video)
-                    # addto database
+                    # add to database
                     session.add(post)
                     # commit
                     session.commit()
-                    print(f'Video "{post.title}" added to DB...')
-            print(f'{len(videos)} posted.')
-            print('Done...')
         finally:
             # you must remove the Session when you're finished!
             Session.remove()
 
+    # start the post_videos() function in a thread if it's not already running
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
         thread = threading.Thread(target=post_videos, name='YouTube')
         thread.start()
 
+    # redirect to home, we're not waiting for the thread
     return redirect(url_for('main.home'))
 
 
