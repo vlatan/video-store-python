@@ -25,10 +25,10 @@ def home():
     # Query the Post table by descending date
     posts = Post.query.order_by(Post.id.desc())
 
-    # If there's a query string in the request
-    if request.args.get("c"):
-        # Get the 'counter' value sent in the query string
-        counter = int(request.args.get("c"))
+    # If there's a counter in the query string in the request
+    if (counter := request.args.get("c")):
+        # Convert that to integer
+        counter = int(counter)
         # Get a coresponding slice of the posts query
         posts = posts.slice(counter, counter + quantity)
         # Serialize and jsonify the posts to be read by JavaScript
@@ -88,11 +88,8 @@ def cron():
 
             # loop through total number of videos
             for video in all_videos:
-                # check if already posted
-                posted = session.query(Post).filter_by(
-                    video_id=video['video_id']).first()
-                # if video is posted
-                if posted:
+                # if video is already posted
+                if (posted := session.query(Post).filter_by(video_id=video['video_id']).first()):
                     # if it doesn't have playlist id
                     if not posted.playlist_id:
                         # add playlist id
