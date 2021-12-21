@@ -37,12 +37,16 @@ def validate_video(response, playlist_id=None):
     upload_date = response['snippet']['publishedAt']
     upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
 
+    # remove urls from the description
+    if (description := response['snippet'].get('description')):
+        description = re.sub(r'http\S+', '', description)
+
     metadata = {'provider': 'YouTube',
                 'video_id': response['id'],
                 'playlist_id': playlist_id,
                 'title': response['snippet']['title'].split(' | ')[0],
                 'thumbnails': response['snippet']['thumbnails'],
-                'description': response['snippet'].get('description'),
+                'description': description,
                 'tags': response['snippet'].get('tags'),
                 'duration': response['contentDetails']['duration'],
                 'upload_date': upload_date}
@@ -135,9 +139,10 @@ def parse_video(url):
 
 def parse_playlist(url):
     parsed = urlparse(url)
-    query = parse_qs(parsed.query).get('list')
-    if query:
-        return query[0]
+    if parsed.hostname in {'www.youtube.com', 'youtube.com', 'youtu.be'}:
+        query = parse_qs(parsed.query).get('list')
+        if query:
+            return query[0]
     raise ValidationError('Unable to parse the URL')
 
 

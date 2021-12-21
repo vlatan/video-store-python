@@ -47,12 +47,8 @@ def post(post_id):
 
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
     duration = convertDuration(post.duration)
-    description = re.sub(r'http\S+', '', post.description)
-    return render_template('post.html',
-                           post=post,
-                           thumb=thumb['url'],
-                           duration=duration.human,
-                           description=description)
+
+    return render_template('post.html', post=post, thumb=thumb['url'], duration=duration.human)
 
 
 @posts.route('/post/new', methods=['GET', 'POST'])
