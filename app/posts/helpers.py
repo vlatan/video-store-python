@@ -21,11 +21,11 @@ def validate_video(response, playlist_id=None):
         raise ValidationError('This video is region-restricted')
 
     text_language = response['snippet'].get('defaultLanguage')
-    if text_language and text_language not in ['en', 'en-US', 'en-GB']:
+    if text_language and not text_language.startswith('en'):
         raise ValidationError('This video\'s title/desc is not in English')
 
     audio_language = response['snippet'].get('defaultAudioLanguage')
-    if audio_language and audio_language not in ['en', 'en-US', 'en-GB']:
+    if audio_language and not audio_language.startswith('en'):
         raise ValidationError('This video\'s audio is not in English')
 
     duration = convertDuration(response['contentDetails']['duration'])
