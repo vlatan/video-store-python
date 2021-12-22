@@ -41,10 +41,18 @@ def validate_video(response, playlist_id=None):
     if (description := response['snippet'].get('description')):
         description = re.sub(r'http\S+', '', description)
 
+    # normalize title
+    title = response['snippet']['title'].split(' | ')[0].split()
+    ex = ['in', 'to', 'for', 'and', 'a', 'is', 'of', 'at']
+    first_word = [title[0].title()]
+    if (rest := title[1:]):
+        rest = [w.lower() if w.lower() in ex else w.title() for w in rest]
+    title = ' '.join(first_word + rest)
+
     metadata = {'provider': 'YouTube',
                 'video_id': response['id'],
                 'playlist_id': playlist_id,
-                'title': response['snippet']['title'].split(' | ')[0],
+                'title': title,
                 'thumbnails': response['snippet']['thumbnails'],
                 'description': description,
                 'tags': response['snippet'].get('tags'),
