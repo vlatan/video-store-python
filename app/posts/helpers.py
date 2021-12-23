@@ -3,7 +3,6 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
-from app.models import Playlist
 
 
 def validate_video(response, playlist_id=None):
