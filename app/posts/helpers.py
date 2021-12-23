@@ -135,10 +135,9 @@ def parse_video(url):
     parsed = urlparse(url)
     if parsed.hostname == 'youtu.be':
         return parsed.path[1:]
-    elif parsed.hostname in {'www.youtube.com', 'youtube.com'}:
+    elif 'youtube.com' in parsed.hostname:
         if parsed.path == '/watch':
-            query = parse_qs(parsed.query).get('v')
-            if query:
+            if (query := parse_qs(parsed.query).get('v')):
                 return query[0]
         elif parsed.path[:7] == '/embed/':
             return parsed.path.split('/')[2]
@@ -147,9 +146,8 @@ def parse_video(url):
 
 def parse_playlist(url):
     parsed = urlparse(url)
-    if parsed.hostname in {'www.youtube.com', 'youtube.com', 'youtu.be'}:
-        query = parse_qs(parsed.query).get('list')
-        if query:
+    if parsed.hostname in ('www.youtube.com', 'youtube.com', 'youtu.be'):
+        if (query := parse_qs(parsed.query).get('list')):
             return query[0]
     raise ValidationError('Unable to parse the URL')
 
