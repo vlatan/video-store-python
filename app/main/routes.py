@@ -1,4 +1,4 @@
-import time
+import time, threading, random
 from googleapiclient.discovery import build
 from flask import render_template, request, redirect, current_app
 from flask import url_for, Blueprint, jsonify, make_response
@@ -6,10 +6,6 @@ from flask_login import login_required
 from app.models import Post, Playlist
 from app.helpers import admin_required
 from app.posts.helpers import get_playlist_videos
-import threading
-import random
-
-# for setting up a scoped_session so we can query the DB in a thread
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -75,7 +71,7 @@ def cron():
                 for playlist in playlists:
                     # get playlist videos from YT
                     playlist_videos = get_playlist_videos(
-                        playlist.playlist_id, youtube, session=session)
+                        playlist.playlist_id, youtube)
                     # loop through the videos in this playlist
                     for video in playlist_videos:
                         # add relationship with this playlist to the video metadata
@@ -106,7 +102,7 @@ def cron():
                     # commit
                     session.commit()
         finally:
-            # you must remove the Session when you're finished!
+            # lastly remove the Session no matter what
             Session.remove()
 
     # start the post_videos() function in a thread if it's not already running
