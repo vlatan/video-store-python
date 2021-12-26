@@ -15,3 +15,4 @@ class Config:
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
+    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
