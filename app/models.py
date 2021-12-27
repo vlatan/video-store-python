@@ -2,7 +2,8 @@ from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
 from flask import current_app
-from app.helpers import dump_datetime
+from app.helpers import dump_datetime, add_to_index
+from app.helpers import remove_from_index, query_index
 
 
 @login_manager.user_loader
@@ -41,7 +42,42 @@ class Playlist(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
 
-class Post(db.Model):
+class SearchableMixin(object):
+    @classmethod
+    def search(cls, expression):
+        ids, total = query_index(cls.__tablename__, expression)
+        if total == 0:
+            return cls.query.filter_by(id=0), 0
+        when = [(ids[i], i) for i in range(len(ids))]
+        return cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)), total
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
+
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes['add'] + session._changes['update']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['delete']:
+            if isinstance(obj, SearchableMixin):
+                remove_from_index(obj.__tablename__, obj)
+        session._changes = None
+
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            add_to_index(cls.__tablename__, obj)
+
+
+class Post(db.Model, SearchableMixin):
+    __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
     video_id = db.Column(db.String(20), unique=True, nullable=False)
@@ -76,3 +112,8 @@ class Post(db.Model):
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
         }
+
+
+# listen for commit and make changes to search index
+db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
