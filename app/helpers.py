@@ -25,7 +25,7 @@ def dump_datetime(value):
 def add_to_index(index, model):
     if not current_app.elasticsearch:
         return
-    payload = {field: model.field for field in model.__searchable__}
+    payload = {field: getattr(model, field) for field in model.__searchable__}
     current_app.elasticsearch.index(index=index, id=model.id, document=payload)
 
 
