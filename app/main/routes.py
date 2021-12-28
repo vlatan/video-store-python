@@ -1,9 +1,12 @@
-import time, threading, random
+import time
+import threading
+import random
 from googleapiclient.discovery import build
-from flask import render_template, request, redirect, current_app
-from flask import url_for, Blueprint, jsonify, make_response
+from flask import render_template, request, redirect, current_app, g
+from flask import url_for, Blueprint, jsonify, make_response, session
 from flask_login import login_required
 from app.models import Post, Playlist
+from app.main.forms import SearchForm
 from app.helpers import admin_required
 from app.posts.helpers import get_playlist_videos
 from sqlalchemy.orm import scoped_session
@@ -13,30 +16,59 @@ from sqlalchemy import create_engine
 main = Blueprint('main', __name__)
 
 
+@main.before_app_request
+def before_request():
+    g.search_form = SearchForm()
+
+
 @main.route('/')
 def home():
     """ Route to return the posts """
-
-    quantity = 12    # number of posts to fetch per load
-    # Query the Post table by descending date
+    per_page = current_app.config['POSTS_PER_PAGE']
+    # get the page number
+    page = request.args.get('page', 1, type=int)
+    # query the Post table in descending order
     posts = Post.query.order_by(Post.id.desc())
+    posts = posts.paginate(page, per_page, False).items
 
-    # If there's a counter in the query string in the request
-    if (counter := request.args.get("c")):
-        # Convert that to integer
-        counter = int(counter)
-        # Get a coresponding slice of the posts query
-        posts = posts.slice(counter, counter + quantity)
-        # Serialize and jsonify the posts to be read by JavaScript
+    # if there are subsequent pages use JavaScript to load them in infinite scroll
+    if page > 1:
+        # posts as JSON object
         posts = jsonify([post.serialize for post in posts])
-
-        time.sleep(0.4)     # Simulate delay
+        # Simulate delay
+        time.sleep(0.4)
         return make_response(posts, 200)
 
-    # Get posts for the first load
-    posts = posts.limit(quantity)
+    return render_template('home.html', posts=posts)
 
-    return render_template('home.html', posts=posts, quantity=quantity)
+
+@main.route('/search')
+def search():
+    # if not g.search_form.validate():
+    #     return redirect(url_for('main.home'))
+    per_page = current_app.config['POSTS_PER_PAGE']
+    # if it's the first page
+    if (page := request.args.get('page', 1, type=int)) == 1:
+        # get the search results
+        posts, total = Post.search(g.search_form.q.data, page, per_page)
+        # save search term and the number of total posts in session
+        session['search_term'], session['total'] = g.search_form.q.data, total
+        # render the template
+        return render_template('search.html', posts=posts)
+
+    # if there are subsequent pages use JavaScript to load them in infinite scroll
+    elif session['total'] > page * per_page or \
+            page * per_page - session['total'] <= per_page:
+        # get the search results
+        posts, total = Post.search(session['search_term'], page, per_page)
+        # posts as JSON object
+        posts = jsonify([post.serialize for post in posts])
+        # Simulate delay
+        time.sleep(0.4)
+        return make_response(posts, 200)
+
+    # if there are no more pages
+    return make_response(jsonify([]), 200)
 
 
 @main.route('/pingapi')

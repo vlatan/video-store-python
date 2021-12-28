@@ -16,3 +16,4 @@ class Config:
     ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))

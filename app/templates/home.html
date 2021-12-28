@@ -23,7 +23,7 @@
 
 	{% endfor %}
 
-	<template id="post_template" data-value="{{ quantity }}">
+	<template id="post_template">
 		<!-- template content -->
 		<a class="home-video-link" href="#">
 			<img class="home-video-img" src="#">
@@ -43,19 +43,21 @@
 	var scroller = document.querySelector("#scroller");
 	var template = document.querySelector('#post_template');
 	var sentinel = document.querySelector('#sentinel');
-	// Set a counter to count the items loaded
-	var counter = parseInt(template.getAttribute('data-value'));
+	// Use infinite scroll from the second page onwards
+	var counter = 2;
 	// There are still posts to be fetched
 	var the_end = false;
 
 	// Function to request new items and render to the dom
 	function loadItems() {
 
-		// Use fetch to request data and pass the counter value in the QS
-		fetch(`/?c=${counter}`).then((response) => {
+		// Use fetch to request data and pass the page number in the QS
+		fetch(`/?page=${counter}`).then((response) => {
 
 			// Convert the response data to JSON
 			response.json().then((data) => {
+
+				console.log(data);
 
 				// If empty JSON, exit the function
 				if (!data.length) {
@@ -64,7 +66,7 @@
 					sentinel.innerHTML = "No more posts";
 					// We got to the end, no more posts
 					the_end = true;
-
+					console.log(the_end);
 					return;
 				}
 
@@ -83,23 +85,24 @@
 
 					// Append template to dom
 					scroller.appendChild(template_clone);
-
-					// Increment the counter
-					counter += 1;
 				}
+
+				// Increment the page counter
+				counter += 1;
 			})
 		})
 	}
 
 	if ('IntersectionObserver' in window) {
+		console.log(the_end);
 		// Create a new IntersectionObserver instance
-		let intersectionObserver = new IntersectionObserver(entry => {
-			// If the entry is intersecting or there are still posts
-			if (entry.isIntersecting || the_end == false) {
+		let intersectionObserver = new IntersectionObserver(([entry]) => {
+			// If the entry is intersecting and there are still posts
+			if (the_end == false && entry.isIntersecting) {
 				// Call the loadItems function
 				loadItems();
 				// Unobserve the entry
-				intersectionObserver.unobserve(entry);
+				// intersectionObserver.unobserve(entry);
 			}
 			// add root margin for better intersection detecetion
 		}, { rootMargin: "100px 0px" });
