@@ -23,24 +23,27 @@ def before_request():
     g.search_form = SearchForm(formdata=request.args, meta={'csrf': False})
 
 
-@main.route('/')
+@main.route('/', methods=['GET', 'POST'])
 def home():
     """ Route to return the posts """
+    # posts per page
     per_page = current_app.config['POSTS_PER_PAGE']
-    # get the page number
-    page = request.args.get('page', 1, type=int)
+    # if it's post request this should contain data
+    post_data = request.get_json()
+    # if post_data get page number, else 1
+    page = post_data.get('page') if post_data else 1
     # query the Post table in descending order
     posts = Post.query.order_by(Post.id.desc())
     posts = posts.paginate(page, per_page, False).items
 
-    # if there are subsequent pages use JavaScript to load them in infinite scroll
-    if page > 1:
-        # posts as JSON object
+    if request.method == 'POST':
+        # if there are subsequent pages send posts as JSON object
         posts = jsonify([post.serialize for post in posts])
         # Simulate delay
         time.sleep(0.4)
         return make_response(posts, 200)
 
+    # render template on the first view (GET method)
     return render_template('home.html', posts=posts)
 
 
@@ -58,16 +61,13 @@ def search():
         posts, total = Post.search(g.search_form.q.data, 1, per_page)
         # save search term and the number of total posts in session
         session['search_term'], session['total'] = g.search_form.q.data, total
-
         # render the template
         return render_template('search.html', posts=posts, total=total)
 
-    page = request.json.get('page')
-    search_term = session['search_term']
-    num_posts = session['total']
-
+    search_term, num_posts = session['search_term'], session['total']
     # if we got the page, search term and the total number of posts
-    if page and search_term and num_posts:
+    if (post_data := request.get_json()) and search_term and num_posts:
+        page = post_data.get('page')
         target = page * per_page
         # if there are subsequent pages pass content to frontend
         if num_posts > target or target - num_posts <= per_page:
@@ -83,9 +83,9 @@ def search():
     return make_response(jsonify([]), 200)
 
 
-@ main.route('/pingapi')
-@ login_required
-@ admin_required
+@main.route('/pingapi')
+@login_required
+@admin_required
 def cron():
     """ Route to fetch videos from the YT chanels.
         This view is called from CRON.
@@ -158,6 +158,6 @@ def cron():
     return redirect(url_for('main.home'))
 
 
-@ main.route('/about')
+@main.route('/about')
 def about():
     return render_template('about.html', title='About')
