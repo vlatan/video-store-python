@@ -10,6 +10,10 @@
 
 {% block content %}
 
+Found <strong>{{ total }}</strong> results for this query.
+
+<br><br>
+
 <!-- div to contain the content -->
 <div id="scroller" class="home-content">
 
@@ -48,17 +52,20 @@
     var the_end = false;
 
     // Function to request new items and render to the dom
-    function loadItems() {
+    async function loadItems(url = '', data = {}) {
 
-        // Use fetch to request data and pass the counter value in the QS
-        fetch(`/search?page=${counter}`).then((response) => {
+        // Use fetch to request data by passing the page number via POST method
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        }).then((response) => {
 
             // Convert the response data to JSON
             response.json().then((data) => {
 
                 // If empty JSON, exit the function
                 if (!data.length) {
-
                     // Replace the spinner with "No more posts"
                     sentinel.innerHTML = "No more posts";
                     // We got to the end, no more posts
@@ -95,12 +102,12 @@
             // If the entry is intersecting or there are still posts
             if (the_end == false && entry.isIntersecting) {
                 // Call the loadItems function
-                loadItems();
+                loadItems('/search', { page: counter });
                 // Unobserve the entry
                 // intersectionObserver.unobserve(entry);
             }
             // add root margin for better intersection detecetion
-        }, { rootMargin: "100px 0px" });
+        }, { rootMargin: "200px 0px" });
 
         // Instruct the IntersectionObserver to watch the sentinel
         intersectionObserver.observe(sentinel);

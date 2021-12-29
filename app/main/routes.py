@@ -18,7 +18,9 @@ main = Blueprint('main', __name__)
 
 @main.before_app_request
 def before_request():
-    g.search_form = SearchForm()
+    # before the request make this search form available sitewide
+    # stored in the global flask variable g
+    g.search_form = SearchForm(formdata=request.args, meta={'csrf': False})
 
 
 @main.route('/')
@@ -42,38 +44,48 @@ def home():
     return render_template('home.html', posts=posts)
 
 
-@main.route('/search')
+@main.route('/search', methods=['GET', 'POST'])
 def search():
-    # if not g.search_form.validate():
-    #     return redirect(url_for('main.home'))
+    # posts per page
     per_page = current_app.config['POSTS_PER_PAGE']
+
     # if it's the first page
-    if (page := request.args.get('page', 1, type=int)) == 1:
+    if request.method == 'GET':
+        # validate the form from which the request is comming
+        if not g.search_form.validate():
+            return redirect(url_for('main.home'))
         # get the search results
-        posts, total = Post.search(g.search_form.q.data, page, per_page)
+        posts, total = Post.search(g.search_form.q.data, 1, per_page)
         # save search term and the number of total posts in session
         session['search_term'], session['total'] = g.search_form.q.data, total
-        # render the template
-        return render_template('search.html', posts=posts)
 
-    # if there are subsequent pages use JavaScript to load them in infinite scroll
-    elif session['total'] > page * per_page or \
-            page * per_page - session['total'] <= per_page:
-        # get the search results
-        posts, total = Post.search(session['search_term'], page, per_page)
-        # posts as JSON object
-        posts = jsonify([post.serialize for post in posts])
-        # Simulate delay
-        time.sleep(0.4)
-        return make_response(posts, 200)
+        # render the template
+        return render_template('search.html', posts=posts, total=total)
+
+    page = request.json.get('page')
+    search_term = session['search_term']
+    num_posts = session['total']
+
+    # if we got the page, search term and the total number of posts
+    if page and search_term and num_posts:
+        target = page * per_page
+        # if there are subsequent pages pass content to frontend
+        if num_posts > target or target - num_posts <= per_page:
+            # get the search results
+            posts, total = Post.search(search_term, page, per_page)
+            # posts as JSON object
+            posts = jsonify([post.serialize for post in posts])
+            # Simulate delay
+            time.sleep(0.4)
+            return make_response(posts, 200)
 
     # if there are no more pages
     return make_response(jsonify([]), 200)
 
 
-@main.route('/pingapi')
-@login_required
-@admin_required
+@ main.route('/pingapi')
+@ login_required
+@ admin_required
 def cron():
     """ Route to fetch videos from the YT chanels.
         This view is called from CRON.
@@ -146,6 +158,6 @@ def cron():
     return redirect(url_for('main.home'))
 
 
-@main.route('/about')
+@ main.route('/about')
 def about():
     return render_template('about.html', title='About')
