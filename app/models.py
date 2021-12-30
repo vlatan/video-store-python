@@ -90,6 +90,7 @@ class Post(db.Model, SearchableMixin):
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
+    related_posts = db.Column(db.PickleType)
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey(Playlist.id))
 
