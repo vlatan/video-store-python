@@ -95,7 +95,7 @@ def cron():
 
     API_KEY = current_app.config['YOUTUBE_API_KEY']
     # number of related posts to fetch
-    NUM_RELATED_POSTS = current_app.config['NUM_RELATED_POSTS']
+    per_page = current_app.config['NUM_RELATED_POSTS']
     # we need the full DB uri relative to the app
     # so we can properly create the engine
     DB = current_app.config['SCOPPED_SESSION_DB_URI']
@@ -143,8 +143,8 @@ def cron():
                         session.commit()
                 else:
                     # get related posts by searching the index using the title of this post
-                    if (related_posts := Post.search(video['title'], 1, NUM_RELATED_POSTS)[0]):
-                        video['related_posts'] = list(related_posts)
+                    video['related_posts'] = Post.search(
+                        video['title'], 1, per_page)[0].all()
                     # create model object
                     post = Post(**video)
                     # add to database
