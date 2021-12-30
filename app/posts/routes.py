@@ -10,7 +10,6 @@ from app.posts.forms import PostForm, PlaylistForm
 from app.posts.helpers import validate_video, convertDuration
 from googleapiclient.discovery import build
 from datetime import datetime, timedelta
-import re
 
 posts = Blueprint('posts', __name__)
 
