@@ -46,12 +46,12 @@ def post(post_id):
         # number of related posts to fetch
         NUM_RELATED_POSTS = current_app.config['NUM_RELATED_POSTS']
         # get related posts by searching the index using the title of this post
-        related_posts = list(Post.search(
-            post.title, 1, NUM_RELATED_POSTS + 1)[0])[1:]
-        # if there are related posts and there's change in them
-        if related_posts and post.related_posts != related_posts:
-            # update related posts
-            post.related_posts = related_posts
+        if (related_posts := Post.search(post.title, 1, NUM_RELATED_POSTS + 1)[0]):
+            related_posts = list(related_posts)[1:]
+            # if there's change in the related posts
+            if post.related_posts != related_posts:
+                # update related posts
+                post.related_posts = related_posts
 
         # update last checked
         post.last_checked = datetime.utcnow()

@@ -142,9 +142,9 @@ def cron():
                         # commit
                         session.commit()
                 else:
-                    # get related posts by searching the index using the title of this video
-                    video['related_posts'] = list(
-                        Post.search(video['title'], 1, NUM_RELATED_POSTS)[0])
+                    # get related posts by searching the index using the title of this post
+                    if (related_posts := Post.search(video['title'], 1, NUM_RELATED_POSTS)[0]):
+                        video['related_posts'] = list(related_posts)
                     # create model object
                     post = Post(**video)
                     # add to database
