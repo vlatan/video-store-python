@@ -19,17 +19,13 @@
 	</div>
 	<div class="metadata">
 		<h1 class="video-title">{{ post.title }}</h1>
-		<div class="video-description">
-			{{ post.description[:200] }}...
-		</div>
 		<div class="video-duration">
 			Duration: {{ duration }}
 		</div>
 		<div class="related_videos">
-			<!-- {{ post.related_posts }} -->
 			{% if post.related_posts %}
-			{% for post in post.related_posts %}
-			{{ post['title'] }} <br>
+			{% for related_post in post.related_posts %}
+			{{ related_post.title }} <br>
 			{% endfor %}
 			{% endif %}
 		</div>
