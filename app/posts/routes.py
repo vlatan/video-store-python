@@ -17,10 +17,9 @@ posts = Blueprint('posts', __name__)
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    # if there 3 days passed from the last checked date
+
+    # perform this check every third day from the last visit
     if post.last_checked + timedelta(days=3) < datetime.utcnow():
-        # update last checked
-        post.last_checked = datetime.utcnow()
         # check if the video is still alive on YouTube
         # and still satisfies all the conditions
         API_KEY = current_app.config['YOUTUBE_API_KEY']
@@ -44,7 +43,23 @@ def post(post_id):
                 # so we can't evaluate the video
                 pass
 
+        # number of related posts to fetch
+        NUM_RELATED_POSTS = current_app.config['NUM_RELATED_POSTS']
+        # get related posts by searching the index using the title of this post
+        related_posts = list(Post.search(
+            post.title, 1, NUM_RELATED_POSTS + 1)[0])[1:]
+        # if there are related posts and there's change in them
+        if related_posts and post.related_posts != related_posts:
+            # update related posts
+            post.related_posts = related_posts
+
+        # update last checked
+        post.last_checked = datetime.utcnow()
+        db.session.commit()
+
+    # get standard size thumb, if doesn't exist get high size
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
+    # create video duration object
     duration = convertDuration(post.duration)
 
     return render_template('post.html', post=post, thumb=thumb['url'], duration=duration.human)

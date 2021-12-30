@@ -17,3 +17,4 @@ class Config:
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
+    NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))

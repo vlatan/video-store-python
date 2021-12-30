@@ -25,6 +25,14 @@
 		<div class="video-duration">
 			Duration: {{ duration }}
 		</div>
+		<div class="related_videos">
+			<!-- {{ post.related_posts }} -->
+			{% if post.related_posts %}
+			{% for post in post.related_posts %}
+			{{ post['title'] }} <br>
+			{% endfor %}
+			{% endif %}
+		</div>
 	</div>
 </article>
 

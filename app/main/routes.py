@@ -94,6 +94,8 @@ def cron():
         https://stackoverflow.com/a/55740595 """
 
     API_KEY = current_app.config['YOUTUBE_API_KEY']
+    # number of related posts to fetch
+    NUM_RELATED_POSTS = current_app.config['NUM_RELATED_POSTS']
     # we need the full DB uri relative to the app
     # so we can properly create the engine
     DB = current_app.config['SCOPPED_SESSION_DB_URI']
@@ -104,7 +106,7 @@ def cron():
 
         # all calls to Session() will create a thread-local session
         Session = scoped_session(session_factory)
-        # create a session
+        # instantiate a session
         session = Session()
 
         try:
@@ -129,7 +131,7 @@ def cron():
 
             # loop through total number of videos
             for video in all_videos:
-                # if video is already posted
+                # if video is already posted (via webform as a single video submit)
                 if (posted := session.query(Post).filter_by(video_id=video['video_id']).first()):
                     # if it doesn't have playlist id
                     if not posted.playlist_id:
@@ -140,6 +142,9 @@ def cron():
                         # commit
                         session.commit()
                 else:
+                    # get related posts by searching the index using the title of this video
+                    video['related_posts'] = list(
+                        Post.search(video['title'], 1, NUM_RELATED_POSTS)[0])
                     # create model object
                     post = Post(**video)
                     # add to database
