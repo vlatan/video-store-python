@@ -1,11 +1,13 @@
 # import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
 
 db = SQLAlchemy()
+migrate = Migrate()
 login_manager = LoginManager()
 # where the user will be redirected if she's not logged in
 login_manager.login_view = 'main.home'
@@ -21,6 +23,7 @@ def create_app(config_class=Config):
     app.elasticsearch = Elasticsearch(elastic_url) if elastic_url else None
 
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
 
     from app.users.routes import users
