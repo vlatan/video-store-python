@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from flask import current_app
 from app.helpers import dump_datetime, add_to_index
 from app.helpers import remove_from_index, query_index
+from elasticsearch.exceptions import NotFoundError, ConnectionTimeout
 
 
 @login_manager.user_loader
@@ -45,8 +46,14 @@ class Playlist(db.Model):
 class SearchableMixin(object):
     @classmethod
     def search(cls, expression, page, per_page):
-        ids, total = query_index(cls.__tablename__, expression, page, per_page)
-        if total == 0:
+        try:
+            ids, total = query_index(
+                cls.__tablename__, expression, page, per_page)
+            if total == 0:
+                return cls.query.filter_by(id=0), 0
+        except (NotFoundError, ConnectionTimeout):
+            # NotFoundError = index is not created on this machine you need to reindex
+            # ConnectionTimeout = search is timing out, probably not enough resources
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
         return cls.query.filter(cls.id.in_(ids)).order_by(
