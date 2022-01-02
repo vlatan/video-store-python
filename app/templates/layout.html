@@ -68,6 +68,9 @@
 
 	</div>
 
+	{% block scripts %}
+	{% endblock scripts %}
+
 	{% if not current_user.is_authenticated %}
 	<script>
 		function OAuth() {

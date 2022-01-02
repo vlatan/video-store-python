@@ -8,7 +8,6 @@
 {% endblock title %}
 
 {% block content %}
-
 <!-- div to contain the content -->
 <div id="scroller" class="home-content">
 
@@ -37,7 +36,9 @@
 <div class="sentinel" id="sentinel">
 	<div class="spinner-border" role="status"></div>
 </div>
+{% endblock content %}
 
+{% block scripts %}
 <script>
 	// Get references to the dom elements
 	var scroller = document.querySelector("#scroller");
@@ -96,7 +97,7 @@
 	if ('IntersectionObserver' in window) {
 		// Create a new IntersectionObserver instance
 		let intersectionObserver = new IntersectionObserver(([entry]) => {
-			// If the entry is intersecting or there are still posts
+			// If there are still posts and the entry is intersecting
 			if (the_end == false && entry.isIntersecting) {
 				// Call the loadItems function
 				loadItems('/', { page: counter });
@@ -110,5 +111,4 @@
 		intersectionObserver.observe(sentinel);
 	}
 </script>
-
-{% endblock content %}
+{% endblock scripts %}

@@ -9,7 +9,6 @@
 {% endblock title %}
 
 {% block content %}
-
 <article class="media-content">
 	<div class="player">
 		<div class="player-content" id="{{ post.video_id }}">
@@ -52,7 +51,11 @@
 		</div>
 	</form>
 </div>
+{% endif %}
+{% endblock content %}
 
+{% block scripts %}
+{% if current_user.is_authenticated and current_user.is_admin %}
 <script>
 	var openModal = document.getElementById('openModal');
 	var noModal = [document.getElementById('modal'),
@@ -86,5 +89,4 @@
 		this.parentNode.replaceChild(e, this);
 	}
 </script>
-
-{% endblock content %}
+{% endblock scripts %}

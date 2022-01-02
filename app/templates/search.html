@@ -9,7 +9,6 @@
 {% endblock title %}
 
 {% block content %}
-
 Found <strong>{{ total }}</strong> results for this query.
 
 <br><br>
@@ -40,7 +39,9 @@ Found <strong>{{ total }}</strong> results for this query.
 <div class="sentinel" id="sentinel">
     <div class="spinner-border" role="status"></div>
 </div>
+{% endblock content %}
 
+{% block scripts %}
 <script>
     // Get references to the dom elements
     var scroller = document.querySelector("#scroller");
@@ -99,7 +100,7 @@ Found <strong>{{ total }}</strong> results for this query.
     if ('IntersectionObserver' in window) {
         // Create a new IntersectionObserver instance
         let intersectionObserver = new IntersectionObserver(([entry]) => {
-            // If the entry is intersecting or there are still posts
+            // If there are still posts and the entry is intersecting
             if (the_end == false && entry.isIntersecting) {
                 // Call the loadItems function
                 loadItems('/search', { page: counter });
@@ -113,4 +114,4 @@ Found <strong>{{ total }}</strong> results for this query.
         intersectionObserver.observe(sentinel);
     }
 </script>
-{% endblock content %}
+{% endblock scripts %}
