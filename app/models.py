@@ -45,18 +45,19 @@ class Playlist(db.Model):
 
 class SearchableMixin(object):
     @classmethod
-    def search(cls, expression, page, per_page):
+    def search(cls, expression, page, per_page, session=None):
+        search_query = session.query(cls) if session else cls.query
         try:
             ids, total = query_index(
                 cls.__tablename__, expression, page, per_page)
             if total == 0:
-                return cls.query.filter_by(id=0), 0
+                return search_query.filter_by(id=0), 0
         except (NotFoundError, ConnectionTimeout):
             # NotFoundError = index is not created on this machine you need to reindex
             # ConnectionTimeout = search is timing out, probably not enough resources
-            return cls.query.filter_by(id=0), 0
+            return search_query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
-        return cls.query.filter(cls.id.in_(ids)).order_by(
+        return search_query.filter(cls.id.in_(ids)).order_by(
             db.case(when, value=cls.id)), total
 
     @classmethod

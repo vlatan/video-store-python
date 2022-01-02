@@ -144,7 +144,7 @@ def cron():
                 else:
                     # get related posts by searching the index using the title of this post
                     video['related_posts'] = Post.search(
-                        video['title'], 1, per_page)[0].all()
+                        video['title'], 1, per_page, session=session)[0].all()
                     # create model object
                     post = Post(**video)
                     # add to database
