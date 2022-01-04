@@ -42,12 +42,6 @@ class PostForm(FlaskForm):
             except (HttpError, IndexError):
                 raise ValidationError('Unable to fetch the video.')
 
-        # number of related posts to fetch
-        per_page = current_app.config['NUM_RELATED_POSTS']
-        # get related posts by searching the index using the title of this post
-        video_info['related_posts'] = Post.search(
-            video_info['title'], 1, per_page)[0].all()
-
         # transform the form input
         content.data = video_info
 

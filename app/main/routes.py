@@ -142,13 +142,14 @@ def cron():
                         # commit
                         session.commit()
                 else:
-                    # get related posts by searching the index using the title of this post
-                    video['related_posts'] = Post.search(
-                        video['title'], 1, per_page, session=session)[0].all()
                     # create model object
                     post = Post(**video)
                     # add to database
                     session.add(post)
+                    # search for related videos using the post title
+                    # and make this post parent to them
+                    for p in Post.search(post.title, 1, per_page, session=session)[0].all():
+                        p.parent_id = post.id
                     # commit
                     session.commit()
         finally:

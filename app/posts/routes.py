@@ -20,8 +20,8 @@ def post(post_id):
 
     # perform this check every third day from the last visit
     if post.last_checked + timedelta(days=3) < datetime.utcnow():
-        # check if the video is still alive on YouTube
-        # and still satisfies all the conditions
+        check_related = False
+        # revalidate the video
         API_KEY = current_app.config['YOUTUBE_API_KEY']
         with build('youtube', 'v3', developerKey=API_KEY) as youtube:
             try:
@@ -33,6 +33,7 @@ def post(post_id):
                 res = req.execute()['items'][0]
                 # this will raise ValidationError if video's invalid
                 validate_video(res)
+                check_related = True
             # video is not validated or doesn't exist
             except (IndexError, ValidationError):
                 db.session.delete(post)
@@ -43,14 +44,17 @@ def post(post_id):
                 # so we can't evaluate the video
                 pass
 
-        # number of related posts to fetch
-        per_page = current_app.config['NUM_RELATED_POSTS']
-        # get related posts by searching the index using the title of this post
-        related_posts = Post.search(post.title, 1, per_page + 1)[0].all()[1:]
-        # if there's change in the related posts
-        if post.related_posts != related_posts:
-            # update related posts
-            post.related_posts = related_posts
+        if check_related:
+            # number of related posts to fetch
+            per_page = current_app.config['NUM_RELATED_POSTS']
+            # get related posts by searching the index using the title of this post
+            related_posts = Post.search(
+                post.title, 1, per_page + 1)[0].all()[1:]
+            # if there's change in the related posts
+            if post.related_posts != related_posts:
+                # make this post parent to them
+                for p in related_posts:
+                    p.parent_id = post.id
 
         # update last checked
         post.last_checked = datetime.utcnow()
@@ -74,10 +78,17 @@ def new_post():
     if form.validate_on_submit():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(**form.content.data, video_poster=current_user)
+        post = Post(**form.content.data, author=current_user)
 
-        # add to db
         db.session.add(post)
+
+        # number of related posts to fetch
+        per_page = current_app.config['NUM_RELATED_POSTS']
+        # search for related videos using the post title
+        # and make this post parent to them
+        for p in Post.search(post.title, 1, per_page)[0].all():
+            p.parent_id = post.id
+
         db.session.commit()
 
         flash('Your post has been created!', 'success')
@@ -97,7 +108,7 @@ def new_playlist():
     if form.validate_on_submit():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
-        playlist = Playlist(**form.content.data, playlist_poster=current_user)
+        playlist = Playlist(**form.content.data, author=current_user)
 
         # add to db
         db.session.add(playlist)

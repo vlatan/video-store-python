@@ -18,9 +18,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(120), nullable=False)
     picture = db.Column(db.String(256), nullable=False)
-    posts = db.relationship('Post', backref='video_poster', lazy=True)
-    playlists = db.relationship(
-        'Playlist', backref='playlist_poster', lazy=True)
+    posts = db.relationship('Post', backref='author', lazy=True)
+    playlists = db.relationship('Playlist', backref='author', lazy=True)
 
     @property
     def is_admin(self):
@@ -40,12 +39,13 @@ class Playlist(db.Model):
     description = db.Column(db.Text)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='playlist', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class SearchableMixin(object):
     @classmethod
     def search(cls, expression, page, per_page, session=None):
+        # check if scopped session is in use
         search_query = session.query(cls) if session else cls.query
         try:
             ids, total = query_index(
@@ -98,9 +98,10 @@ class Post(db.Model, SearchableMixin):
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
-    related_posts = db.Column(db.PickleType)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    playlist_db_id = db.Column(db.Integer, db.ForeignKey(Playlist.id))
+    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
+    related_posts = db.relationship('Post', lazy=True)
 
     @property
     def serialize(self):
@@ -118,6 +119,7 @@ class Post(db.Model, SearchableMixin):
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
             'last_checked': dump_datetime(self.last_checked),
+            'parent_id': self.parent_id,
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
         }
