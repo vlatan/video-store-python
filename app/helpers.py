@@ -22,23 +22,23 @@ def dump_datetime(value):
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
 
-def add_to_index(index, model):
-    elastic = current_app.elasticsearch
+def add_to_index(index, model, app=None):
+    elastic = app.elasticsearch if app else current_app.elasticsearch
     if not (elastic and elastic.ping()):
         return
     payload = {field: getattr(model, field) for field in model.__searchable__}
     elastic.index(index=index, id=model.id, document=payload)
 
 
-def remove_from_index(index, model):
-    elastic = current_app.elasticsearch
+def remove_from_index(index, model, app=None):
+    elastic = app.elasticsearch if app else current_app.elasticsearch
     if not (elastic and elastic.ping()):
         return
     elastic.delete(index=index, id=model.id)
 
 
-def query_index(index, query, page, per_page):
-    elastic = current_app.elasticsearch
+def query_index(index, query, page, per_page, app=None):
+    elastic = app.elasticsearch if app else current_app.elasticsearch
     if not (elastic and elastic.ping()):
         return [], 0
     search = elastic.search(

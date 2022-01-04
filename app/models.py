@@ -44,12 +44,12 @@ class Playlist(db.Model):
 
 class SearchableMixin(object):
     @classmethod
-    def search(cls, expression, page, per_page, session=None):
+    def search(cls, expression, page, per_page, session=None, app=None):
         # check if scopped session is in use
         search_query = session.query(cls) if session else cls.query
         try:
             ids, total = query_index(
-                cls.__tablename__, expression, page, per_page)
+                cls.__tablename__, expression, page, per_page, app=app)
             if total == 0:
                 return search_query.filter_by(id=0), 0
         except (NotFoundError, ConnectionTimeout):

@@ -102,7 +102,7 @@ def cron():
     engine = create_engine(DB)
     session_factory = sessionmaker(bind=engine)
 
-    def post_videos():
+    def post_videos(app):
 
         # all calls to Session() will create a thread-local session
         Session = scoped_session(session_factory)
@@ -148,7 +148,7 @@ def cron():
                     session.add(post)
                     # search for related videos using the post title
                     # and make this post parent to them
-                    for p in Post.search(post.title, 1, per_page, session=session)[0].all():
+                    for p in Post.search(post.title, 1, per_page, session=session, app=app)[0].all():
                         p.parent_id = post.id
                     # commit
                     session.commit()
@@ -158,7 +158,8 @@ def cron():
 
     # start the post_videos() function in a thread if it's not already running
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
-        thread = threading.Thread(target=post_videos, name='YouTube')
+        thread = threading.Thread(target=post_videos, name='YouTube', kwargs={
+                                  'app': current_app._get_current_object()})
         thread.start()
 
     # redirect to home, we're not waiting for the thread
