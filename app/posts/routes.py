@@ -81,6 +81,9 @@ def new_post():
         post = Post(**form.content.data, author=current_user)
 
         db.session.add(post)
+        # must imediatelly commit otherwise `db.event.listen` isn't working
+        # therefore post won't be added to the search index
+        db.session.commit()
 
         # number of related posts to fetch
         per_page = current_app.config['NUM_RELATED_POSTS']

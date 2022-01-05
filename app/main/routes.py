@@ -146,6 +146,9 @@ def cron():
                     post = Post(**video)
                     # add to database
                     session.add(post)
+                    # must imediatelly commit otherwise `db.event.listen` isn't working
+                    # therefore post won't be added to the search index
+                    session.commit()
                     # search for related videos using the post title
                     # and make this post parent to them
                     for p in Post.search(post.title, 1, per_page, session=session, app=app)[0].all():
