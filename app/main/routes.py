@@ -5,7 +5,8 @@ from googleapiclient.discovery import build
 from flask import render_template, request, redirect, current_app, g
 from flask import url_for, Blueprint, jsonify, make_response, session
 from flask_login import login_required
-from app.models import Post, Playlist
+from app import db
+from app.models import Post, Playlist, SearchableMixin
 from app.main.forms import SearchForm
 from app.helpers import admin_required
 from app.posts.helpers import get_playlist_videos
@@ -102,12 +103,17 @@ def cron():
     engine = create_engine(DB)
     session_factory = sessionmaker(bind=engine)
 
-    def post_videos(app):
+    def post_videos():
 
         # all calls to Session() will create a thread-local session
         Session = scoped_session(session_factory)
         # instantiate a session
         session = Session()
+
+        # listen for commit and make changes to search index
+        db.event.listen(session, 'before_commit',
+                        SearchableMixin.before_commit)
+        db.event.listen(session, 'after_commit', SearchableMixin.after_commit)
 
         try:
             # get all playlists from db
@@ -151,7 +157,7 @@ def cron():
                     session.commit()
                     # search for related videos using the post title
                     # and make this post parent to them
-                    for p in Post.search(post.title, 1, per_page, session=session, app=app)[0].all():
+                    for p in Post.search(post.title, 1, per_page, session=session)[0].all():
                         p.parent_id = post.id
                     # commit
                     session.commit()
@@ -161,8 +167,7 @@ def cron():
 
     # start the post_videos() function in a thread if it's not already running
     if 'YouTube' not in [t.name for t in threading.enumerate()]:
-        thread = threading.Thread(target=post_videos, name='YouTube', kwargs={
-                                  'app': current_app._get_current_object()})
+        thread = threading.Thread(target=post_videos, name='YouTube')
         thread.start()
 
     # redirect to home, we're not waiting for the thread

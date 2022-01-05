@@ -1,7 +1,9 @@
+import os
 from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user
+from elasticsearch import Elasticsearch
 
 
 def admin_required(func):
@@ -22,23 +24,32 @@ def dump_datetime(value):
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
 
 
-def add_to_index(index, model, app=None):
-    elastic = app.elasticsearch if app else current_app.elasticsearch
+def prep_elastic():
+    try:
+        return current_app.elasticsearch
+    except RuntimeError:
+        # we're out of the app context, set up elasticsearch manually
+        elastic_url = os.environ.get('ELASTICSEARCH_URL')
+        return Elasticsearch(elastic_url) if elastic_url else None
+
+
+def add_to_index(index, model):
+    elastic = prep_elastic()
     if not (elastic and elastic.ping()):
         return
     payload = {field: getattr(model, field) for field in model.__searchable__}
     elastic.index(index=index, id=model.id, document=payload)
 
 
-def remove_from_index(index, model, app=None):
-    elastic = app.elasticsearch if app else current_app.elasticsearch
+def remove_from_index(index, model):
+    elastic = prep_elastic()
     if not (elastic and elastic.ping()):
         return
     elastic.delete(index=index, id=model.id)
 
 
-def query_index(index, query, page, per_page, app=None):
-    elastic = app.elasticsearch if app else current_app.elasticsearch
+def query_index(index, query, page, per_page):
+    elastic = prep_elastic()
     if not (elastic and elastic.ping()):
         return [], 0
     search = elastic.search(
