@@ -88,7 +88,7 @@ def new_post():
         per_page = current_app.config['NUM_RELATED_POSTS']
         # search for related videos using the post title
         # and make this post parent to them
-        for p in Post.search(post.title, 1, per_page)[0].all():
+        for p in Post.search(post.title, 1, per_page)[0].all()[1:]:
             p.parent_id = post.id
 
         db.session.commit()
