@@ -8,7 +8,7 @@ from elasticsearch import Elasticsearch
 from flask_msearch import Search
 
 db = SQLAlchemy()
-search = Search()
+# search = Search()
 migrate = Migrate()
 login_manager = LoginManager()
 # where the user will be redirected if she's not logged in
@@ -26,16 +26,18 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    search.init_app(app)
+    # search.init_app(app)
     login_manager.init_app(app)
 
     from app.users.routes import users
     from app.posts.routes import posts
     from app.main.routes import main
+    from app.search.routes import search
     from app.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
+    app.register_blueprint(search)
     app.register_blueprint(errors)
 
     return app
