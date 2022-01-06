@@ -204,7 +204,7 @@ def cron():
                     session.commit()
                     # search for related videos using the post title
                     # and make this post parent to them
-                    for p in Post.search(post.title, 1, per_page, session=session)[0].all():
+                    for p in Post.search(post.title, 1, per_page, session=session)[0].all()[1:]:
                         p.parent_id = post.id
                     # commit
                     session.commit()
