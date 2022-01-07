@@ -48,17 +48,14 @@ def validate_video(response, playlist_id=None):
         rest = [w.lower() if w.lower() in ex else w.title() for w in rest]
     title = ' '.join(first_word + rest)
 
-    metadata = {'provider': 'YouTube',
-                'video_id': response['id'],
-                'playlist_id': playlist_id,
-                'title': title,
-                'thumbnails': response['snippet']['thumbnails'],
-                'description': description,
-                'tags': response['snippet'].get('tags'),
-                'duration': response['contentDetails']['duration'],
-                'upload_date': upload_date}
-
-    return metadata
+    return {'video_id': response['id'],
+            'playlist_id': playlist_id,
+            'title': title,
+            'thumbnails': response['snippet']['thumbnails'],
+            'description': description,
+            'tags': response['snippet'].get('tags'),
+            'duration': response['contentDetails']['duration'],
+            'upload_date': upload_date}
 
 
 def validate_playlist(playlist_id, youtube):
