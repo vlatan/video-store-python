@@ -98,10 +98,9 @@ class Post(db.Model, SearchableMixin):
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
-    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
-    related_posts = db.relationship('Post', lazy=True)
+    related_posts = db.Column(db.PickleType, default=[])
 
     @property
     def serialize(self):
@@ -119,7 +118,6 @@ class Post(db.Model, SearchableMixin):
             'upload_date': dump_datetime(self.upload_date),
             'date_posted': dump_datetime(self.date_posted),
             'last_checked': dump_datetime(self.last_checked),
-            'parent_id': self.parent_id,
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
         }

@@ -32,8 +32,15 @@ def post(post_id):
                 # which means the video does not exist
                 res = req.execute()['items'][0]
                 # this will raise ValidationError if video's invalid
-                validate_video(res)
-                check_related = True
+                if validate_video(res):
+                    # number of related posts to fetch
+                    per_page = current_app.config['NUM_RELATED_POSTS']
+                    # get related posts by searching the index using the title of this post
+                    related_posts = Post.search(
+                        post.title, 1, per_page + 1)[0].all()[1:]
+                    # if there's change in the related posts
+                    if post.related_posts != related_posts:
+                        post.related_posts = related_posts
             # video is not validated or doesn't exist
             except (IndexError, ValidationError):
                 db.session.delete(post)
@@ -43,17 +50,6 @@ def post(post_id):
                 # we couldn't connect to YT API,
                 # so we can't evaluate the video
                 pass
-
-        if check_related:
-            # number of related posts to fetch
-            per_page = current_app.config['NUM_RELATED_POSTS']
-            # get related posts by searching the index using the title of this post
-            related_posts = Post.search(post.title, 1, per_page)[0].all()[1:]
-            # if there's change in the related posts
-            if post.related_posts != related_posts:
-                # make this post parent to them
-                for p in related_posts:
-                    p.parent_id = post.id
 
         # update last checked
         post.last_checked = datetime.utcnow()
@@ -78,19 +74,14 @@ def new_post():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.content.data, author=current_user)
-
-        db.session.add(post)
-        # must imediatelly commit otherwise `db.event.listen` isn't working
-        # therefore post won't be added to the search index
-        db.session.commit()
-
         # number of related posts to fetch
         per_page = current_app.config['NUM_RELATED_POSTS']
         # search for related videos using the post title
-        # and make this post parent to them
-        for p in Post.search(post.title, 1, per_page)[0].all()[1:]:
-            p.parent_id = post.id
+        if (related_posts := Post.search(post.title, 1, per_page)[0].all()):
+            post.related_posts = related_posts
 
+        # add post to database
+        db.session.add(post)
         db.session.commit()
 
         flash('Your post has been created!', 'success')

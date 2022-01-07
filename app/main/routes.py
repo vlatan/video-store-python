@@ -103,18 +103,14 @@ def cron():
                         # commit
                         session.commit()
                 else:
-                    # create model object
+                    # create object from Model
                     post = Post(**video)
-                    # add to database
-                    session.add(post)
-                    # must imediatelly commit otherwise `db.event.listen` isn't working
-                    # therefore post won't be added to the search index
-                    session.commit()
                     # search for related videos using the post title
-                    # and make this post parent to them
-                    for p in Post.search(post.title, 1, per_page, session=session)[0].all()[1:]:
-                        p.parent_id = post.id
-                    # commit
+                    if (related_posts := Post.search(post.title, 1, per_page, session=session)[0].all()):
+                        post.related_posts = related_posts
+
+                    # add post to database
+                    session.add(post)
                     session.commit()
         finally:
             # lastly remove the Session no matter what
