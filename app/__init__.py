@@ -33,11 +33,13 @@ def create_app(config_class=Config):
     from app.posts.routes import posts
     from app.main.routes import main
     from app.search.routes import search
+    from app.cron.routes import cron
     from app.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(search)
+    app.register_blueprint(cron)
     app.register_blueprint(errors)
 
     return app
