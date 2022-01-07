@@ -26,6 +26,19 @@
 			<button id="openModal" class="modal-button">Delete</button>
 			{% endif %}
 		</div>
+		{% if current_user.is_authenticated %}
+		{% if current_user.has_liked_post(post) %}
+		<a href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
+		{% else %}
+		<a href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}">Like</a>
+		{% endif %}
+		{% endif %}
+		{{ likes }}
+		{% if likes == 1 %}
+		like
+		{% else %}
+		likes
+		{% endif %}
 		<div class="related_videos">
 			{% if post.related_posts %}
 			{% for related_post in post.related_posts %}

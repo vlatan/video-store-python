@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     picture = db.Column(db.String(256), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
+    liked = db.relationship('PostLike', backref='user', lazy=True)
 
     @property
     def is_admin(self):
@@ -27,6 +28,22 @@ class User(db.Model, UserMixin):
         if self.email == admin_email:
             return True
         return False
+
+    def like_post(self, post):
+        if not self.has_liked_post(post):
+            like = PostLike(user_id=self.id, post_id=post.id)
+            db.session.add(like)
+
+    def unlike_post(self, post):
+        if self.has_liked_post(post):
+            PostLike.query.filter_by(
+                user_id=self.id,
+                post_id=post.id).delete()
+
+    def has_liked_post(self, post):
+        return PostLike.query.filter(
+            PostLike.user_id == self.id,
+            PostLike.post_id == post.id).count() > 0
 
 
 class Playlist(db.Model):
@@ -101,6 +118,7 @@ class Post(db.Model, SearchableMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
     related_posts = db.Column(db.PickleType, default=[])
+    likes = db.relationship('PostLike', backref='post', lazy='dynamic')
 
     @property
     def serialize(self):
@@ -121,6 +139,12 @@ class Post(db.Model, SearchableMixin):
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
         }
+
+
+class PostLike(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
 
 
 # listen for commit and make changes to search index

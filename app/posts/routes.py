@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash
-from flask import redirect, abort, Blueprint, current_app
+from flask import redirect, abort, Blueprint, current_app, request
 from flask_login import current_user, login_required
 from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
@@ -60,7 +60,8 @@ def post(post_id):
     # create video duration object
     duration = convertDuration(post.duration)
 
-    return render_template('post.html', post=post, thumb=thumb['url'], duration=duration.human)
+    return render_template('post.html', post=post, thumb=thumb['url'],
+                           duration=duration.human, likes=post.likes.count())
 
 
 @posts.route('/post/new', methods=['GET', 'POST'])
@@ -131,3 +132,16 @@ def delete_post(post_id):
     db.session.commit()
     flash('The video has been deleted', 'success')
     return redirect(url_for('main.home'))
+
+
+@posts.route('/post/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.get_or_404(post_id)
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+    return redirect(request.referrer)
