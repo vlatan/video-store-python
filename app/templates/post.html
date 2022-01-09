@@ -122,18 +122,15 @@
 			event.target.classList.toggle("like-no");
 			event.target.classList.toggle("like-yes");
 			if (event.target.classList.contains("like-yes")) {
-				getLikeData(window.location.path, { action: 'like' })
-					.then(data => {
-						setLikeCounter(data);
-					});
+				var likeAction = 'like';
 			} else {
-				// console.log("Send unlike to backend.")
-				getLikeData(window.location.path, { action: 'unlike' })
-					.then(data => {
-						setLikeCounter(data);
-					});
+				var likeAction = 'unlike';
 			}
-		})
+			getLikeData(window.location.path, { action: likeAction })
+				.then(data => {
+					setLikeCounter(data);
+				});
+		});
 	}
 
 	document.addEventListener("DOMContentLoaded", listenForLikes);
