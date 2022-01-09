@@ -76,6 +76,30 @@
     align-items: center;
 }
 
+/* ############# Likes ############# */
+
+.likes {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+button.like {
+    border: none;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+}
+
+.like-yes {
+    background: url(/static/images/like-yes.svg) no-repeat;
+}
+
+.like-no {
+    background: url(/static/images/like-no.svg) no-repeat;
+}
+
+
 /* ############# Delete Video Modal ############# */
 
 /* Set a style for all modal buttons */

@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, jsonify, make_response
 from flask import redirect, abort, Blueprint, current_app, request
 from flask_login import current_user, login_required
 from wtforms.validators import ValidationError
@@ -14,13 +14,31 @@ from datetime import datetime, timedelta
 posts = Blueprint('posts', __name__)
 
 
-@posts.route('/post/<int:post_id>/')
+@login_required
+def perform_action(post):
+    frontend_data = request.get_json()
+    action = frontend_data.get('action') if frontend_data else None
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+        return make_response(jsonify('liked'), 200)
+    elif action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+        return make_response(jsonify('unliked'), 200)
+    return make_response(jsonify(None), 200)
+
+
+@posts.route('/post/<int:post_id>/', methods=['GET', 'POST'])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
 
+    if request.method == 'POST':
+        print('We got POST request')
+        return perform_action(post)
+
     # perform this check every third day from the last visit
     if post.last_checked + timedelta(days=3) < datetime.utcnow():
-        check_related = False
         # revalidate the video
         API_KEY = current_app.config['YOUTUBE_API_KEY']
         with build('youtube', 'v3', developerKey=API_KEY) as youtube:
@@ -134,14 +152,14 @@ def delete_post(post_id):
     return redirect(url_for('main.home'))
 
 
-@posts.route('/post/<int:post_id>/<action>')
-@login_required
-def like_action(post_id, action):
-    post = Post.query.get_or_404(post_id)
-    if action == 'like':
-        current_user.like_post(post)
-        db.session.commit()
-    if action == 'unlike':
-        current_user.unlike_post(post)
-        db.session.commit()
-    return redirect(request.referrer)
+# @posts.route('/post/<int:post_id>/<action>')
+# @login_required
+# def like_action(post_id, action):
+#     post = Post.query.get_or_404(post_id)
+#     if action == 'like':
+#         current_user.like_post(post)
+#         db.session.commit()
+#     if action == 'unlike':
+#         current_user.unlike_post(post)
+#         db.session.commit()
+#     return redirect(request.referrer)

@@ -26,19 +26,20 @@
 			<button id="openModal" class="modal-button">Delete</button>
 			{% endif %}
 		</div>
-		{% if current_user.is_authenticated %}
-		{% if current_user.has_liked_post(post) %}
-		<a href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
-		{% else %}
-		<a href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}">Like</a>
-		{% endif %}
-		{% endif %}
-		{{ likes }}
-		{% if likes == 1 %}
-		like
-		{% else %}
-		likes
-		{% endif %}
+		<div class="likes">
+			{% if current_user.is_authenticated %}
+			{% if current_user.has_liked_post(post) %}
+			<button class="like like-yes"></button>
+			{% else %}
+			<button class="like like-no"></button>
+			{% endif %}
+			{% endif %}
+			<span class="like-counter">
+				{% if likes %}
+				{{ likes }}
+				{% endif %}
+			</span>
+		</div>
 		<div class="related_videos">
 			{% if post.related_posts %}
 			{% for related_post in post.related_posts %}
@@ -68,7 +69,8 @@
 {% endblock content %}
 
 {% block scripts %}
-{% if current_user.is_authenticated and current_user.is_admin %}
+{% if current_user.is_authenticated %}
+{% if current_user.is_admin %}
 <script>
 	var openModal = document.getElementById('openModal');
 	var noModal = [document.getElementById('modal'),
@@ -83,6 +85,58 @@
 			modal.style.display = "none";
 		}
 	}
+</script>
+{% endif %}
+
+<script>
+	function setLikeCounter(data) {
+		let counter = parseInt(document.querySelector(".like-counter").innerHTML);
+		if (data === 'liked') {
+			if (isNaN(counter)) {
+				counter = 1;
+			} else {
+				counter += 1;
+			}
+		} else if (data === 'unliked') {
+			if (counter === 1) {
+				counter = '';
+			} else {
+				counter -= 1;
+			}
+		}
+		document.querySelector(".like-counter").innerHTML = counter
+	}
+
+	async function getLikeData(url = '', data = {}) {
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		});
+		return response.json();
+	}
+
+	function listenForLikes() {
+		const like = document.querySelector(".like");
+		like.addEventListener("click", (event) => {
+			event.target.classList.toggle("like-no");
+			event.target.classList.toggle("like-yes");
+			if (event.target.classList.contains("like-yes")) {
+				getLikeData(window.location.path, { action: 'like' })
+					.then(data => {
+						setLikeCounter(data);
+					});
+			} else {
+				// console.log("Send unlike to backend.")
+				getLikeData(window.location.path, { action: 'unlike' })
+					.then(data => {
+						setLikeCounter(data);
+					});
+			}
+		})
+	}
+
+	document.addEventListener("DOMContentLoaded", listenForLikes);
 </script>
 {% endif %}
 
