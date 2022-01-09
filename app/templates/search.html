@@ -81,7 +81,7 @@ Found <strong>{{ total }}</strong> results for this query.
                     let template_clone = template.content.cloneNode(true);
 
                     // Query & update the template content
-                    template_clone.querySelector('.home-video-link').href = `/post/${data[i]['id']}`;
+                    template_clone.querySelector('.home-video-link').href = `/post/${data[i]['id']}/`;
                     let thumb = template_clone.querySelector('.home-video-img');
                     thumb.src = data[i]['thumbnails']['medium']['url'];
                     thumb.alt = data[i]['title'];
