@@ -34,7 +34,6 @@ def post(post_id):
     post = Post.query.get_or_404(post_id)
 
     if request.method == 'POST':
-        print('We got POST request')
         return perform_action(post)
 
     # perform this check every third day from the last visit
