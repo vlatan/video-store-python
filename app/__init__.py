@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
-from flask_msearch import Search
+# from flask_msearch import Search
 
 db = SQLAlchemy()
 # search = Search()
