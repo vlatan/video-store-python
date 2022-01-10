@@ -42,7 +42,8 @@ class User(db.Model, UserMixin, ActionMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
-    faved = db.relationship('PostFave', backref='user', lazy=True)
+    faved = db.relationship('PostFave', backref='user',
+                            cascade='all,delete', lazy='dinamic')
 
     @property
     def is_admin(self):
@@ -124,7 +125,10 @@ class Post(db.Model, SearchableMixin):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
     related_posts = db.Column(db.PickleType, default=[])
-    likes = db.relationship('PostLike', backref='post', lazy='dynamic')
+    likes = db.relationship('PostLike', backref='post',
+                            cascade='all,delete', lazy='dynamic')
+    faves = db.relationship('PostFave', backref='post',
+                            cascade='all,delete', lazy=True)
 
     @property
     def serialize(self):
