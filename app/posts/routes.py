@@ -1,73 +1,23 @@
-from flask import render_template, url_for, flash, jsonify, make_response
-from flask import redirect, abort, Blueprint, current_app, request
+from flask import render_template, url_for, flash
+from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
-from wtforms.validators import ValidationError
-from googleapiclient.errors import HttpError
 from app import db
 from app.helpers import admin_required
 from app.models import Post, Playlist
 from app.posts.forms import PostForm, PlaylistForm
-from app.posts.helpers import validate_video, convertDuration
-from googleapiclient.discovery import build
+from app.posts.helpers import convertDuration, revalidate_video
 from datetime import datetime, timedelta
 
 posts = Blueprint('posts', __name__)
 
 
-@login_required
-def perform_action(post):
-    frontend_data = request.get_json()
-    action = frontend_data.get('action') if frontend_data else None
-    if action == 'like':
-        current_user.like_post(post)
-        db.session.commit()
-        return make_response(jsonify('liked'), 200)
-    elif action == 'unlike':
-        current_user.unlike_post(post)
-        db.session.commit()
-        return make_response(jsonify('unliked'), 200)
-    return make_response(jsonify(None), 200)
-
-
-@posts.route('/post/<int:post_id>/', methods=['GET', 'POST'])
+@posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
 
-    if request.method == 'POST':
-        return perform_action(post)
-
-    # perform this check every third day from the last visit
+    # revalidate video every third day from the last visit
     if post.last_checked + timedelta(days=3) < datetime.utcnow():
-        # revalidate the video
-        API_KEY = current_app.config['YOUTUBE_API_KEY']
-        with build('youtube', 'v3', developerKey=API_KEY) as youtube:
-            try:
-                scope = {'id': post.video_id,
-                         'part': ['status', 'snippet', 'contentDetails']}
-                req = youtube.videos().list(**scope)
-                # this will raise IndexError if ['items'] is empty list
-                # which means the video does not exist
-                res = req.execute()['items'][0]
-                # this will raise ValidationError if video's invalid
-                if validate_video(res):
-                    # number of related posts to fetch
-                    per_page = current_app.config['NUM_RELATED_POSTS']
-                    # get related posts by searching the index using the title of this post
-                    related_posts = Post.search(
-                        post.title, 1, per_page + 1)[0].all()[1:]
-                    # if there's change in the related posts
-                    if post.related_posts != related_posts:
-                        post.related_posts = related_posts
-            # video is not validated or doesn't exist
-            except (IndexError, ValidationError):
-                db.session.delete(post)
-                db.session.commit()
-                abort(404)
-            except HttpError:
-                # we couldn't connect to YT API,
-                # so we can't evaluate the video
-                pass
-
+        revalidate_video(post)
         # update last checked
         post.last_checked = datetime.utcnow()
         db.session.commit()
@@ -140,25 +90,20 @@ def playlists():
     return render_template('playlists.html', posts=playlists, title='Playlists')
 
 
-@posts.route('/post/<int:post_id>/delete', methods=['POST'])
+@posts.route('/post/<int:post_id>/<action>', methods=['POST'])
 @login_required
-@admin_required
-def delete_post(post_id):
+def perform_action(post_id, action):
     post = Post.query.get_or_404(post_id)
-    db.session.delete(post)
-    db.session.commit()
-    flash('The video has been deleted', 'success')
-    return redirect(url_for('main.home'))
-
-
-# @posts.route('/post/<int:post_id>/<action>')
-# @login_required
-# def like_action(post_id, action):
-#     post = Post.query.get_or_404(post_id)
-#     if action == 'like':
-#         current_user.like_post(post)
-#         db.session.commit()
-#     if action == 'unlike':
-#         current_user.unlike_post(post)
-#         db.session.commit()
-#     return redirect(request.referrer)
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+        return make_response('Success', 200)
+    elif action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+        return make_response('Success', 200)
+    elif action == 'delete' and current_user.is_admin:
+        db.session.delete(post)
+        db.session.commit()
+        flash('The video has been deleted', 'success')
+        return redirect(url_for('main.home'))

@@ -2,7 +2,11 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
+from flask import abort, current_app
+from app import db
+from app.models import Post
 from googleapiclient.errors import HttpError
+from googleapiclient.discovery import build
 
 
 def validate_video(response, playlist_id=None):
@@ -56,6 +60,39 @@ def validate_video(response, playlist_id=None):
             'tags': response['snippet'].get('tags'),
             'duration': response['contentDetails']['duration'],
             'upload_date': upload_date}
+
+
+def revalidate_video(post):
+    # revalidate the video
+    API_KEY = current_app.config['YOUTUBE_API_KEY']
+    with build('youtube', 'v3', developerKey=API_KEY) as youtube:
+        try:
+            scope = {'id': post.video_id,
+                     'part': ['status', 'snippet', 'contentDetails']}
+            req = youtube.videos().list(**scope)
+            # this will raise IndexError if ['items'] is empty list
+            # which means the video does not exist
+            res = req.execute()['items'][0]
+            # this will raise ValidationError if video's invalid
+            if validate_video(res):
+                # number of related posts to fetch
+                per_page = current_app.config['NUM_RELATED_POSTS']
+                # get related posts by searching the index using the title of this post
+                related_posts = Post.search(
+                    post.title, 1, per_page + 1)[0].all()[1:]
+                # if there's change in the related posts
+                if post.related_posts != related_posts:
+                    post.related_posts = related_posts
+                    db.session.commit()
+        # video is not validated or doesn't exist
+        except (IndexError, ValidationError):
+            db.session.delete(post)
+            db.session.commit()
+            abort(404)
+        except HttpError:
+            # we couldn't connect to YT API,
+            # so we can't evaluate the video
+            pass
 
 
 def validate_playlist(playlist_id, youtube):
