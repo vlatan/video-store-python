@@ -43,7 +43,7 @@ class User(db.Model, UserMixin, ActionMixin):
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
     faved = db.relationship('PostFave', backref='user',
-                            cascade='all,delete', lazy='dinamic')
+                            cascade='all,delete', lazy='dynamic')
 
     @property
     def is_admin(self):
