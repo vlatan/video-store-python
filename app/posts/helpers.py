@@ -84,6 +84,12 @@ def revalidate_video(post):
                 if post.related_posts != related_posts:
                     post.related_posts = related_posts
                     db.session.commit()
+                # add video to index if not already there
+                es = current_app.elasticsearch
+                index_name, fields = Post.__tablename__, Post.__searchable__
+                if es and es.ping() and not es.exists(index=index_name, id=post.id):
+                    payload = {field: getattr(post, field) for field in fields}
+                    es.index(index=index_name, id=post.id, document=payload)
         # video is not validated or doesn't exist
         except (IndexError, ValidationError):
             db.session.delete(post)
