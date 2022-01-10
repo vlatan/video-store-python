@@ -80,8 +80,8 @@
 
 .likes {
     display: flex;
-    align-items: center;
-    gap: 1rem;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 button.like {
