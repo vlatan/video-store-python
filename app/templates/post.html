@@ -58,7 +58,6 @@
 		<div class="container">
 			<h2>Delete Video</h2>
 			<p>Are you sure you want to delete this video?</p>
-
 			<div class="modal-buttons-wrap">
 				<button id="cancelModal" type="button" class="modal-button cancelbtn">Cancel</button>
 				<button type="submit" class="modal-button deletebtn">Delete</button>
@@ -109,30 +108,33 @@
 	}
 
 	async function performAction(action) {
-		const response = await fetch(`${window.location.pathname}${action}`, { method: 'POST' });
-		return response;
+		const url = `${window.location.pathname}${action}`;
+		return await fetch(url, { method: 'POST' });
 	}
 
-	function listenForLikes() {
-		const like = document.querySelector(".like");
-		like.addEventListener("click", (event) => {
-			event.target.classList.toggle("like-no");
-			event.target.classList.toggle("like-yes");
-			if (event.target.classList.contains("like-yes")) {
-				var current_action = 'like';
-			} else {
-				var current_action = 'unlike';
+	function listenForAction(action) {
+		const action_element = document.querySelector(`.${action}`);
+		action_element.addEventListener('click', (event) => {
+			event.target.classList.toggle(`${action}-no`);
+			event.target.classList.toggle(`${action}-yes`);
+			let current_action = action;
+			if (event.target.classList.contains(`${action}-no`)) {
+				current_action = `un${action}`;
 			}
 			performAction(current_action)
 				.then(response => {
 					if (response.ok) {
-						setLikeCounter(current_action);
+						if (current_action.includes('like')) {
+							setLikeCounter(current_action);
+						}
 					}
 				});
 		});
 	}
 
-	document.addEventListener("DOMContentLoaded", listenForLikes);
+	document.addEventListener("DOMContentLoaded", () => {
+		listenForAction('like');
+	});
 </script>
 {% endif %}
 
