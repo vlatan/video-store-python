@@ -28,7 +28,7 @@
 		</div>
 		<div class="likes">
 			{% if current_user.is_authenticated %}
-			{% if current_user.has_liked_post(post) %}
+			{% if current_user.has_casted(post, 'like') %}
 			<button class="like like-yes"></button>
 			{% else %}
 			<button class="like like-no"></button>

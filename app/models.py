@@ -12,7 +12,28 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-class User(db.Model, UserMixin):
+class ActionMixin(object):
+    def cast(self, post, action):
+        if not self.has_casted(post, action):
+            model = PostLike if action == 'like' else PostFave
+            cast = model(user_id=self.id, post_id=post.id)
+            db.session.add(cast)
+
+    def uncast(self, post, action):
+        if self.has_casted(post, action):
+            model = PostLike if action == 'like' else PostFave
+            model.query.filter_by(
+                user_id=self.id,
+                post_id=post.id).delete()
+
+    def has_casted(self, post, action):
+        model = PostLike if action is 'like' else PostFave
+        return model.query.filter(
+            model.user_id == self.id,
+            model.post_id == post.id).count() > 0
+
+
+class User(db.Model, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
     openid = db.Column(db.String(256), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -21,6 +42,7 @@ class User(db.Model, UserMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
+    faved = db.relationship('PostFave', backref='user', lazy=True)
 
     @property
     def is_admin(self):
@@ -28,22 +50,6 @@ class User(db.Model, UserMixin):
         if self.email == admin_email:
             return True
         return False
-
-    def like_post(self, post):
-        if not self.has_liked_post(post):
-            like = PostLike(user_id=self.id, post_id=post.id)
-            db.session.add(like)
-
-    def unlike_post(self, post):
-        if self.has_liked_post(post):
-            PostLike.query.filter_by(
-                user_id=self.id,
-                post_id=post.id).delete()
-
-    def has_liked_post(self, post):
-        return PostLike.query.filter(
-            PostLike.user_id == self.id,
-            PostLike.post_id == post.id).count() > 0
 
 
 class Playlist(db.Model):
@@ -142,6 +148,12 @@ class Post(db.Model, SearchableMixin):
 
 
 class PostLike(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+
+
+class PostFave(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))

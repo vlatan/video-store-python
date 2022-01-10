@@ -95,11 +95,11 @@ def playlists():
 def perform_action(post_id, action):
     post = Post.query.get_or_404(post_id)
     if action == 'like':
-        current_user.like_post(post)
+        current_user.cast(post, 'like')
         db.session.commit()
         return make_response('Success', 200)
     elif action == 'unlike':
-        current_user.unlike_post(post)
+        current_user.uncast(post, 'like')
         db.session.commit()
         return make_response('Success', 200)
     elif action == 'delete' and current_user.is_admin:
