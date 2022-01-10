@@ -126,7 +126,7 @@
 			} else {
 				var likeAction = 'unlike';
 			}
-			getLikeData(window.location.path, { action: likeAction })
+			getLikeData(window.location.pathname, { action: likeAction })
 				.then(data => {
 					setLikeCounter(data);
 				});
