@@ -102,6 +102,14 @@ def perform_action(post_id, action):
         current_user.uncast(post, 'like')
         db.session.commit()
         return make_response('Success', 200)
+    if action == 'fave':
+        current_user.cast(post, 'fave')
+        db.session.commit()
+        return make_response('Success', 200)
+    elif action == 'unfave':
+        current_user.uncast(post, 'fave')
+        db.session.commit()
+        return make_response('Success', 200)
     elif action == 'delete' and current_user.is_admin:
         db.session.delete(post)
         db.session.commit()

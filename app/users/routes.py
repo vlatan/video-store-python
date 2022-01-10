@@ -7,7 +7,7 @@ from flask import render_template, url_for, flash, session
 from flask import redirect, request, Blueprint, current_app
 from flask_login import current_user, logout_user, login_required
 from app import db
-from app.models import User, Post
+from app.models import User
 from app.users.forms import UpdateAccountForm
 from app.users.helpers import user_ready
 
@@ -137,11 +137,8 @@ def account():
                            image_file=image_file, form=form)
 
 
-@users.route('/user/<string:username>')
-def user_posts(username):
-    page = request.args.get('page', 1, type=int)
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user)\
-        .order_by(Post.date_posted.desc())\
-        .paginate(page=page, per_page=5)
-    return render_template('user_posts.html', posts=posts, user=user)
+@users.route('/user/<int:user_id>/favorites')
+def favorites(user_id):
+    user = User.query.get_or_404(user_id)
+    faves = [fave.post for fave in user.faved]
+    return render_template('favorites.html', posts=faves, title='Favorites')

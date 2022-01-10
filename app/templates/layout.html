@@ -36,7 +36,7 @@
 				<a class="nav-item" href="{{ url_for('posts.new_playlist') }}">New Playlist</a>
 				<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
 				{% endif %}
-				<a class="nav-item" href="{{ url_for('posts.new_post') }}">Favorites</a>
+				<a class="nav-item" href="{{ url_for('users.favorites', user_id=current_user.id) }}">Favorites</a>
 				<a class="nav-item username" href="{{ url_for('users.account') }}">
 					{% if current_user.picture == 'default.jpg' %}
 					<img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" class="username-image"
