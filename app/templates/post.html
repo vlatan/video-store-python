@@ -34,11 +34,22 @@
 			<button class="like like-no"></button>
 			{% endif %}
 			{% endif %}
+
 			<span class="like-counter">
 				{% if likes %}
 				{{ likes }}
 				{% endif %}
 			</span>
+		</div>
+
+		<div class="faves">
+			{% if current_user.is_authenticated %}
+			{% if current_user.has_casted(post, 'fave') %}
+			<button class="fave fave-yes">Faved</button>
+			{% else %}
+			<button class="fave fave-no">Watch later</button>
+			{% endif %}
+			{% endif %}
 		</div>
 		<div class="related_videos">
 			{% if post.related_posts %}
