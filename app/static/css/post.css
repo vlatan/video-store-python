@@ -76,15 +76,22 @@
     align-items: center;
 }
 
-/* ############# Likes ############# */
+/* ############# Social (Likes and Faves) ############# */
 
-.likes {
+.social {
     display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
+    gap: 2.5rem;
 }
 
-button.like {
+.likes, .faves {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    min-width: 80px;
+}
+
+button.like, button.fave {
     border: none;
     cursor: pointer;
     width: 24px;
@@ -97,6 +104,14 @@ button.like {
 
 .like-no {
     background: url(/static/images/like-no.svg) no-repeat;
+}
+
+.fave-yes {
+    background: url(/static/images/fave-yes.svg) no-repeat;
+}
+
+.fave-no {
+    background: url(/static/images/fave-no.svg) no-repeat;
 }
 
 

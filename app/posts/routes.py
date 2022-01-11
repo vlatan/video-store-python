@@ -27,8 +27,13 @@ def post(post_id):
     # create video duration object
     duration = convertDuration(post.duration)
 
+    num_likes = post.likes.count()
+    likes = '1 Like' if num_likes == 1 else f'{num_likes} Likes'
+    if not num_likes:
+        likes = 'Like'
+
     return render_template('post.html', post=post, thumb=thumb['url'],
-                           duration=duration.human, likes=post.likes.count())
+                           duration=duration.human, likes=likes)
 
 
 @posts.route('/post/new', methods=['GET', 'POST'])

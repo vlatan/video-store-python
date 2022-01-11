@@ -112,8 +112,10 @@ def logout():
     logout_user()
     login_needed = [url_for('users.account', _external=True),
                     url_for('posts.new_post', _external=True),
-                    url_for('posts.new_playlist', _external=True)]
+                    url_for('posts.new_playlist', _external=True),
+                    url_for('users.favorites', _external=True)]
     referrer = request.referrer
+    flash('You were signed out.')
     if referrer in login_needed:
         return redirect(url_for('main.home'))
     return redirect(referrer)
@@ -137,8 +139,7 @@ def account():
                            image_file=image_file, form=form)
 
 
-@users.route('/user/<int:user_id>/favorites')
-def favorites(user_id):
-    user = User.query.get_or_404(user_id)
-    faves = [fave.post for fave in user.faved]
-    return render_template('favorites.html', posts=faves, title='Favorites')
+@users.route('/favorites')
+@login_required
+def favorites():
+    return render_template('favorites.html', faved=current_user.faved, title='Favorites')
