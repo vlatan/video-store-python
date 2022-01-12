@@ -74,7 +74,7 @@
 	{% if not current_user.is_authenticated %}
 	<script>
 		function OAuth() {
-			var url = '{{ url_for("users.oauth") }}';
+			var url = '{{ url_for("users.authorize") }}';
 			var width = screen.availWidth * 0.44;
 			var height = screen.availHeight * 0.83;
 			var left = (screen.availWidth / 2) - (width / 2);

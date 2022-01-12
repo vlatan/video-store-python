@@ -24,3 +24,23 @@ class Config:
     ELASTICSEARCH = {"hosts": [ELASTICSEARCH_URL]}
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))
+
+    GOOGLE_OAUTH_CLIENT_CONFIG = {
+        "web": {
+            "client_id": GOOGLE_OAUTH_CLIENT_ID,
+            "project_id": "doxder",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": GOOGLE_OAUTH_CLIENT_SECRET,
+            "redirect_uris": [
+                "http://localhost:5000/login/google/authorized",
+                "http://localhost:5000/oauth2callback",
+                "http://localhost:5000/oauth"
+            ],
+            "javascript_origins": [
+                "http://localhost",
+                "http://localhost:5000"
+            ]
+        }
+    }
