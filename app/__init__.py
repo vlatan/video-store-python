@@ -26,7 +26,6 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True)
-    # search.init_app(app)
     login_manager.init_app(app)
 
     from app.users.routes import users
@@ -34,12 +33,14 @@ def create_app(config_class=Config):
     from app.main.routes import main
     from app.search.routes import search
     from app.cron.routes import cron
+    from app.auth.routes import auth
     from app.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(search)
     app.register_blueprint(cron)
+    app.register_blueprint(auth)
     app.register_blueprint(errors)
 
     return app

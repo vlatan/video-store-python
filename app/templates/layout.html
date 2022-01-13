@@ -41,9 +41,9 @@
 					<img src="{{ current_user.picture }}" class="username-image" width="20" height="20" alt="">
 					{{ current_user.username }}
 				</a>
-				<a class="nav-item g_id_signout" href="{{ url_for('users.logout') }}">Sign out</a>
+				<a class="nav-item g_id_signout" href="{{ url_for('auth.logout') }}">Log out</a>
 				{% else %}
-				<a class="nav-item" href="#" onclick="OAuth()">Sign in</a>
+				<a class="nav-item" href="#" onclick="OAuth()">Log in</a>
 				{% endif %}
 			</nav>
 		</header>
@@ -70,7 +70,7 @@
 	{% if not current_user.is_authenticated %}
 	<script>
 		function OAuth() {
-			var url = '{{ url_for("users.authorize") }}';
+			var url = '{{ url_for("auth.authorize") }}';
 			var width = screen.availWidth * 0.44;
 			var height = screen.availHeight * 0.83;
 			var left = (screen.availWidth / 2) - (width / 2);
@@ -81,7 +81,7 @@
 
 	<script src="https://accounts.google.com/gsi/client" async defer></script>
 	<div id="g_id_onload" data-client_id="{{ config['GOOGLE_OAUTH_CLIENT_ID'] }}"
-		data-login_uri="{{ url_for('users.onetap') }}">
+		data-login_uri="{{ url_for('auth.onetap') }}">
 	</div>
 	{% endif %}
 
