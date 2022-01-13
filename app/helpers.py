@@ -9,8 +9,8 @@ from elasticsearch import Elasticsearch
 def admin_required(func):
     @wraps(func)
     def only_admin(*args, **kwargs):
-        admin_email = current_app.config['ADMIN_EMAIL']
-        if current_user.email != admin_email:
+        admin_openid = current_app.config['ADMIN_OPENID']
+        if current_user.openid != admin_openid:
             flash('You need to be admin to access that page!', 'info')
             return redirect(url_for('main.home'))
         return func(*args, **kwargs)

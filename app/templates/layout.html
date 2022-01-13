@@ -38,13 +38,9 @@
 				{% endif %}
 				<a class="nav-item" href="{{ url_for('users.favorites') }}">Favorites</a>
 				<a class="nav-item username" href="{{ url_for('users.account') }}">
-					{% if current_user.picture == 'default.jpg' %}
-					<img src="{{ url_for('static', filename='profile_pics/default.jpg') }}" class="username-image"
-						width="20" height="20" alt="">
-					{% else %}
 					<img src="{{ current_user.picture }}" class="username-image" width="20" height="20" alt="">
-					{% endif %}
-					{{ current_user.username }}</a>
+					{{ current_user.username }}
+				</a>
 				<a class="nav-item g_id_signout" href="{{ url_for('users.logout') }}">Sign out</a>
 				{% else %}
 				<a class="nav-item" href="#" onclick="OAuth()">Sign in</a>
