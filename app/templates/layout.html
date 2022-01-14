@@ -17,7 +17,7 @@
 </head>
 
 <body>
-	<div class="site-wrap">
+	<div class="site-header-wrap">
 		<header class="site-header">
 			<a class="logo" href="/">Doxder</a>
 			<nav class="navbar">
@@ -47,22 +47,22 @@
 				{% endif %}
 			</nav>
 		</header>
-
-		<main role="main" class="content-wrap">
-			{% with messages = get_flashed_messages(with_categories=true) %}
-			{% if messages %}
-			{% for category, message in messages %}
-			<div class="alert alert-{{ category }}">
-				{{ message }}
-			</div>
-			{% endfor %}
-			{% endif %}
-			{% endwith %}
-			{% block content %}
-			{% endblock content %}
-		</main>
-
 	</div>
+
+	<main role="main" class="content-wrap">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		{% for category, message in messages %}
+		<div class="alert alert-{{ category }}">
+			{{ message }}
+		</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+		{% block content %}
+		{% endblock content %}
+	</main>
+
 
 	{% block scripts %}
 	{% endblock scripts %}
