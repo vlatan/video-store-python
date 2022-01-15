@@ -60,7 +60,7 @@
     flex-direction: column;
     gap: var(--content-padding);
     background-color: var(--secondary-background-color);
-    /* border-radius: 1rem; */
+    border-radius: 1rem;
     padding: var(--content-padding);
 }
 
@@ -82,6 +82,7 @@
 }
 
 .likes, .faves {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -92,24 +93,53 @@
 button.like, button.fave {
     border: none;
     cursor: pointer;
-    width: 24px;
-    height: 24px;
+    background: none;
+    padding-left: 1.5rem;
+    font-size: .9rem;
 }
 
-.like-yes {
-    background: url(/static/images/like-yes.svg) no-repeat;
+button.like::before,
+button.fave::before {
+    position: absolute;
+    left: 0;
+    width: 14px;
+    height: 14px;
 }
 
-.like-no {
-    background: url(/static/images/like-no.svg) no-repeat;
+button.like::before {
+    top: 1px;
 }
 
-.fave-yes {
-    background: url(/static/images/fave-yes.svg) no-repeat;
+.like-yes::before {
+    content: url('/static/images/like-yes.svg');
 }
 
-.fave-no {
-    background: url(/static/images/fave-no.svg) no-repeat;
+.like-no::before {
+    content: url(/static/images/like-no.svg);
+}
+
+button.like:hover.like-yes::before {
+    content: url(/static/images/like-no.svg);
+}
+
+button.like:hover.like-no::before {
+    content: url(/static/images/like-yes.svg);
+}
+
+.fave-yes::before {
+    content: url(/static/images/fave-yes.svg);
+}
+
+.fave-no::before {
+    content: url(/static/images/fave-no.svg);
+}
+
+button.fave:hover.fave-yes::before {
+    content: url(/static/images/fave-no.svg);
+}
+
+button.fave:hover.fave-no::before {
+    content: url(/static/images/fave-yes.svg);
 }
 
 

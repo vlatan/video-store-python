@@ -2,7 +2,7 @@
 
 :root {
     --primary-background-color: rgb(12, 12, 12);
-    --secondary-background-color: rgba(18, 18, 18, 0.6);
+    --secondary-background-color: rgb(21, 24, 28);
     --primary-font-color: #cacaca;
     --content-width: 1200px;
     --main-font-family: 'Roboto', sans-serif;
@@ -69,7 +69,7 @@ ul, li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 4rem;
+    min-height: 3.5rem;
     /* border-bottom: 1px solid var(--main-color); */
 }
 
@@ -124,4 +124,30 @@ a.nav-item.username {
 
 .nav-item img.username-image {
     border-radius: 50%;
+}
+
+.need-login {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    background: blue;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: .7rem 2rem;
+    top: 58px;
+    right: 52px;
+}
+
+.need-login:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 10%;
+	width: 0;
+	height: 0;
+	border: 10px solid transparent;
+	border-bottom-color: blue;
+	border-top: 0;
+	margin-left: -10px;
+	margin-top: -10px;
 }

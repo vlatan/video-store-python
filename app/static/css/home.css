@@ -3,7 +3,8 @@
     grid-template-columns: repeat(4, minmax(50px, 320px));
     /* grid-template-rows: repeat(auto, 1fr); */
     justify-content: stretch;
-    gap: var(--content-padding);
+    column-gap: var(--content-padding);
+    row-gap: calc(var(--content-padding) + 1rem);
 }
 
 a.home-video-link {

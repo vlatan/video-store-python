@@ -30,26 +30,24 @@
 			<div class="likes">
 				{% if current_user.is_authenticated %}
 				{% if current_user.has_casted(post, 'like') %}
-				<button class="like like-yes"></button>
+				<button class="like like-yes like-counter">{{ likes }}</button>
 				{% else %}
-				<button class="like like-no"></button>
+				<button class="like like-no like-counter">{{ likes }}</button>
 				{% endif %}
+				{% else %}
+				<button class="like like-no no-auth">{{ likes }}</button>
 				{% endif %}
-
-				<span class="like-counter">
-					{{ likes }}
-				</span>
 			</div>
 
 			<div class="faves">
 				{% if current_user.is_authenticated %}
 				{% if current_user.has_casted(post, 'fave') %}
-				<button class="fave fave-yes"></button>
-				<span class="fave-status">Saved</span>
+				<button class="fave fave-yes fave-status">Saved</button>
 				{% else %}
-				<button class="fave fave-no"></button>
-				<span class="fave-status">Save</span>
+				<button class="fave fave-no fave-status">Save</button>
 				{% endif %}
+				{% else %}
+				<button class="fave fave-no no-auth">Save</button>
 				{% endif %}
 			</div>
 		</div>
@@ -161,6 +159,21 @@
 	document.addEventListener("DOMContentLoaded", () => {
 		listenForAction('like');
 		listenForAction('fave');
+	});
+</script>
+{% else %}
+<script>
+	var needLogin = document.querySelector('.need-login');
+	var login = document.querySelectorAll('.no-auth');
+
+	document.addEventListener('click', (event) => {
+		if (Array.from(login).includes(event.target)) {
+			needLogin.style.display = 'block';
+		}
+
+		else if (needLogin.style.display === 'block' && event.target != needLogin) {
+			needLogin.style.display = 'none';
+		}
 	});
 </script>
 {% endif %}

@@ -43,7 +43,10 @@
 				</a>
 				<a class="nav-item g_id_signout" href="{{ url_for('auth.logout') }}">Log out</a>
 				{% else %}
-				<a class="nav-item" href="#" onclick="OAuth()">Log in</a>
+				<a class="nav-item" href="#" onclick="OAuth()">
+					Log in
+				</a>
+				<div class="need-login">Please login</div>
 				{% endif %}
 			</nav>
 		</header>
@@ -79,10 +82,10 @@
 		}
 	</script>
 
-	<script src="https://accounts.google.com/gsi/client" async defer></script>
+	<!-- <script src="https://accounts.google.com/gsi/client" async defer></script>
 	<div id="g_id_onload" data-client_id="{{ config['GOOGLE_OAUTH_CLIENT_ID'] }}"
 		data-login_uri="{{ url_for('auth.onetap') }}">
-	</div>
+	</div> -->
 	{% endif %}
 
 </body>
