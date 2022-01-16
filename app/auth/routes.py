@@ -115,7 +115,7 @@ def logout():
                     url_for('posts.new_playlist', _external=True),
                     url_for('users.favorites', _external=True)]
     referrer = request.referrer
-    flash('You were signed out.')
+    flash('You\'ve been logged out!', 'info')
     if referrer in login_needed:
         return redirect(url_for('main.home'))
     return redirect(referrer)

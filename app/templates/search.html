@@ -37,7 +37,7 @@ Found <strong>{{ total }}</strong> results for this query.
 
 <!-- element to trigger the IntersectionObserver -->
 <div class="sentinel" id="sentinel">
-    <div class="spinner-border" role="status"></div>
+    <div id="spinner" role="status"></div>
 </div>
 {% endblock content %}
 
@@ -47,6 +47,7 @@ Found <strong>{{ total }}</strong> results for this query.
     var scroller = document.querySelector("#scroller");
     var template = document.querySelector('#post_template');
     var sentinel = document.querySelector('#sentinel');
+    var spinner = document.querySelector('#spinner');
     // Use infinite scroll from the second page onwards
     var counter = 2;
     // There are still posts to be fetched
@@ -101,14 +102,16 @@ Found <strong>{{ total }}</strong> results for this query.
         // Create a new IntersectionObserver instance
         let intersectionObserver = new IntersectionObserver(([entry]) => {
             // If there are still posts and the entry is intersecting
-            if (the_end == false && entry.isIntersecting) {
+            if (the_end === false && entry.isIntersecting) {
+                // apply spinner
+                spinner.classList.add('spinner');
                 // Call the loadItems function
                 loadItems('/search', { page: counter });
                 // Unobserve the entry
                 // intersectionObserver.unobserve(entry);
             }
             // add root margin for better intersection detecetion
-        }, { rootMargin: "200px 0px" });
+        }, { rootMargin: "100px 0px" });
 
         // Instruct the IntersectionObserver to watch the sentinel
         intersectionObserver.observe(sentinel);

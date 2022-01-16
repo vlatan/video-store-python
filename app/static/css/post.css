@@ -110,36 +110,24 @@ button.like::before {
     top: 1px;
 }
 
-.like-yes::before {
-    content: url('/static/images/like-yes.svg');
-}
-
-.like-no::before {
-    content: url(/static/images/like-no.svg);
-}
-
-button.like:hover.like-yes::before {
-    content: url(/static/images/like-no.svg);
-}
-
+.like-yes::before,
 button.like:hover.like-no::before {
     content: url(/static/images/like-yes.svg);
 }
 
-.fave-yes::before {
-    content: url(/static/images/fave-yes.svg);
-}
-
-.fave-no::before {
-    content: url(/static/images/fave-no.svg);
-}
-
-button.fave:hover.fave-yes::before {
-    content: url(/static/images/fave-no.svg);
-}
-
+.fave-yes::before,
 button.fave:hover.fave-no::before {
     content: url(/static/images/fave-yes.svg);
+}
+
+.like-no::before,
+button.like:hover.like-yes::before {
+    content: url(/static/images/like-no.svg);
+}
+
+.fave-no::before,
+button.fave:hover.fave-yes::before {
+    content: url(/static/images/fave-no.svg);
 }
 
 
@@ -241,4 +229,46 @@ hr {
     .cancelbtn, .deletebtn {
         width: 100%;
     }
+}
+
+.related_videos {
+    display: flex;
+    flex-direction: column;
+    row-gap: .5rem;
+}
+
+.related-video {
+    display: grid;
+    grid-template-columns: 40% auto;
+    column-gap: 1rem;
+    text-decoration: none;
+}
+
+.related-img {
+    display: block;
+    position: relative;
+    padding-bottom: 56.25%;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+    height: 0;
+}
+
+.related-img img {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    border: none;
+}
+
+h3.related-post-title {
+    font-size: .9rem;
+    font-weight: normal;
 }

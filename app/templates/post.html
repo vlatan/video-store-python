@@ -53,8 +53,17 @@
 		</div>
 		<div class="related_videos">
 			{% if post.related_posts %}
-			{% for related_post in post.related_posts %}
-			{{ related_post.title }} <br>
+			{% for related_post in post.related_posts[:3] %}
+			{% set thumb = related_post.thumbnails['default'] %}
+			<a href="/post/{{ related_post.id }}" class="related-video">
+				<span class="related-img">
+					<img src="{{ thumb['url'] }}" width="{{ thumb['width'] }}" height="{{ thumb['height'] }}"
+						alt="{{ related_post.title }}">
+				</span>
+				<h3 class="related-post-title">
+					{{ related_post.title }}
+				</h3>
+			</a>
 			{% endfor %}
 			{% endif %}
 		</div>

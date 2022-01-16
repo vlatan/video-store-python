@@ -4,7 +4,7 @@ from flask import url_for, flash, redirect, request
 
 
 def failed_login():
-    flash('Sorry, there was a problem signing in to your account.')
+    flash('Sorry, there was a problem signing in to your account.', 'info')
     return redirect(request.referrer)
 
 
