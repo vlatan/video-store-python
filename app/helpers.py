@@ -3,7 +3,8 @@ from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user
-from elasticsearch import Elasticsearch, ImproperlyConfigured, ElasticsearchException
+from elasticsearch import Elasticsearch
+from elasticsearch import ImproperlyConfigured, ElasticsearchException
 
 
 def admin_required(func):
@@ -49,8 +50,9 @@ def remove_from_index(index, model):
 
 
 def query_index(index, query, page, per_page):
-    es = prep_elastic()
     try:
+        if not (es := prep_elastic()):
+            raise ImproperlyConfigured
         search = es.search(
             index=index,
             body={'query': {'multi_match': {'query': query, 'fields': ['*']}},
@@ -59,6 +61,5 @@ def query_index(index, query, page, per_page):
         # there was a problem with elasticserach
         # you may need to log this error
         return [], 0
-
     ids = [int(hit['_id']) for hit in search['hits']['hits']]
     return ids, search['hits']['total']['value']

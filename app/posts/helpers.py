@@ -85,9 +85,11 @@ def revalidate_video(post):
                 if post.related_posts != related_posts:
                     post.related_posts = related_posts
                     db.session.commit()
+
                 # add video to index if not already there
                 try:
-                    es = current_app.elasticsearch
+                    if not (es := current_app.elasticsearch):
+                        raise ImproperlyConfigured
                     index_name, fields = Post.__tablename__, Post.__searchable__
                     payload = {field: getattr(post, field) for field in fields}
                     es.index(index=index_name, id=post.id, document=payload)
