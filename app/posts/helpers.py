@@ -7,6 +7,7 @@ from app import db
 from app.models import Post
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+from elasticsearch import ImproperlyConfigured, ElasticsearchException
 
 
 def validate_video(response, playlist_id=None):
@@ -85,11 +86,15 @@ def revalidate_video(post):
                     post.related_posts = related_posts
                     db.session.commit()
                 # add video to index if not already there
-                es = current_app.elasticsearch
-                index_name, fields = Post.__tablename__, Post.__searchable__
-                if es and es.ping() and not es.exists(index=index_name, id=post.id):
+                try:
+                    es = current_app.elasticsearch
+                    index_name, fields = Post.__tablename__, Post.__searchable__
                     payload = {field: getattr(post, field) for field in fields}
                     es.index(index=index_name, id=post.id, document=payload)
+                except (ImproperlyConfigured, ElasticsearchException):
+                    # there was a problem with elasticserach
+                    # you may need to log this error
+                    pass
         # video is not validated or doesn't exist
         except (IndexError, ValidationError):
             db.session.delete(post)
