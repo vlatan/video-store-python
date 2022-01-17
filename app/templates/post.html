@@ -10,63 +10,67 @@
 
 {% block content %}
 <article class="media-content">
-	<div class="player">
-		<div class="player-content" id="{{ post.video_id }}">
-			<img alt="{{ post.title }}" src="{{ thumb }}">
-			<div class="play"></div>
-		</div>
-	</div>
-	<div class="metadata">
-		<h1 class="video-title">{{ post.title }}</h1>
-		<div class="metadata-block">
-			<div class="video-duration">
-				Duration: {{ duration }}
+	<div class="video-content">
+		<div class="player">
+			<div class="player-content" id="{{ post.video_id }}">
+				<img alt="{{ post.title }}" src="{{ thumb }}">
+				<div class="play"></div>
 			</div>
-			{% if current_user.is_authenticated and current_user.is_admin %}
-			<button id="openModal" class="modal-button">Delete</button>
-			{% endif %}
 		</div>
-		<div class="social">
-			<div class="likes">
-				{% if current_user.is_authenticated %}
-				{% if current_user.has_casted(post, 'like') %}
-				<button class="like like-yes like-counter">{{ likes }}</button>
-				{% else %}
-				<button class="like like-no like-counter">{{ likes }}</button>
-				{% endif %}
-				{% else %}
-				<button class="like like-no no-auth">{{ likes }}</button>
-				{% endif %}
-			</div>
 
-			<div class="faves">
-				{% if current_user.is_authenticated %}
-				{% if current_user.has_casted(post, 'fave') %}
-				<button class="fave fave-yes fave-status">Saved</button>
-				{% else %}
-				<button class="fave fave-no fave-status">Save</button>
-				{% endif %}
-				{% else %}
-				<button class="fave fave-no no-auth">Save</button>
-				{% endif %}
+		<header class="metadata">
+			<h1 class="video-title">{{ post.title }}</h1>
+			<div class="other-metadata">
+				<div class="metadata-block">
+					<div class="video-duration">
+						Duration: {{ duration }}
+					</div>
+					{% if current_user.is_authenticated and current_user.is_admin %}
+					<button id="openModal" class="modal-button">Delete</button>
+					{% endif %}
+				</div>
+				<div class="social">
+					<div class="likes">
+						{% if current_user.is_authenticated %}
+						{% if current_user.has_casted(post, 'like') %}
+						<button class="like like-yes like-counter">{{ likes }}</button>
+						{% else %}
+						<button class="like like-no like-counter">{{ likes }}</button>
+						{% endif %}
+						{% else %}
+						<button class="like like-no no-auth">{{ likes }}</button>
+						{% endif %}
+					</div>
+
+					<div class="faves">
+						{% if current_user.is_authenticated %}
+						{% if current_user.has_casted(post, 'fave') %}
+						<button class="fave fave-yes fave-status">Saved</button>
+						{% else %}
+						<button class="fave fave-no fave-status">Save</button>
+						{% endif %}
+						{% else %}
+						<button class="fave fave-no no-auth">Save</button>
+						{% endif %}
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="related_videos">
-			{% if post.related_posts %}
-			{% for related_post in post.related_posts[:3] %}
-			{% set thumb = related_post.thumbnails['default'] %}
-			<a href="/post/{{ related_post.id }}" class="related-video">
-				<span class="related-img">
-					<img src="{{ thumb['url'] }}" width="{{ thumb['width'] }}" height="{{ thumb['height'] }}"
-						alt="{{ related_post.title }}">
-				</span>
-				<h3 class="related-post-title">
-					{{ related_post.title }}
-				</h3>
-			</a>
-			{% endfor %}
-			{% endif %}
-		</div>
+		</header>
+	</div>
+
+	<div class="related_videos">
+		{% if post.related_posts %}
+		{% for related_post in post.related_posts %}
+		{% set thumb = related_post.thumbnails['medium'] %}
+		<a href="/post/{{ related_post.id }}" class="related-video">
+			<img class="related-img" src="{{ thumb['url'] }}" width="{{ thumb['width'] }}"
+				height="{{ thumb['height'] }}" alt="{{ related_post.title }}">
+			<h2 class="related-post-title">
+				{{ related_post.title }}
+			</h2>
+		</a>
+		{% endfor %}
+		{% endif %}
 	</div>
 </article>
 
@@ -75,7 +79,7 @@
 	<span id="closeModal" class="close" title="Close">&times;</span>
 	<form class="modal-content" action="{{ url_for('posts.perform_action', post_id=post.id, action='delete') }}"
 		method="POST">
-		<div class="container">
+		<div class="modal-container">
 			<h2>Delete Video</h2>
 			<p>Are you sure you want to delete this video?</p>
 			<div class="modal-buttons-wrap">

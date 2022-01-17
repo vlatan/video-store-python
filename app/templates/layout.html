@@ -42,11 +42,15 @@
 				</a>
 				<a class="nav-item g_id_signout" href="{{ url_for('auth.logout') }}">Log out</a>
 				{% else %}
-				<a class="nav-item" href="#" onclick="OAuth()">
-					Log in
-				</a>
-				<div class="need-login">Please login</div>
-				{% endif %}
+				<div class="login-wrap">
+					<a class="login nav-item" href="#" onclick="OAuth()">
+						<!-- Log in -->
+						<img src="{{ url_for('static', filename='/images/google-sign-in-blue.png') }}" width="160"
+							alt="">
+					</a>
+					<div class="need-login">Please login</div>
+					{% endif %}
+				</div>
 			</nav>
 		</header>
 	</div>
