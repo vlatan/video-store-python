@@ -9,6 +9,12 @@ from app.auth.helpers import failed_login, get_user_ready
 auth = Blueprint('auth', __name__)
 
 
+@auth.route('/fb_test')
+def fb_test():
+    fb_app_id = current_app.config['FB_CLIENT_ID']
+    return render_template('fb_test.html', fb_app_id=fb_app_id)
+
+
 @auth.route('/authorize/onetap', methods=['POST'])
 def onetap():
     if current_user.is_authenticated:

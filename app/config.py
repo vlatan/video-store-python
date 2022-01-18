@@ -13,6 +13,7 @@ class Config:
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))
+    FB_CLIENT_ID = os.environ.get('FB_CLIENT_ID')
     YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
     GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
