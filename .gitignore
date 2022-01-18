@@ -134,3 +134,5 @@ dmypy.json
 testing/
 msearch/
 migrations/
+certs/
+*_test*
