@@ -82,7 +82,7 @@ def revalidate_video(post):
                 related_posts = Post.search(
                     post.title, 1, per_page + 1)[0].all()[1:]
                 # if there's change in the related posts
-                if post.related_posts != related_posts:
+                if related_posts and post.related_posts != related_posts:
                     post.related_posts = related_posts
                     db.session.commit()
 
@@ -91,8 +91,11 @@ def revalidate_video(post):
                     if not (es := current_app.elasticsearch):
                         raise ImproperlyConfigured
                     index_name, fields = Post.__tablename__, Post.__searchable__
-                    payload = {field: getattr(post, field) for field in fields}
-                    es.index(index=index_name, id=post.id, document=payload)
+                    if not es.exists(index=index_name, id=post.id):
+                        payload = {field: getattr(post, field)
+                                   for field in fields}
+                        es.index(index=index_name,
+                                 id=post.id, document=payload)
                 except (ImproperlyConfigured, ElasticsearchException):
                     # there was a problem with elasticserach
                     # you may need to log this error
