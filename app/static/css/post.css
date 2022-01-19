@@ -171,79 +171,87 @@ button.modal-button:hover {
     opacity: 1;
 }
 
-.modal-buttons-wrap {
-    display: flex;
-    justify-content: space-between;
-    gap: 1.2rem;
-}
-
-/* Float cancel and delete buttons and add an equal width */
-button.cancelbtn, button.deletebtn {
-    width: 50%;
-    padding: .8rem 2rem;
-}
-
-/* Add a color to the cancel button */
-button.cancelbtn {
-    background-color: #ccc;
-    color: black;
-}
-
-/* Add padding and center-align text to the modal container */
-.modal-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 1.2rem;
-    padding: 1.2rem;
-}
-
 /* The Modal (background) */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     justify-content: center;
     align-items: center;
-    z-index: 1; /* Sit on top */
+    z-index: 101; /* Sit on top */
     left: 0;
     top: 0;
-    width: 100vw; /* Full width */
-    height: 100vh; /* Full height */
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: #474e5d;
-    opacity: .95;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.8);
+    animation: fadeIn 400ms ease-in forwards;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
 }
 
 /* Modal Content/Box */
 .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
     background-color: #fefefe;
     border-radius: 5px;
-    margin: auto; /* 5% from the top, 15% from the bottom and centered */
+    margin: auto;
     border: 1px solid #888;
-    width: 30%; /* Could be more or less, depending on screen size */
+    width: 30%;
+    color: black;
+    gap: 1.2rem;
+    padding: 1.2rem;
+    transform: translateX(30%);
+    opacity: 0;
+    animation: flyInRight 100ms ease-in 300ms forwards;
 }
 
-/* Style the horizontal ruler */
-hr {
-    border: 1px solid #f1f1f1;
-    margin-bottom: 25px;
+@keyframes flyInRight {
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.modal-buttons-wrap {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+/* Float cancel and delete buttons and add an equal width */
+button.cancel-button, button.delete-button {
+    width: 50%;
+    padding: .8rem 2rem;
+}
+
+/* Add a color to the cancel button */
+button.cancel-button {
+    background-color: #ccc;
+    color: black;
 }
 
 /* The Modal Close Button (x) */
-.close {
+.close-modal {
     position: absolute;
-    right: 35px;
-    top: 15px;
-    font-size: 40px;
+    right: .6rem;
+    top: 0;
+    font-size: 2rem;
     font-weight: bold;
-    color: #f1f1f1;
+    color: black;
 }
 
-.close:hover,
-.close:focus {
+.close-modal:hover,
+.close-modal:focus {
     color: #f44336;
+    text-decoration: none;
     cursor: pointer;
 }
 
@@ -253,6 +261,9 @@ hr {
         width: 100%;
     }
 }
+
+
+/* ############# Related Videos ############# */
 
 .related_videos {
     display: flex;

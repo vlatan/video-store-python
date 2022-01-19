@@ -185,6 +185,10 @@ a.nav-item.login:after {
     background: var(--secondary-background-color);
 }
 
+@keyframes fadeOut {
+    to {opacity: 0;}
+}
+
 /* .alert-info {
     background: blue;
 }
@@ -196,8 +200,3 @@ a.nav-item.login:after {
 .alert-warning {
     background: red;
 } */
-
-@keyframes fadeOut {
-    from {opacity: 1;}
-    to {opacity: 0;}
-}
