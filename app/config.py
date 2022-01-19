@@ -27,11 +27,14 @@ class Config:
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": GOOGLE_OAUTH_CLIENT_SECRET,
             "redirect_uris": [
-                "http://localhost:5000/authorize"
+                "http://localhost:5000/authorize",
+                "https://localhost:5000/authorize"
             ],
             "javascript_origins": [
                 "http://localhost",
-                "http://localhost:5000"
+                "http://localhost:5000",
+                "https://localhost",
+                "https://localhost:5000"
             ]
         }
     }
