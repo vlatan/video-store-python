@@ -5,6 +5,7 @@ from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, login_user, logout_user, login_required
 from app.auth.helpers import failed_login, get_user_ready
+from app.models import User
 
 auth = Blueprint('auth', __name__)
 
@@ -46,6 +47,26 @@ def onetap():
         return failed_login()
 
     user = get_user_ready(openid, user_info)
+    # begin user session by logging the user in
+    login_user(user, remember=True)
+    return redirect(request.referrer)
+
+
+@auth.route('/authorize/facebook', methods=['POST'])
+def facebook():
+    if current_user.is_authenticated:
+        return redirect(request.referrer)
+
+    if not (data := request.form):
+        return failed_login()
+
+    for item in data.items():
+        print(item)
+
+    print(request.referrer)
+
+    # grab first user for tesing
+    user = User.query.first()
     # begin user session by logging the user in
     login_user(user, remember=True)
     return redirect(request.referrer)
