@@ -22,9 +22,8 @@ class ActionMixin(object):
     def uncast(self, post, action):
         if self.has_casted(post, action):
             model = PostLike if action == 'like' else PostFave
-            model.query.filter_by(
-                user_id=self.id,
-                post_id=post.id).delete()
+            cast = model.query.filter_by(user_id=self.id, post_id=post.id)
+            cast.delete()
 
     def has_casted(self, post, action):
         model = PostLike if action == 'like' else PostFave
@@ -35,10 +34,10 @@ class ActionMixin(object):
 
 class User(db.Model, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
-    openid = db.Column(db.String(256), unique=True, nullable=False)
-    email = db.Column(db.String(120))
-    username = db.Column(db.String(120))
-    picture = db.Column(db.String(256))
+    google_data = db.relationship(
+        'googleData', backref='user', cascade='all,delete', lazy='dynamic')
+    facebook_data = db.relationship(
+        'facebookData', backref='user', cascade='all,delete', lazy='dynamic')
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
@@ -48,9 +47,26 @@ class User(db.Model, UserMixin, ActionMixin):
     @property
     def is_admin(self):
         admin_openid = current_app.config['ADMIN_OPENID']
-        if self.openid == admin_openid:
+        if self.google_data.social_id == admin_openid:
             return True
         return False
+
+
+class socialMixin(object):
+    social_id = db.Column(db.String(256), unique=True, nullable=False)
+    email = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+    picture = db.Column(db.String(256))
+
+
+class googleData(db.Model, socialMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class facebookData(db.Model, socialMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class Playlist(db.Model):
