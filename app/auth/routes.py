@@ -7,7 +7,7 @@ from google.auth.transport import requests as google_requests
 from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, login_user, logout_user, login_required
-from app.auth.helpers import failed_login, get_user_ready
+from app.auth.helpers import failed_login, get_google_user_ready
 from app.models import User
 
 auth = Blueprint('auth', __name__)
@@ -59,16 +59,16 @@ def google():
         user_info = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
         # check if there's user ID, if not it will raise ValueError
-        openid = user_info['sub']
+        open_id = user_info['sub']
     except ValueError:
         # Invalid token
         return render_template('close_oauth.html')
 
-    user = get_user_ready(openid, user_info)
+    user = get_google_user_ready(open_id, user_info)
     # begin user session by logging the user in
     login_user(user, remember=True)
 
-    # store revoke token in session in case the user want's to revoke access
+    # store revoke token in session in case the user wants to revoke access
     session['revoke_token'] = credentials.token
 
     return render_template('close_oauth.html')
@@ -99,12 +99,12 @@ def onetap():
         user_info = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
         # check if there's user ID, if not it will raise ValueError
-        openid = user_info['sub']
+        open_id = user_info['sub']
     except ValueError:
         # Invalid token
         return failed_login()
 
-    user = get_user_ready(openid, user_info)
+    user = get_google_user_ready(open_id, user_info)
     # begin user session by logging the user in
     login_user(user, remember=True)
     return redirect(request.referrer)
@@ -171,13 +171,13 @@ def facebook():
         user_info_uri = (f'{GRAPH_ENDPOINT}{USER_ID}?access_token={ACCESS_TOKEN}&'
                          'fields=id,first_name,picture,email')
         # get response from the user_info_uri
-        user_info = requests.get(user_info_uri).json()
-
-        if user_info:
-            # grab the first user for testing
-            user = User.query.first()
+        if (user_info := requests.get(user_info_uri).json()):
+            # process user for login
+            # user = get_facebook_user_ready(USER_ID, user_info)
             # begin user session by logging the user in
-            login_user(user, remember=True)
+            # login_user(user, remember=True)
+            # store revoke token in session in case the user wants to revoke access
+            session['revoke_token'] = ACCESS_TOKEN
     except Exception:
         # failed to complete the process
         return render_template('close_oauth.html')
