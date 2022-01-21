@@ -17,18 +17,6 @@
 </head>
 
 <body>
-	{% if not current_user.is_authenticated %}
-	<div id="g_id_onload" data-client_id="{{ config['GOOGLE_OAUTH_CLIENT_ID'] }}" data-context="signin"
-		data-ux_mode="popup" data-login_uri="{{ url_for('auth.onetap') }}" data-auto_prompt="false">
-	</div>
-	<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-	<div id="fb-root"></div>
-	<script async defer crossorigin="anonymous"
-		src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v12.0&appId={{ config['FB_CLIENT_ID'] }}&autoLogAppEvents=1"
-		nonce="FIQrIcXg"></script>
-	{% endif %}
-
 	<div class="site-header-wrap">
 		<header class="site-header">
 			<a class="logo" href="/">Doxder</a>
@@ -68,11 +56,8 @@
 							documentaries.
 						</p>
 						<div class="login-buttons">
-							<div class="g_id_signin" data-type="standard" data-shape="rectangular"
-								data-theme="filled_blue" data-text="signin_with" data-size="large"
-								data-logo_alignment="left" data-width="286">
-							</div>
-							<!-- <button class="brand-login-button google-login" onclick="OAuth()">
+							<button class="brand-login-button google-login"
+								onclick="popupWindow(`{{ url_for('auth.google') }}`, 'Google')">
 								<div class="brand-logo google-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3"
 										class="google-svg">
@@ -91,14 +76,9 @@
 									</svg>
 								</div>
 								<div class="brand-text">Sign In with Google</div>
-							</button> -->
-
-							<div class="fb-login-button" data-width="286px" data-size="large"
-								data-button-type="login_with" data-layout="default" data-auto-logout-link="false"
-								data-use-continue-as="true" data-scope="public_profile,email"
-								onlogin="checkLoginState()"></div>
-
-							<!-- <button class=" brand-login-button facebook-login">
+							</button>
+							<button class=" brand-login-button facebook-login"
+								onclick="popupWindow(`{{ url_for('auth.facebook') }}`)">
 								<div class="brand-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 67 400 368"
 										class="facebook-svg">
@@ -111,7 +91,7 @@
 									</svg>
 								</div>
 								<div class="brand-text">Login with Facebook</div>
-								</button> -->
+							</button>
 						</div>
 					</div>
 				</div>
@@ -157,46 +137,13 @@
 
 	{% if not current_user.is_authenticated %}
 	<script>
-		function OAuth() {
-			var url = '{{ url_for("auth.authorize") }}';
-			var width = screen.availWidth * 0.44;
-			var height = screen.availHeight * 0.83;
-			var left = (screen.availWidth / 2) - (width / 2);
-			var top = (screen.availHeight / 2) - (height / 2);
-			window.open(url, '_blank', 'width=' + width + ', height=' + height + ', left=' + left + ', top=' + top + '');
-		}
-	</script>
-
-	<script>
-		function processUserDetails(response) {
-			var accessToken = response.authResponse.accessToken;
-			FB.api('/me', { fields: 'id,first_name,picture,email' }, function (response) {
-				var userDetails = new URLSearchParams({
-					accessToken: accessToken,
-					userId: response.id,
-					firstName: response.first_name,
-					picture: response.picture.data.url,
-					email: response.email
-				});
-
-				fetch(`{{ url_for('auth.facebook') }}`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					},
-					body: userDetails
-				}).then(response => {
-					window.location.replace(response.url);
-				});
-			});
-		}
-
-		function checkLoginState() {
-			FB.getLoginStatus(function (response) {
-				if (response.status === 'connected') {
-					processUserDetails(response);
-				}
-			});
+		function popupWindow(url) {
+			var w = window.top.innerWidth * 0.44;
+			var h = window.top.innerHeight * 0.9;
+			const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
+			const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
+			console.log(`width=${w}, height=${h}, top=${y}, left=${x}`);
+			return window.open(url, '_blank', `width=${w}, height=${h}, top=${y}, left=${x}`);
 		}
 	</script>
 	{% endif %}
