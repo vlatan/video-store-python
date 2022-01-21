@@ -10,10 +10,10 @@ class Config:
     # Flask app secret key
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
-    # Admin Google opend
+    # Admin Google openid
     ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
 
-    # SQlAlchemy stuff
+    # SQLAlchemy stuff
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SCOPPED_SESSION_DB_URI = os.environ.get('SCOPPED_SESSION_DB_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
