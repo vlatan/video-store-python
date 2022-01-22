@@ -11,7 +11,7 @@ def admin_required(func):
     @wraps(func)
     def only_admin(*args, **kwargs):
         admin_openid = current_app.config['ADMIN_OPENID']
-        if current_user.openid != admin_openid:
+        if current_user.google_id != admin_openid:
             flash('You need to be admin to access that page!', 'info')
             return redirect(url_for('main.home'))
         return func(*args, **kwargs)
@@ -35,31 +35,42 @@ def prep_elastic():
 
 
 def add_to_index(index, model):
-    elastic = prep_elastic()
-    if not (elastic and elastic.ping()):
+    try:
+        if not (es := prep_elastic()):
+            raise ImproperlyConfigured
+
+        payload = {field: getattr(model, field)
+                   for field in model.__searchable__}
+        es.index(index=index, id=model.id, document=payload)
+
+    except (ImproperlyConfigured, ElasticsearchException):
         return
-    payload = {field: getattr(model, field) for field in model.__searchable__}
-    elastic.index(index=index, id=model.id, document=payload)
 
 
 def remove_from_index(index, model):
-    elastic = prep_elastic()
-    if not (elastic and elastic.ping()):
+    try:
+        if not (es := prep_elastic()):
+            raise ImproperlyConfigured
+
+        es.delete(index=index, id=model.id)
+
+    except (ImproperlyConfigured, ElasticsearchException):
         return
-    elastic.delete(index=index, id=model.id)
 
 
 def query_index(index, query, page, per_page):
     try:
         if not (es := prep_elastic()):
             raise ImproperlyConfigured
-        search = es.search(
-            index=index,
-            body={'query': {'multi_match': {'query': query, 'fields': ['*']}},
-                  'from': (page - 1) * per_page, 'size': per_page})
+
+        payload = {'query': {'multi_match': {'query': query, 'fields': ['*']}},
+                   'from': (page - 1) * per_page, 'size': per_page}
+        search = es.search(index=index, body=payload)
+
+        ids = [int(hit['_id']) for hit in search['hits']['hits']]
+        return ids, search['hits']['total']['value']
+
     except (ImproperlyConfigured, ElasticsearchException):
         # there was a problem with elasticserach
         # you may need to log this error
         return [], 0
-    ids = [int(hit['_id']) for hit in search['hits']['hits']]
-    return ids, search['hits']['total']['value']
