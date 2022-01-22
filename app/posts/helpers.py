@@ -47,11 +47,12 @@ def validate_video(response, playlist_id=None):
 
     # normalize title
     title = response['snippet']['title'].split(' | ')[0].split()
-    ex = ['in', 'to', 'for', 'and', 'a', 'is', 'of', 'at']
-    first_word = [title[0].title()]
-    if (rest := title[1:]):
-        rest = [w.lower() if w.lower() in ex else w.title() for w in rest]
-    title = ' '.join(first_word + rest)
+    ex = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
+          'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but' 'per', 'via']
+    middle = [w.lower() if w.lower() in ex else w.capitalize()
+              for w in title[1:-1]]
+    title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
+    title = ' '.join(title)
 
     return {'video_id': response['id'],
             'playlist_id': playlist_id,
