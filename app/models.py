@@ -4,7 +4,6 @@ from flask_login import UserMixin
 from flask import current_app
 from app.helpers import dump_datetime, add_to_index
 from app.helpers import remove_from_index, query_index
-from elasticsearch.exceptions import NotFoundError, ConnectionTimeout
 
 
 @login_manager.user_loader
@@ -34,10 +33,11 @@ class ActionMixin(object):
 
 class User(db.Model, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
-    google_data = db.relationship(
-        'googleData', backref='user', cascade='all,delete', lazy='dynamic')
-    facebook_data = db.relationship(
-        'facebookData', backref='user', cascade='all,delete', lazy='dynamic')
+    google_id = db.Column(db.String(256), unique=True, nullable=True)
+    facebook_id = db.Column(db.String(256), unique=True, nullable=True)
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120))
+    picture = db.Column(db.String(512))
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
@@ -47,26 +47,9 @@ class User(db.Model, UserMixin, ActionMixin):
     @property
     def is_admin(self):
         admin_openid = current_app.config['ADMIN_OPENID']
-        if self.google_data.social_id == admin_openid:
+        if self.google_id == admin_openid:
             return True
         return False
-
-
-class socialMixin(object):
-    social_id = db.Column(db.String(256), unique=True, nullable=False)
-    email = db.Column(db.String(120))
-    name = db.Column(db.String(120))
-    picture = db.Column(db.String(256))
-
-
-class googleData(db.Model, socialMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-
-class facebookData(db.Model, socialMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class Playlist(db.Model):

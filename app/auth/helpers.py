@@ -1,6 +1,6 @@
 from app import db
 from app.models import User
-from flask import url_for, flash, redirect, request
+from flask import flash, redirect, request
 
 
 def failed_login():
@@ -8,28 +8,27 @@ def failed_login():
     return redirect(request.referrer)
 
 
-def get_user_ready(openid, user_info):
-    email = user_info.get('email')
-    username = user_info.get('given_name', 'Guest')
-    default_picture = url_for('static', filename='profile_pics/default.jpg')
-    picture = user_info.get('picture', default_picture)
+def get_user_ready(user_info):
+    if (facebook_id := user_info.get('facebook_id')):
+        user = User.query.filter_by(facebook_id=facebook_id).first()
+    else:
+        user = User.query.filter_by(google_id=user_info['google_id']).first()
 
-    # if this user doesn't exist in our db
-    if not (user := User.query.filter_by(openid=openid).first()):
-        user = User(openid=openid, email=email,
-                    username=username, picture=picture)
+    # if this user does not exist, create it
+    if not user:
+        user = User(**user_info)
         db.session.add(user)
         db.session.commit()
-        return user
-
     # otherwise update mutable info for this user if changed
-    if user.email != email:
-        user.email = email
-        db.session.commit()
-    if user.username != username:
-        user.username = username
-        db.session.commit()
-    if user.picture != picture:
-        user.picture = picture
-        db.session.commit()
+    else:
+        if user.email != user_info['email']:
+            user.email = user_info['email']
+            db.session.commit()
+        if user.name != user_info['name']:
+            user.name = user_info['name']
+            db.session.commit()
+        if user.picture != user_info['picture']:
+            user.picture = user_info['picture']
+            db.session.commit()
+
     return user

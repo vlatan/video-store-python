@@ -8,8 +8,7 @@ from google.auth.transport import requests as google_requests
 from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, login_user, logout_user, login_required
-from app.auth.helpers import failed_login, get_google_user_ready
-from app.models import User
+from app.auth.helpers import failed_login, get_user_ready
 
 auth = Blueprint('auth', __name__)
 
@@ -57,22 +56,27 @@ def google():
     try:
         # verify the integrity of the ID token and return the user info
         # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
-        user_info = id_token.verify_oauth2_token(
+        data = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
-        # check if there's user ID, if not it will raise ValueError
-        openid = user_info['sub']
+
+        # process user data for login
+        default_pic = url_for('static', filename='profile_pics/default.jpg')
+        user_info = {'google_id': data['sub'], 'email': data.get('email'),
+                     'name': data.get('first_name', 'Guest'),
+                     'picture': data.get('picture', default_pic)}
+
+        # get user ready (create or update their info)
+        user = get_user_ready(user_info)
+        # begin user session by logging the user in
+        login_user(user, remember=True)
+        # store revoke token in session in case the user wants to revoke access
+        session['revoke_token'] = credentials.token
+        # successfully completed the process
+        return render_template('close_oauth.html')
+
     except ValueError:
         # Invalid token
         return render_template('close_oauth.html')
-
-    user = get_google_user_ready(openid, user_info)
-    # begin user session by logging the user in
-    login_user(user, remember=True)
-
-    # store revoke token in session in case the user wants to revoke access
-    session['revoke_token'] = credentials.token
-
-    return render_template('close_oauth.html')
 
 
 @auth.route('/authorize/onetap', methods=['POST'])
@@ -97,18 +101,25 @@ def onetap():
         token = request.form.get('credential')
         CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
         # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
-        user_info = id_token.verify_oauth2_token(
+        data = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
-        # check if there's user ID, if not it will raise ValueError
-        openid = user_info['sub']
+
+        # process user data for login
+        default_pic = url_for('static', filename='profile_pics/default.jpg')
+        user_info = {'google_id': data['sub'], 'email': data.get('email'),
+                     'name': data.get('first_name', 'Guest'),
+                     'picture': data.get('picture', default_pic)}
+
+        # get user ready (create or update their info)
+        user = get_user_ready(user_info)
+        # begin user session by logging the user in
+        login_user(user, remember=True)
+        # successfully completed the process
+        return redirect(request.referrer)
+
     except ValueError:
         # Invalid token
         return failed_login()
-
-    user = get_google_user_ready(openid, user_info)
-    # begin user session by logging the user in
-    login_user(user, remember=True)
-    return redirect(request.referrer)
 
 
 @auth.route('/authorize/facebook')
@@ -150,48 +161,54 @@ def facebook():
         # exchange the code for access token
         CLIENT_SECRET = current_app.config['FB_CLIENT_SECRET']
         access_token_endpoint = 'https://graph.facebook.com/v12.0/oauth/access_token'
-        # parameters to the access token endpoint
+        # parameters for the access token endpoint
         payload = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI,
                    'client_secret': CLIENT_SECRET, 'code': CODE}
-        # get response from the access token endpoint (json response)
-        credentials = requests.get(
-            access_token_endpoint, params=payload).json()
-
-        if not (ACCESS_TOKEN := credentials.get('access_token')):
-            # failed to complete the process
-            raise KeyError
+        # get access token from the access token endpoint (json response)
+        ACCESS_TOKEN = requests.get(access_token_endpoint,
+                                    params=payload).json()['access_token']
 
         # verify the access token we got
         inspect_token_endpoint = 'https://graph.facebook.com/debug_token'
-        # parameters to the inspect token endpoint
+        # parameters for the inspect token endpoint
         payload = {'input_token': ACCESS_TOKEN,
                    'access_token': f'{CLIENT_ID}|{CLIENT_SECRET}'}
         # get response from the inspect token endpoint (json response)
         data = requests.get(inspect_token_endpoint,
-                            params=payload).json().get('data')
-
-        if not (data and data.get('is_valid') and (USER_ID := (data.get('user_id')))):
-            # failed to complete the process
+                            params=payload).json()['data']
+        # this will be True if access token is valid
+        if not data.get('is_valid'):
+            # failed to complete the process (invalid access token)
             raise KeyError
 
         # get user info
+        USER_ID = data['user_id']
         graph_endpoint = f'https://graph.facebook.com/v12.0/{USER_ID}'
-        # parameters to the graph endpoint
+        # parameters for the graph endpoint
         payload = {'access_token': ACCESS_TOKEN,
                    'fields': 'id,first_name,picture,email'}
         # get response from the graph endpoint (json response)
-        if (user_info := requests.get(graph_endpoint, params=payload).json()):
-            # process user for login
-            # user = get_facebook_user_ready(USER_ID, user_info)
-            # begin user session by logging the user in
-            # login_user(user, remember=True)
-            # store revoke token in session in case the user wants to revoke access
-            session['revoke_token'] = ACCESS_TOKEN
-    except Exception:
-        # failed to complete the process
+        data = requests.get(graph_endpoint, params=payload).json()
+
+        # process user data for login
+        default_pic = url_for('static', filename='profile_pics/default.jpg')
+        pic = data.get('picture', {}).get('data', {}).get('url', default_pic)
+        user_info = {'facebook_id': USER_ID, 'email': data.get('email'),
+                     'name': data.get('first_name', 'Guest'), 'picture': pic}
+
+        # get user ready (create or update their info)
+        user = get_user_ready(user_info)
+        # begin user session by logging the user in
+        login_user(user, remember=True)
+        # store revoke token in session in case the user wants to revoke access
+        session['revoke_token'] = ACCESS_TOKEN
+        # successfully completed the process
         return render_template('close_oauth.html')
 
-    return render_template('close_oauth.html')
+    except Exception:
+        # failed to complete the process, signal to the parent window
+        # https://www.google.com/search?q=signal+to+the+parent+window+javascript&oq=signal+to+the+parent+window&aqs=chrome.1.69i57j33i22i29i30l5.8295j0j7&sourceid=chrome&ie=UTF-8
+        return render_template('close_oauth.html')
 
 
 @auth.route('/logout')
