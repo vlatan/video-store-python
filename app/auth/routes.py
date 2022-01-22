@@ -62,7 +62,7 @@ def google():
         # process user data for login
         default_pic = url_for('static', filename='profile_pics/default.jpg')
         user_info = {'google_id': data['sub'], 'email': data.get('email'),
-                     'name': data.get('first_name', 'Guest'),
+                     'name': data.get('given_name', 'Guest'),
                      'picture': data.get('picture', default_pic)}
 
         # get user ready (create or update their info)
@@ -107,7 +107,7 @@ def onetap():
         # process user data for login
         default_pic = url_for('static', filename='profile_pics/default.jpg')
         user_info = {'google_id': data['sub'], 'email': data.get('email'),
-                     'name': data.get('first_name', 'Guest'),
+                     'name': data.get('given_name', 'Guest'),
                      'picture': data.get('picture', default_pic)}
 
         # get user ready (create or update their info)
