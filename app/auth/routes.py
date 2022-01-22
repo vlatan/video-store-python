@@ -1,6 +1,7 @@
 import os
 import hashlib
 import requests
+from urllib.parse import urlencode
 import google_auth_oauthlib.flow
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
@@ -59,12 +60,12 @@ def google():
         user_info = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
         # check if there's user ID, if not it will raise ValueError
-        open_id = user_info['sub']
+        openid = user_info['sub']
     except ValueError:
         # Invalid token
         return render_template('close_oauth.html')
 
-    user = get_google_user_ready(open_id, user_info)
+    user = get_google_user_ready(openid, user_info)
     # begin user session by logging the user in
     login_user(user, remember=True)
 
@@ -99,12 +100,12 @@ def onetap():
         user_info = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
         # check if there's user ID, if not it will raise ValueError
-        open_id = user_info['sub']
+        openid = user_info['sub']
     except ValueError:
         # Invalid token
         return failed_login()
 
-    user = get_google_user_ready(open_id, user_info)
+    user = get_google_user_ready(openid, user_info)
     # begin user session by logging the user in
     login_user(user, remember=True)
     return redirect(request.referrer)
@@ -124,16 +125,20 @@ def facebook():
         if current_user.is_authenticated:
             return redirect(request.referrer)
 
-        DIALOG_ENDPOINT = 'https://www.facebook.com/v12.0/dialog/oauth'
         # create an anti-forgery unique token
         STATE = hashlib.sha256(os.urandom(1024)).hexdigest()
         # put it in a session
         session['state'] = STATE
-        # construct the dialog url
-        dialog_uri = (f'{DIALOG_ENDPOINT}?response_type=code&'
-                      f'client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&'
-                      f'state={STATE}&auth_type=rerequest&scope=email')
-        # redirect to the dialog uri
+
+        # prepare the dialog uri
+        dialog_endpoint = 'https://www.facebook.com/v12.0/dialog/oauth'
+        # parameters to the dialog endpoint
+        payload = {'response_type': 'code', 'client_id': CLIENT_ID,
+                   'redirect_uri': REDIRECT_URI, 'state': STATE,
+                   'auth_type': 'rerequest', 'scope': 'email'}
+        dialog_uri = f'{dialog_endpoint}?{urlencode(payload)}'
+
+        # redirect to the dialog endpoint
         return redirect(dialog_uri)
 
     # check if the anti-forgery unique session token is valid
@@ -143,35 +148,39 @@ def facebook():
 
     try:
         # exchange the code for access token
-        ACCESS_TOKEN_ENDPOINT = 'https://graph.facebook.com/v12.0/oauth/access_token'
         CLIENT_SECRET = current_app.config['FB_CLIENT_SECRET']
-        access_token_uri = (f'{ACCESS_TOKEN_ENDPOINT}?'
-                            f'client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&'
-                            f'client_secret={CLIENT_SECRET}&code={CODE}')
-        # get response from the access_token_uri
-        credentials = requests.get(access_token_uri).json()
+        access_token_endpoint = 'https://graph.facebook.com/v12.0/oauth/access_token'
+        # parameters to the access token endpoint
+        payload = {'client_id': CLIENT_ID, 'redirect_uri': REDIRECT_URI,
+                   'client_secret': CLIENT_SECRET, 'code': CODE}
+        # get response from the access token endpoint (json response)
+        credentials = requests.get(
+            access_token_endpoint, params=payload).json()
 
         if not (ACCESS_TOKEN := credentials.get('access_token')):
             # failed to complete the process
             raise KeyError
 
         # verify the access token we got
-        INSPECT_TOKEN_ENDPOINT = 'https://graph.facebook.com/debug_token'
-        inspect_token_uri = (f'{INSPECT_TOKEN_ENDPOINT}?input_token={ACCESS_TOKEN}&'
-                             f'access_token={CLIENT_ID}|{CLIENT_SECRET}')
-        # get response from the inspect_token_uri
-        data = requests.get(inspect_token_uri).json().get('data')
+        inspect_token_endpoint = 'https://graph.facebook.com/debug_token'
+        # parameters to the inspect token endpoint
+        payload = {'input_token': ACCESS_TOKEN,
+                   'access_token': f'{CLIENT_ID}|{CLIENT_SECRET}'}
+        # get response from the inspect token endpoint (json response)
+        data = requests.get(inspect_token_endpoint,
+                            params=payload).json().get('data')
 
         if not (data and data.get('is_valid') and (USER_ID := (data.get('user_id')))):
             # failed to complete the process
             raise KeyError
 
         # get user info
-        GRAPH_ENDPOINT = 'https://graph.facebook.com/v12.0/'
-        user_info_uri = (f'{GRAPH_ENDPOINT}{USER_ID}?access_token={ACCESS_TOKEN}&'
-                         'fields=id,first_name,picture,email')
-        # get response from the user_info_uri
-        if (user_info := requests.get(user_info_uri).json()):
+        graph_endpoint = f'https://graph.facebook.com/v12.0/{USER_ID}'
+        # parameters to the graph endpoint
+        payload = {'access_token': ACCESS_TOKEN,
+                   'fields': 'id,first_name,picture,email'}
+        # get response from the graph endpoint (json response)
+        if (user_info := requests.get(graph_endpoint, params=payload).json()):
             # process user for login
             # user = get_facebook_user_ready(USER_ID, user_info)
             # begin user session by logging the user in
