@@ -43,12 +43,18 @@ def validate_video(response):
 def fetch_video_data(response, playlist_id=None):
     # normalize title
     title = response['snippet']['title'].split(' | ')[0].split()
-    ex = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
-          'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but' 'per', 'via']
-    middle = [w.lower() if w.lower() in ex else w.capitalize()
-              for w in title[1:-1]]
-    title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
-    title = ' '.join(title)
+    prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
+            'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but' 'per', 'via']
+    punct = [':', '.', '!', '?']
+    norm_title = title[0].capitalize()
+    if (length := len(title)) > 1:
+        for i in range(1, length - 1):
+            word = title[i].capitalize()
+            if title[i].lower() in prep and title[i-1][-1] not in punct:
+                word = title[i].lower()
+            norm_title += ' ' + word
+        norm_title += ' ' + title[-1].capitalize()
+    title = norm_title
 
     # remove urls from the description
     if (description := response['snippet'].get('description')):
