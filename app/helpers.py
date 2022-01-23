@@ -36,33 +36,25 @@ def prep_elastic():
 
 def add_to_index(index, model):
     try:
-        if not (es := prep_elastic()):
-            raise ImproperlyConfigured
-
+        es = prep_elastic()
         payload = {field: getattr(model, field)
                    for field in model.__searchable__}
         es.index(index=index, id=model.id, document=payload)
-
-    except (ImproperlyConfigured, ElasticsearchException):
+    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
         return
 
 
 def remove_from_index(index, model):
     try:
-        if not (es := prep_elastic()):
-            raise ImproperlyConfigured
-
+        es = prep_elastic()
         es.delete(index=index, id=model.id)
-
-    except (ImproperlyConfigured, ElasticsearchException):
+    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
         return
 
 
 def query_index(index, query, page, per_page):
     try:
-        if not (es := prep_elastic()):
-            raise ImproperlyConfigured
-
+        es = prep_elastic()
         payload = {'query': {'multi_match': {'query': query, 'fields': ['*']}},
                    'from': (page - 1) * per_page, 'size': per_page}
         search = es.search(index=index, body=payload)
@@ -70,7 +62,7 @@ def query_index(index, query, page, per_page):
         ids = [int(hit['_id']) for hit in search['hits']['hits']]
         return ids, search['hits']['total']['value']
 
-    except (ImproperlyConfigured, ElasticsearchException):
+    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
         # there was a problem with elasticserach
         # you may need to log this error
         return [], 0
