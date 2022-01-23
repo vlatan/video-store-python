@@ -54,9 +54,13 @@ def validate_video(response, playlist_id=None):
     title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
     title = ' '.join(title)
 
-    # convert tags list to string
-    tags = response['snippet'].get('tags')
-    tags = ' '.join(tags) if tags else None
+    # normalize tags (remove duplicates and title words)
+    if (tags := response['snippet'].get('tags')):
+        # remove words contained in the title
+        tags = [w for w in ' '.join(tags).split()
+                if w.lower() not in title.lower()]
+        # remove duplicate words and join as string
+        tags = ' '.join(dict.fromkeys(tags))
 
     return {'video_id': response['id'],
             'playlist_id': playlist_id,
