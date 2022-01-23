@@ -110,7 +110,7 @@ class Post(db.Model, SearchableMixin):
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
-    tags = db.Column(db.PickleType)
+    tags = db.Column(db.Text)
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)

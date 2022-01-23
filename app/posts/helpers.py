@@ -54,12 +54,16 @@ def validate_video(response, playlist_id=None):
     title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
     title = ' '.join(title)
 
+    # convert tags list to string
+    tags = response['snippet'].get('tags')
+    tags = ' '.join(tags) if tags else None
+
     return {'video_id': response['id'],
             'playlist_id': playlist_id,
             'title': title,
             'thumbnails': response['snippet']['thumbnails'],
             'description': description,
-            'tags': response['snippet'].get('tags'),
+            'tags': tags,
             'duration': response['contentDetails']['duration'],
             'upload_date': upload_date}
 
