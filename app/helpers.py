@@ -3,8 +3,7 @@ from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user
-from elasticsearch import Elasticsearch
-from elasticsearch import ImproperlyConfigured, ElasticsearchException
+from elasticsearch import Elasticsearch, ImproperlyConfigured, ElasticsearchException
 
 
 def admin_required(func):
@@ -12,7 +11,7 @@ def admin_required(func):
     def only_admin(*args, **kwargs):
         admin_openid = current_app.config['ADMIN_OPENID']
         if current_user.google_id != admin_openid:
-            flash('You need to be admin to access that page!', 'info')
+            flash('Sorry, it seems you don\'t have access to that page!', 'info')
             return redirect(url_for('main.home'))
         return func(*args, **kwargs)
     return only_admin
@@ -63,6 +62,5 @@ def query_index(index, query, page, per_page):
         return ids, search['hits']['total']['value']
 
     except (AttributeError, ImproperlyConfigured, ElasticsearchException):
-        # there was a problem with elasticserach
         # you may need to log this error
         return [], 0
