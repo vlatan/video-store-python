@@ -1,4 +1,4 @@
-from app.posts.helpers import validate_video
+from app.posts.helpers import validate_video, fetch_video_data
 from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
 
@@ -33,8 +33,10 @@ def get_playlist_videos(playlist_id, youtube):
         for item in res['items']:
             try:
                 # this will raise ValidationError if video's invalid
-                video_info = validate_video(item, playlist_id=playlist_id)
-                videos.append(video_info)
+                if validate_video(item):
+                    video_info = fetch_video_data(
+                        item, playlist_id=playlist_id)
+                    videos.append(video_info)
             except ValidationError:
                 # video not validated
                 # continue, try the next video

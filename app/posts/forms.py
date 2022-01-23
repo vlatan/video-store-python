@@ -4,7 +4,7 @@ from googleapiclient.errors import HttpError
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
 from app.models import Post, Playlist
-from app.posts.helpers import parse_video, validate_video
+from app.posts.helpers import parse_video, validate_video, fetch_video_data
 from app.posts.helpers import parse_playlist, validate_playlist
 from googleapiclient.discovery import build
 
@@ -33,7 +33,8 @@ class PostForm(FlaskForm):
                 # call YouTube API, get response (execute request)
                 res = req.execute()['items'][0]
                 # this will raise exception if unable to fetch
-                video_info = validate_video(res)
+                if validate_video(res):
+                    video_info = fetch_video_data(res)
             # if video's not valid
             except ValidationError:
                 # re-raise the exception thrown from validate_video()

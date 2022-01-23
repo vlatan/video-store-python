@@ -10,7 +10,7 @@ from googleapiclient.discovery import build
 from elasticsearch import ImproperlyConfigured, ElasticsearchException
 
 
-def validate_video(response, playlist_id=None):
+def validate_video(response):
     if response['status']['privacyStatus'] != 'public':
         raise ValidationError('This video is not public.')
 
@@ -37,14 +37,10 @@ def validate_video(response, playlist_id=None):
         raise ValidationError(
             'This video is too short. Minimum length 30 minutes.')
 
-    # convert upload date into Python datetime object
-    upload_date = response['snippet']['publishedAt']
-    upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
+    return True
 
-    # remove urls from the description
-    if (description := response['snippet'].get('description')):
-        description = re.sub(r'http\S+', '', description)
 
+def fetch_video_data(response, playlist_id=None):
     # normalize title
     title = response['snippet']['title'].split(' | ')[0].split()
     ex = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
@@ -54,16 +50,24 @@ def validate_video(response, playlist_id=None):
     title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
     title = ' '.join(title)
 
+    # remove urls from the description
+    if (description := response['snippet'].get('description')):
+        description = re.sub(r'http\S+', '', description)
+
     # normalize tags (remove duplicates and title/desc words)
     if (tags := response['snippet'].get('tags')):
-        duplicate, result = set(), []
+        duplicate, result = set(), ''
         use = title.lower() + description.lower()
         for word in ' '.join(tags).split():
-            l_word = word.lower()
-            if l_word not in duplicate and l_word not in use:
-                duplicate.add(l_word)
-                result.append(word)
-        tags = ' '.join(result)
+            lower_word = word.lower()
+            if lower_word not in duplicate and lower_word not in use:
+                duplicate.add(lower_word)
+                result += word + ' '
+        tags = result.strip()
+
+    # convert upload date into Python datetime object
+    upload_date = response['snippet']['publishedAt']
+    upload_date = datetime.strptime(upload_date, '%Y-%m-%dT%H:%M:%SZ')
 
     return {'video_id': response['id'],
             'playlist_id': playlist_id,
