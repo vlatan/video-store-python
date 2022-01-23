@@ -54,13 +54,16 @@ def validate_video(response, playlist_id=None):
     title = [title[0].capitalize()] + middle + [title[-1].capitalize()]
     title = ' '.join(title)
 
-    # normalize tags (remove duplicates and title words)
+    # normalize tags (remove duplicates and title/desc words)
     if (tags := response['snippet'].get('tags')):
-        # remove words contained in the title
-        tags = [w for w in ' '.join(tags).split()
-                if w.lower() not in title.lower()]
-        # remove duplicate words and join as string
-        tags = ' '.join(dict.fromkeys(tags))
+        duplicate, result = set(), []
+        use = title.lower() + description.lower()
+        for word in ' '.join(tags).split():
+            l_word = word.lower()
+            if l_word not in duplicate and l_word not in use:
+                duplicate.add(l_word)
+                result.append(word)
+        tags = ' '.join(result)
 
     return {'video_id': response['id'],
             'playlist_id': playlist_id,
@@ -97,15 +100,14 @@ def revalidate_video(post):
 
                 # add video to index if not already there
                 try:
-                    if not (es := current_app.elasticsearch):
-                        raise ImproperlyConfigured
+                    es = current_app.elasticsearch
                     index_name, fields = Post.__tablename__, Post.__searchable__
                     if not es.exists(index=index_name, id=post.id):
                         payload = {field: getattr(post, field)
                                    for field in fields}
                         es.index(index=index_name,
                                  id=post.id, document=payload)
-                except (ImproperlyConfigured, ElasticsearchException):
+                except (AttributeError, ImproperlyConfigured, ElasticsearchException):
                     # there was a problem with elasticserach
                     # you may need to log this error
                     pass
