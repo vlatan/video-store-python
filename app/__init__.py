@@ -25,7 +25,7 @@ def create_app(config_class=Config):
     app.elasticsearch = Elasticsearch(elastic_url) if elastic_url else None
 
     db.init_app(app)
-    migrate.init_app(app, db, render_as_batch=True)
+    migrate.init_app(app, db, render_as_batch=True, compare_type=True)
     login_manager.init_app(app)
 
     from app.users.routes import users
