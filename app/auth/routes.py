@@ -55,6 +55,7 @@ def google():
 
     try:
         # verify the integrity of the ID token and return the user info
+        # https://developers.google.com/identity/one-tap/android/idtoken-auth#using-a-google-api-client-library
         # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
         data = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
@@ -72,11 +73,12 @@ def google():
         # store revoke token in session in case the user wants to revoke access
         session['revoke_token'] = credentials.token
         # successfully completed the process
-        return render_template('close_oauth.html')
+        return render_template('bingo_popup.html')
 
-    except ValueError:
+    except Exception:
         # Invalid token
-        return render_template('close_oauth.html')
+        # Failed to complete the process, signal to the parent window
+        return render_template('bummer_popup.html')
 
 
 @auth.route('/authorize/onetap', methods=['POST'])
@@ -100,6 +102,7 @@ def onetap():
         # verify the integrity of the ID token and get the user info
         token = request.form.get('credential')
         CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
+        # https://developers.google.com/identity/one-tap/android/idtoken-auth#using-a-google-api-client-library
         # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
         data = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
@@ -117,14 +120,14 @@ def onetap():
         # successfully completed the process
         return redirect(request.referrer)
 
-    except ValueError:
+    except Exception:
         # Invalid token
         return failed_login()
 
 
 @auth.route('/authorize/facebook')
 def facebook():
-    # https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow#login
+    # https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow
 
     CLIENT_ID = current_app.config['FB_CLIENT_ID']
     REDIRECT_URI = url_for('auth.facebook', _external=True)
@@ -152,12 +155,12 @@ def facebook():
         # redirect to the dialog endpoint
         return redirect(dialog_uri)
 
-    # check if the anti-forgery unique session token is valid
-    if request.args.get('state') != session['state']:
-        # failed to complete the process
-        return render_template('close_oauth.html')
-
     try:
+        # check if the anti-forgery unique session token is valid
+        if request.args.get('state') != session['state']:
+            # failed to complete the process
+            raise ValueError
+
         # exchange the code for access token
         CLIENT_SECRET = current_app.config['FB_CLIENT_SECRET']
         access_token_endpoint = 'https://graph.facebook.com/v12.0/oauth/access_token'
@@ -179,7 +182,7 @@ def facebook():
         # this will be True if access token is valid
         if not data.get('is_valid'):
             # failed to complete the process (invalid access token)
-            raise KeyError
+            raise ValueError
 
         # get user info
         USER_ID = data['user_id']
@@ -203,12 +206,11 @@ def facebook():
         # store revoke token in session in case the user wants to revoke access
         session['revoke_token'] = ACCESS_TOKEN
         # successfully completed the process
-        return render_template('close_oauth.html')
+        return render_template('bingo_popup.html')
 
     except Exception:
         # failed to complete the process, signal to the parent window
-        # https://www.google.com/search?q=signal+to+the+parent+window+javascript&oq=signal+to+the+parent+window&aqs=chrome.1.69i57j33i22i29i30l5.8295j0j7&sourceid=chrome&ie=UTF-8
-        return render_template('close_oauth.html')
+        return render_template('bummer_popup.html')
 
 
 @auth.route('/logout')
