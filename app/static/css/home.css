@@ -1,4 +1,4 @@
-.home-content {
+.scroll-content {
     display: grid;
     grid-template-columns: repeat(4, minmax(50px, 320px));
     justify-content: stretch;
@@ -6,23 +6,23 @@
     row-gap: calc(var(--content-padding));
 }
 
-a.home-video-link {
+a.video-link {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     text-decoration: none;
 }
 
-a.home-video-link:hover {
+a.video-link:hover {
     color: white;
 }
 
-img.home-video-img {
+img.video-img {
     width: 100%;
     height: auto;
 }
 
-h2.home-video-title {
+h2.video-title {
     font-weight: normal;
     font-size: .9rem;
 }

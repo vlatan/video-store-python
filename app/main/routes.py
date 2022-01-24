@@ -27,7 +27,7 @@ def home():
         return make_response(posts, 200)
 
     # render template on the first view (GET method)
-    return render_template('home.html', posts=posts)
+    return render_template('scroll_content.html', posts=posts, title='Doxder')
 
 
 @main.route('/about')

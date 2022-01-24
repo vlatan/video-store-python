@@ -9,11 +9,9 @@
 
 {% block content %}
 <!-- div to contain the content -->
-<div id="scroller" class="home-content">
+<div id="scroller" class="scroll-content">
 
-    {% for fave in faved %}
-    {% set post = fave.post %}
-
+    {% for post in posts %}
     <a class="home-video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
         <img class="home-video-img" src="{{ post.thumbnails['medium']['url'] }}"
             width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"

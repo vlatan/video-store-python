@@ -28,4 +28,5 @@ def account():
 @users.route('/favorites')
 @login_required
 def favorites():
-    return render_template('favorites.html', faved=current_user.faved, title='Favorites')
+    posts = [fave.post for fave in current_user.faved]
+    return render_template('scroll_content.html', posts=posts, title='Favorites')
