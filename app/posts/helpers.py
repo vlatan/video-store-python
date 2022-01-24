@@ -45,7 +45,7 @@ def fetch_video_data(response, playlist_id=None):
     title = response['snippet']['title'].split(' | ')[0].split()
     prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
             'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but' 'per', 'via']
-    punct = [':', '.', '!', '?']
+    punct = [':', '.', '!', '?', '-', '—', '|']
     norm_title = title[0].capitalize()
     if (length := len(title)) > 1:
         for i in range(1, length - 1):
@@ -53,8 +53,7 @@ def fetch_video_data(response, playlist_id=None):
             if title[i].lower() in prep and title[i-1][-1] not in punct:
                 word = title[i].lower()
             norm_title += ' ' + word
-        norm_title += ' ' + title[-1].capitalize()
-    title = norm_title
+        title = norm_title + ' ' + title[-1].capitalize()
 
     # remove urls from the description
     if (description := response['snippet'].get('description')):
