@@ -29,4 +29,4 @@ def account():
 @login_required
 def favorites():
     posts = [fave.post for fave in current_user.faved]
-    return render_template('scroll_content.html', posts=posts, title='Favorites')
+    return render_template('content.html', posts=posts, title='Favorites')
