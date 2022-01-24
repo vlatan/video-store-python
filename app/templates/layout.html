@@ -115,9 +115,19 @@
 	{% endif %}
 	{% endwith %}
 
+	<div id="logInMessage"></div>
 
-	{% block scripts %}
-	{% endblock scripts %}
+	{% if not current_user.is_authenticated %}
+	<script>
+		function popupWindow(url) {
+			var w = window.top.innerWidth * 0.4;
+			var h = window.top.innerHeight * 0.9;
+			const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
+			const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
+			return window.open(url, '_blank', `width=${w}, height=${h}, top=${y}, left=${x}`);
+		}
+	</script>
+	{% endif %}
 
 	<script>
 		var openModal = document.getElementById('openModal');
@@ -135,21 +145,6 @@
 		}
 	</script>
 
-	{% if not current_user.is_authenticated %}
-	<script>
-		function popupWindow(url) {
-			var w = window.top.innerWidth * 0.4;
-			var h = window.top.innerHeight * 0.9;
-			const y = window.top.outerHeight / 2 + window.top.screenY - (h / 2);
-			const x = window.top.outerWidth / 2 + window.top.screenX - (w / 2);
-			return window.open(url, '_blank', `width=${w}, height=${h}, top=${y}, left=${x}`);
-		}
-	</script>
-
-	{% else %}
-
-	{% endif %}
-	<div id="logInMessage"></div>
 	<script>
 		// get login state
 		var loginState = localStorage.getItem('LoggedIn');
@@ -166,6 +161,8 @@
 		localStorage.removeItem('LoggedIn');
 	</script>
 
+	{% block scripts %}
+	{% endblock scripts %}
 </body>
 
 </html>
