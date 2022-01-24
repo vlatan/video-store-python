@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="none"> <!-- Equivalent to noindex, nofollow. -->
+    <title>Not signed in...</title>
+</head>
+
+<body>
+
+    <script>
+        if (window.opener && window.opener !== window) {
+            window.opener.location.reload();
+            localStorage.setItem('LoggedIn', 'bummer');
+            window.close();
+        }
+        else {
+            document.location = "{{ url_for('main.home') }}"
+        }
+    </script>
+
+</body>
+
+</html>
