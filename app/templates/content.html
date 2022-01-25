@@ -3,13 +3,9 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
 {% endblock css %}
 
-{% block title %}
-<title>{{ title }}</title>
-{% endblock title %}
-
 {% block content %}
 
-{% if total %}
+{% if 'Search' in title %}
 Found <strong>{{ total }}</strong> results for this query.
 <br><br>
 {% endif %}
@@ -44,5 +40,7 @@ Found <strong>{{ total }}</strong> results for this query.
 {% endblock content %}
 
 {% block scripts %}
+{% if total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+{% endif %}
 {% endblock scripts %}

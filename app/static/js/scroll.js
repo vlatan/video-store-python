@@ -3,8 +3,10 @@ var scroller = document.querySelector("#scroller");
 var template = document.querySelector('#post_template');
 var sentinel = document.querySelector('#sentinel');
 var spinner = document.querySelector('#spinner');
+// apply spinner
+spinner.classList.add('spinner');
 // Use infinite scroll from the second page onwards
-var counter = 2;
+var page = 2;
 // There are still posts to be fetched
 var the_end = false;
 
@@ -17,6 +19,11 @@ async function loadItems(url = '', data = {}) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     }).then((response) => {
+
+        if (!response.ok) {
+            the_end = true;
+            return
+        }
 
         // Convert the response data to JSON
         response.json().then((data) => {
@@ -48,7 +55,7 @@ async function loadItems(url = '', data = {}) {
             }
 
             // Increment the page counter
-            counter += 1;
+            page += 1;
         })
     })
 }
@@ -58,10 +65,8 @@ if ('IntersectionObserver' in window) {
     let intersectionObserver = new IntersectionObserver(([entry]) => {
         // If there are still posts and the entry is intersecting
         if (the_end === false && entry.isIntersecting) {
-            // apply spinner
-            spinner.classList.add('spinner');
             // Call the loadItems function
-            loadItems(`${window.location.pathname}`, { page: counter });
+            loadItems(`${window.location.pathname}`, { page: page });
             // Unobserve the entry
             // intersectionObserver.unobserve(entry);
         }

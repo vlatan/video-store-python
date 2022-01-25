@@ -33,7 +33,7 @@ def post(post_id):
         likes = 'Like'
 
     return render_template('post.html', post=post, thumb=thumb['url'],
-                           duration=duration.human, likes=likes)
+                           duration=duration.human, likes=likes, title=post.title)
 
 
 @posts.route('/post/new', methods=['GET', 'POST'])

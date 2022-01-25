@@ -22,6 +22,7 @@ class Config:
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))
+    APP_NAME = os.environ.get('APP_NAME')
 
     # Facebook authentication
     FB_CLIENT_ID = os.environ.get('FB_CLIENT_ID')

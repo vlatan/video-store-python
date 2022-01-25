@@ -33,7 +33,8 @@ def search_results():
         # save keyword and the total number of posts in session
         session['keyword'], session['total'] = keyword, total
         # render the template
-        return render_template('content.html', posts=posts, total=total)
+        return render_template('content.html', posts=posts,
+                               total=total, title='Search')
 
     keyword, total = session['keyword'], session['total']
     # if we got the frontend data (POST), the keyword and the total number of posts

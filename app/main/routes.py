@@ -17,6 +17,7 @@ def home():
     page = frontend_data.get('page') if frontend_data else 1
     # query the Post table in descending order
     posts = Post.query.order_by(Post.id.desc())
+    total = posts.count()
     posts = posts.paginate(page, per_page, False).items
 
     if request.method == 'POST':
@@ -27,7 +28,8 @@ def home():
         return make_response(posts, 200)
 
     # render template on the first view (GET method)
-    return render_template('content.html', posts=posts, title='Doxder')
+    return render_template('content.html', posts=posts,
+                           total=total)
 
 
 @main.route('/about')
