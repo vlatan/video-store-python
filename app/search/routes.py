@@ -41,9 +41,8 @@ def search_results():
     if (frontend_data := request.get_json()) and keyword and total:
         # get the page number
         page = frontend_data.get('page')
-        posts_so_far = page * per_page
-        # if there are subsequent pages send content to frontend
-        if total > posts_so_far or posts_so_far - total <= per_page:
+        # if there are subsequent posts send content to frontend
+        if total > (page - 1) * per_page:
             # get the search results
             posts, total = Post.search(keyword, page, per_page)
             # posts as JSON object
