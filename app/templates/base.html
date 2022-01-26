@@ -33,22 +33,26 @@
 
 			<nav class="navbar">
 				{% if current_user.is_authenticated %}
-				{% if current_user.is_admin %}
-				<a class="nav-item" href="{{ url_for('posts.playlists') }}">Playlists</a>
-				<a class="nav-item" href="{{ url_for('posts.new_playlist') }}">New Playlist</a>
-				<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
-				{% endif %}
-				<a class="nav-item" href="{{ url_for('users.favorites') }}">Favorites</a>
-				<span class="nav-item username">
-					<img src="{{ current_user.picture }}" class="username-image" width="20" height="20" alt="">
-					<a class="nav-item" href="{{ url_for('users.account') }}">
+				<div class="dropdown">
+					<button class="nav-item username drop-btn" onclick="dropDown()">
+						<img src="{{ current_user.picture }}" class="drop-btn username-image" width="20" height="20"
+							alt="">
 						{{ current_user.name }}
-					</a>
-				</span>
-				<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
+					</button>
+					<div class="dropdown-content">
+						{% if current_user.is_admin %}
+						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Playlists</a>
+						<a class="nav-item" href="{{ url_for('posts.new_playlist') }}">New Playlist</a>
+						<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
+						{% endif %}
+						<a class="nav-item" href="{{ url_for('users.favorites') }}">Favorites</a>
+						<a class="nav-item" href="{{ url_for('users.account') }}">Account</a>
+						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
+					</div>
+				</div>
 				{% else %}
 				<div class="login-wrap">
-					<a id="openModal" class="nav-item">Log in</a>
+					<a id="openModal" class="nav-item" href="javascript:void(0)">Log in</a>
 					<div class="need-login">Please login</div>
 				</div>
 
@@ -126,6 +130,21 @@
 	<script async defer src="{{ url_for('static', filename='js/pop.js') }}"></script>
 	{% endif %}
 	<script async defer src="{{ url_for('static', filename='js/shared.js') }}"></script>
+	<script>
+		var dropContent = document.querySelector('.dropdown-content');
+		function dropDown() {
+			dropContent.classList.toggle('show-dropdown');
+		}
+
+		window.addEventListener('click', function (event) {
+			console.log(event.target);
+			if (!event.target.matches('.drop-btn')) {
+				if (dropContent.classList.contains('show-dropdown')) {
+					dropContent.classList.remove('show-dropdown');
+				}
+			}
+		});
+	</script>
 </body>
 
 </html>
