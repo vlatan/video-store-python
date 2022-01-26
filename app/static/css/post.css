@@ -4,6 +4,12 @@
     gap: var(--content-padding);
 }
 
+@media screen and (max-width: 800px) {
+    .media-content {
+        grid-template-columns: 100%;
+    }
+}
+
 .video-content {
     display: flex;
     flex-direction: column;

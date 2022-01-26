@@ -1,4 +1,4 @@
-/* ################# variables ################# */
+/* ################# Variables ################# */
 
 :root {
     --primary-background-color: rgb(24, 24, 24);
@@ -11,7 +11,7 @@
 }
 
 
-/* ################# reset ################# */
+/* ################# Reset ################# */
 
 *, *:after, *:before {
     box-sizing: border-box;
@@ -29,14 +29,12 @@ body {
     background-color: var(--primary-background-color);
 }
 
-body
-
 ul, li {
     list-style: none;
 }
 
 
-/* ################# content ################# */
+/* ################# Header / Content ################# */
 
 .site-header-wrap {
     background-color: var(--secondary-background-color);
@@ -48,7 +46,13 @@ ul, li {
 
 .site-header, .content-wrap {
     max-width: var(--content-width);
-    margin: auto;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 1260px) {
+    .site-header, .content-wrap {
+        margin: 0 var(--content-padding);
+    }
 }
 
 .content-wrap {
@@ -102,7 +106,7 @@ input.search-form-input:focus {
     align-items: center;
 }
 
-a.nav-item {
+.nav-item {
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -128,7 +132,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     transform: scaleX(1);
 }
 
-a.nav-item.username {
+.nav-item.username {
     gap: .5rem;
 }
 
@@ -142,9 +146,11 @@ a.nav-item.username {
     align-items: center;
 }
 
-a.nav-item.login:after {
+/* a.nav-item.login::after {
     content: none;
-}
+} */
+
+/* ############# Alert Messages ############# */
 
 .need-login {
     display: none;
@@ -162,8 +168,8 @@ a.nav-item.login:after {
     border: 2px solid var(--secondary-background-color);
 }
 
-.need-login:after {
-	content: '';
+.need-login::after {
+	content: "";
 	position: absolute;
 	top: 0;
 	right: 10%;
@@ -242,7 +248,6 @@ a.nav-item.login:after {
     border-radius: 5px;
     margin: auto;
     border: 1px solid #888;
-    /* width: 30%; */
     color: black;
     gap: 1.2rem;
     padding: var(--content-padding);
