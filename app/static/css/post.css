@@ -110,8 +110,6 @@ h1.video-title {
     justify-content: flex-start;
     gap: 0.5rem;
     min-width: 80px;
-    height: 16px;
-    line-height: 16px;
 }
 
 button.like, button.fave {
@@ -125,19 +123,19 @@ button.like, button.fave {
 button.like::before,
 button.fave::before {
     position: absolute;
+    display: block;
     left: 0;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 button.like::before {
-    top: 1px;
-    width: 14px;
-    height: 14px;
+    top: 55%;
+    width: 15px;
 }
 
 button.fave::before {
-    bottom: 1px;
-    width: 16px;
-    height: 16px;
+    width: 17px;
 }
 
 .like-yes::before,
@@ -150,13 +148,11 @@ button.fave:hover.fave-no::before {
     content: url(/static/images/fave-yes.svg);
 }
 
-.like-no::before,
-button.like:hover.like-yes::before {
+.like-no::before {
     content: url(/static/images/like-no.svg);
 }
 
-.fave-no::before,
-button.fave:hover.fave-yes::before {
+.fave-no::before {
     content: url(/static/images/fave-no.svg);
 }
 
