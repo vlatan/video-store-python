@@ -42,18 +42,21 @@ def validate_video(response):
 
 def fetch_video_data(response, playlist_id=None):
     # normalize title
-    title = response['snippet']['title'].split(' | ')[0].split()
+    title = response['snippet']['title'].split(' | ')[0]
     prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
-            'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but' 'per', 'via']
-    punct = [':', '.', '!', '?', '-', '—', '|']
-    norm_title = title[0].capitalize()
-    if (length := len(title)) > 1:
+            'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but', 'per', 'via']
+    punct, words = [':', '.', '!', '?', '-', '—', '|'], title.split()
+    if (length := len(words)) > 1:
+        norm_title = words[0].capitalize()
         for i in range(1, length - 1):
-            word = title[i].capitalize()
-            if title[i].lower() in prep and title[i-1][-1] not in punct:
-                word = title[i].lower()
+            if words[i][0] in ['(', '"', "'", ]:
+                word = words[i][0] + words[i][1].upper() + words[i][2:]
+            elif words[i].lower() in prep and words[i-1][-1] not in punct:
+                word = words[i].lower()
+            else:
+                word = words[i].capitalize()
             norm_title += ' ' + word
-        title = norm_title + ' ' + title[-1].capitalize()
+        title = norm_title + ' ' + words[-1].capitalize()
 
     # remove urls from the description
     if (description := response['snippet'].get('description')):
