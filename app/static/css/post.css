@@ -99,6 +99,7 @@ h1.video-title {
 
 .social {
     display: flex;
+    align-items: center;
     gap: var(--content-padding);
 }
 
@@ -109,13 +110,15 @@ h1.video-title {
     justify-content: flex-start;
     gap: 0.5rem;
     min-width: 80px;
+    height: 16px;
+    line-height: 16px;
 }
 
 button.like, button.fave {
     border: none;
     cursor: pointer;
     background: none;
-    padding-left: 1.5rem;
+    padding-left: 1.3rem;
     font-size: .9rem;
 }
 
@@ -123,18 +126,16 @@ button.like::before,
 button.fave::before {
     position: absolute;
     left: 0;
-    /* width: 14px;
-    height: 14px; */
 }
 
 button.like::before {
-    top: 10%;
+    top: 1px;
     width: 14px;
     height: 14px;
 }
 
 button.fave::before {
-    top: -1%;
+    bottom: 1px;
     width: 16px;
     height: 16px;
 }
