@@ -40,9 +40,9 @@ def validate_video(response):
     return True
 
 
-def fetch_video_data(response, playlist_id=None):
+def normalize_title(title):
     # remove content after pipe symbol
-    title = response['snippet']['title'].split(' | ')[0]
+    title = title.split(' | ')[0]
     # remove bracketed content
     title = re.sub("[\(\[].*?[\)\]]", "", title).strip()
     # remove extra spaces
@@ -50,7 +50,11 @@ def fetch_video_data(response, playlist_id=None):
     # common prepositions
     prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
             'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but', 'per', 'via']
-    punct, words = [':', '.', '!', '?', '-', '—', '|'], title.split()
+    # punctuation
+    punct = [':', '.', '!', '?', '-', '—', '|']
+    # split title into words
+    words = title.split()
+
     if (length := len(words)) > 1:
         norm_title = words[0].capitalize()
         for i in range(1, length - 1):
@@ -65,20 +69,31 @@ def fetch_video_data(response, playlist_id=None):
             norm_title += ' ' + word
         title = norm_title + ' ' + words[-1].capitalize()
 
+    return title
+
+
+def normalize_tags(tags, used):
+    duplicate, result = {'documentary', 'documentaries'}, ''
+    for word in ' '.join(tags).split():
+        lower_word = word.lower()
+        if lower_word not in duplicate and lower_word not in used:
+            duplicate.add(lower_word)
+            result += word + ' '
+    return result.strip()
+
+
+def fetch_video_data(response, playlist_id=None):
+    # normalize title
+    title = normalize_title(response['snippet']['title'])
+
     # remove urls from the description
     if (description := response['snippet'].get('description')):
         description = re.sub(r'http\S+', '', description)
 
-    # normalize tags (remove duplicates and title/desc words)
+    # convert to string and normalize tags
     if (tags := response['snippet'].get('tags')):
-        duplicate, result = {'documentary', 'documentaries'}, ''
-        use = title.lower() + description.lower()
-        for word in ' '.join(tags).split():
-            lower_word = word.lower()
-            if lower_word not in duplicate and lower_word not in use:
-                duplicate.add(lower_word)
-                result += word + ' '
-        tags = result.strip()
+        used = title.lower() + description.lower()
+        tags = normalize_tags(tags, used)
 
     # convert upload date into Python datetime object
     upload_date = response['snippet']['publishedAt']
