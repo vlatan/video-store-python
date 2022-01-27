@@ -15,7 +15,7 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/authorize/google')
 def google():
-    # https://developers.google.com/identity/protocols/oauth2/web-server
+    # https://tinyurl.com/ymadyw2k
     CLIENT_CONFIG = current_app.config['GOOGLE_CLIENT_CONFIG']
     CLIENT_ID = current_app.config['GOOGLE_CLIENT_ID']
     REDIRECT_URL = url_for('auth.google', _external=True)
@@ -55,8 +55,8 @@ def google():
 
     try:
         # verify the integrity of the ID token and return the user info
-        # https://developers.google.com/identity/one-tap/android/idtoken-auth#using-a-google-api-client-library
-        # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
+        # https://tinyurl.com/z2b5xr25
+        # https://tinyurl.com/3dwm6pxe
         data = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
 
@@ -102,8 +102,8 @@ def onetap():
         # verify the integrity of the ID token and get the user info
         token = request.form.get('credential')
         CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
-        # https://developers.google.com/identity/one-tap/android/idtoken-auth#using-a-google-api-client-library
-        # https://google-auth.readthedocs.io/en/stable/reference/google.oauth2.id_token.html#google.oauth2.id_token.verify_oauth2_token
+        # https://tinyurl.com/z2b5xr25
+        # https://tinyurl.com/3dwm6pxe
         data = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
 
@@ -127,7 +127,7 @@ def onetap():
 
 @auth.route('/authorize/facebook')
 def facebook():
-    # https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow
+    # https://tinyurl.com/yzexjyru
 
     CLIENT_ID = current_app.config['FB_CLIENT_ID']
     REDIRECT_URI = url_for('auth.facebook', _external=True)
