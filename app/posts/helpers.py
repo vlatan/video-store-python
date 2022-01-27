@@ -41,16 +41,23 @@ def validate_video(response):
 
 
 def fetch_video_data(response, playlist_id=None):
-    # normalize title
+    # remove content after pipe symbol
     title = response['snippet']['title'].split(' | ')[0]
+    # remove bracketed content
+    title = re.sub("[\(\[].*?[\)\]]", "", title).strip()
+    # remove extra spaces
+    title = re.sub(' +', ' ', title)
+    # common prepositions
     prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
             'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but', 'per', 'via']
     punct, words = [':', '.', '!', '?', '-', '—', '|'], title.split()
     if (length := len(words)) > 1:
         norm_title = words[0].capitalize()
         for i in range(1, length - 1):
-            if words[i][0] in ['(', '"', "'", ]:
+            # if here's quotation mark before the first letter of the word
+            if words[i][0] in ['"', "'", ]:
                 word = words[i][0] + words[i][1].upper() + words[i][2:]
+            # if the word is common prepositon and there's no punctuation befor it
             elif words[i].lower() in prep and words[i-1][-1] not in punct:
                 word = words[i].lower()
             else:
