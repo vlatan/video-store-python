@@ -71,7 +71,7 @@ def fetch_video_data(response, playlist_id=None):
 
     # normalize tags (remove duplicates and title/desc words)
     if (tags := response['snippet'].get('tags')):
-        duplicate, result = set(), ''
+        duplicate, result = {'documentary', 'documentaries'}, ''
         use = title.lower() + description.lower()
         for word in ' '.join(tags).split():
             lower_word = word.lower()
