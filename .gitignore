@@ -132,7 +132,7 @@ dmypy.json
 *.db
 .vscode
 testing/
-msearch/
+logs/
 migrations/
 certs/
 *_test*

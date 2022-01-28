@@ -1,11 +1,13 @@
 # import os
+import os
+import json
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
-# from flask_msearch import Search
+from logging.config import dictConfig
 
 db = SQLAlchemy()
 # search = Search()
@@ -18,6 +20,11 @@ login_manager.login_message_category = 'warning'
 
 
 def create_app(config_class=Config):
+    # config logger
+    # with open(os.environ.get('LOG_CONFIG'), 'r') as j:
+    #     dictConfig(json.load(j))
+
+    # create application object
     app = Flask(__name__)
     app.config.from_object(config_class)
 
