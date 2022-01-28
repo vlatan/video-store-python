@@ -55,8 +55,7 @@ def google():
 
     try:
         # verify the integrity of the ID token and return the user info
-        # https://tinyurl.com/z2b5xr25
-        # https://tinyurl.com/3dwm6pxe
+        # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
         data = id_token.verify_oauth2_token(
             credentials.id_token, google_requests.Request(), CLIENT_ID)
 
@@ -102,8 +101,7 @@ def onetap():
         # verify the integrity of the ID token and get the user info
         token = request.form.get('credential')
         CLIENT_ID = current_app.config['GOOGLE_OAUTH_CLIENT_ID']
-        # https://tinyurl.com/z2b5xr25
-        # https://tinyurl.com/3dwm6pxe
+        # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
         data = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID)
 
