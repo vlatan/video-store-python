@@ -2,8 +2,7 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(50px, 320px));
     justify-content: stretch;
-    column-gap: var(--content-padding);
-    row-gap: calc(var(--content-padding));
+    gap: var(--content-padding);
 }
 
 @media screen and (max-width: 1024px) {
