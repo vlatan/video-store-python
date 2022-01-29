@@ -23,14 +23,13 @@
 	<div class="site-header-wrap">
 		<header class="site-header">
 			<a class="logo" href="/">Doxder</a>
-			{% if g.search_form %}
-			<form class="search-form" method="get" action="{{ url_for('search.search_results') }}">
-				{{ g.search_form.q(size=20, class='search-form-input',
-				placeholder=g.search_form.q.label.text) }}
-			</form>
-			{% endif %}
-
 			<nav class="navbar">
+				{% if g.search_form %}
+				<form class="search-form" method="get" action="{{ url_for('search.search_results') }}">
+					{{ g.search_form.q(size=20, class='search-form-input',
+					placeholder=g.search_form.q.label.text) }}
+				</form>
+				{% endif %}
 				<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">

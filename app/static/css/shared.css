@@ -65,7 +65,7 @@ ul, li {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    column-gap: calc(var(--content-padding) * 2.5);
+    column-gap: calc(var(--content-padding) * 5);
     min-height: var(--header-hight);
 }
 
@@ -76,6 +76,14 @@ a.logo {
     letter-spacing: -.06rem;
     line-height: 1;
     display: block;
+}
+
+.navbar {
+    display: flex;
+    flex: 1;
+    column-gap: var(--content-padding);
+    justify-content: space-between;
+    align-items: center;
 }
 
 .search-form {
@@ -98,13 +106,6 @@ input.search-form-input {
 
 input.search-form-input:focus {
     outline: none;
-}
-
-.navbar {
-    display: flex;
-    column-gap: var(--content-padding);
-    justify-content: space-between;
-    align-items: center;
 }
 
 .dropdown {
