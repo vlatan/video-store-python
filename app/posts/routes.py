@@ -95,7 +95,7 @@ def playlists():
     return render_template('playlists.html', posts=playlists, title='Playlists')
 
 
-@posts.route('/post/<int:post_id>/<action>', methods=['POST'])
+@posts.route('/post/<int:post_id>/<string:action>', methods=['POST'])
 @login_required
 def perform_action(post_id, action):
     if (post := Post.query.get(post_id)):
