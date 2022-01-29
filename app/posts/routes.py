@@ -107,7 +107,7 @@ def perform_action(post_id, action):
             current_user.uncast(post, 'like')
             db.session.commit()
             return make_response('Success', 200)
-        if action == 'fave':
+        elif action == 'fave':
             current_user.cast(post, 'fave')
             db.session.commit()
             return make_response('Success', 200)
