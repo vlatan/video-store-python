@@ -114,9 +114,9 @@ input.search-form-input:focus {
 .dropdown-content {
     display: none;
     position: absolute;
-    top: 170%;
+    top: 160%;
     right: 0;
-    padding: var(--content-padding);
+    padding: var(--content-padding) calc(var(--content-padding) + .5rem);
     background-color: var(--secondary-background-color);
     border: 1px solid var(--primary-border-color);
     border-radius: 1rem;
