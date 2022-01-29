@@ -40,9 +40,10 @@ ul, li {
 .site-header-wrap {
     background-color: var(--secondary-background-color);
     margin-bottom: var(--content-padding);
-    position: fixed;
-    width: 100%;
     z-index: 99999;
+    position: sticky;
+    top: 0;
+    width: 100%;
 }
 
 .site-header, .content-wrap {
@@ -57,7 +58,6 @@ ul, li {
 }
 
 .content-wrap {
-    padding-top: calc(var(--header-hight) + var(--content-padding));
     min-height: 105vh;
 }
 
