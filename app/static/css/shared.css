@@ -109,7 +109,6 @@ input.search-form-input:focus {
 
 .dropdown {
     position: relative;
-    display: flex;
 }
 
 .dropdown-content {
@@ -118,17 +117,13 @@ input.search-form-input:focus {
     top: 170%;
     right: 0;
     padding: var(--content-padding);
-    min-width: 150px;
     background-color: var(--secondary-background-color);
     border: 1px solid var(--primary-border-color);
     border-radius: 1rem;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     flex-direction: column;
-    flex-flow: column wrap;
     row-gap: .5rem;
-    transform: scale(0);
-    transition: transform .2s ease-in-out;
 }
 
 .dropdown-content::after {
@@ -147,7 +142,12 @@ input.search-form-input:focus {
 
 .show-dropdown {
     display: flex;
-    transform: scale(1);
+    transform: scale(0);
+    animation: expand 100ms ease-in forwards;
+}
+
+@keyframes expand {
+    to {transform: scale(1);}
 }
 
 .nav-item {
@@ -158,6 +158,11 @@ input.search-form-input:focus {
     align-items: center;
     text-decoration: none;
     line-height: 1.55;
+}
+
+.dropdown-content .nav-item {
+    white-space: nowrap;
+    margin-right: auto;
 }
 
 a.nav-item::after {
@@ -195,10 +200,6 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 	border-bottom: 0;
 	margin-left: -6px;
 	margin-top: -6px;
-}
-
-.nav-item.username a {
-    text-decoration: none;
 }
 
 .nav-item img.username-image {
