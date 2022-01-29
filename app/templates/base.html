@@ -23,7 +23,6 @@
 	<div class="site-header-wrap">
 		<header class="site-header">
 			<a class="logo" href="/">Doxder</a>
-
 			{% if g.search_form %}
 			<form class="search-form" method="get" action="{{ url_for('search.search_results') }}">
 				{{ g.search_form.q(size=20, class='search-form-input',
@@ -32,6 +31,7 @@
 			{% endif %}
 
 			<nav class="navbar">
+				<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
 					<button class="nav-item username drop-btn" onclick="dropDown()">
@@ -41,7 +41,6 @@
 					</button>
 					<div class="dropdown-content">
 						{% if current_user.is_admin %}
-						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Playlists</a>
 						<a class="nav-item" href="{{ url_for('posts.new_playlist') }}">New Playlist</a>
 						<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
 						{% endif %}
