@@ -1,4 +1,5 @@
 import os
+import requests
 from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
@@ -15,6 +16,13 @@ def admin_required(func):
             return redirect(url_for('main.home'))
         return func(*args, **kwargs)
     return only_admin
+
+
+def save_image(image_url, name):
+    response = requests.get(image_url)
+    if response.ok:
+        with open(name, 'wb') as file:
+            file.write(response.content)
 
 
 def dump_datetime(value):
