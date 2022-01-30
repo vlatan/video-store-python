@@ -18,11 +18,13 @@ def admin_required(func):
     return only_admin
 
 
-def save_image(image_url, name):
+def save_image(image_url, file_path):
     response = requests.get(image_url)
     if response.ok:
-        with open(name, 'wb') as file:
+        with open(file_path, 'wb') as file:
             file.write(response.content)
+            return True
+    return False
 
 
 def dump_datetime(value):

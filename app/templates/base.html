@@ -34,8 +34,8 @@
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
 					<button class="nav-item username drop-btn" onclick="dropDown()">
-						<img src="{{ current_user.picture }}" class="drop-btn username-image" width="20" height="20"
-							alt="">
+						<img src="{{ url_for('static', filename='user_images/' + current_user.local_picture) }}"
+							class="drop-btn username-image" width="20" height="20" alt="">
 						{{ current_user.name }}
 					</button>
 					<div class="dropdown-content">

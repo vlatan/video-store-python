@@ -60,10 +60,9 @@ def google():
             credentials.id_token, google_requests.Request(), CLIENT_ID)
 
         # process user data for login
-        default_pic = url_for('static', filename='profile_pics/default.jpg')
         user_info = {'google_id': data['sub'], 'email': data.get('email'),
                      'name': data.get('given_name', 'Guest'),
-                     'picture': data.get('picture', default_pic)}
+                     'picture': data.get('picture')}
 
         # get user ready (create or update their info)
         user = get_user_ready(user_info)
@@ -106,10 +105,9 @@ def onetap():
             token, google_requests.Request(), CLIENT_ID)
 
         # process user data for login
-        default_pic = url_for('static', filename='profile_pics/default.jpg')
         user_info = {'google_id': data['sub'], 'email': data.get('email'),
                      'name': data.get('given_name', 'Guest'),
-                     'picture': data.get('picture', default_pic)}
+                     'picture': data.get('picture')}
 
         # get user ready (create or update their info)
         user = get_user_ready(user_info)
@@ -192,8 +190,7 @@ def facebook():
         data = requests.get(graph_endpoint, params=payload).json()
 
         # process user data for login
-        default_pic = url_for('static', filename='profile_pics/default.jpg')
-        pic = data.get('picture', {}).get('data', {}).get('url', default_pic)
+        pic = data.get('picture', {}).get('data', {}).get('url')
         user_info = {'facebook_id': USER_ID, 'email': data.get('email'),
                      'name': data.get('first_name', 'Guest'), 'picture': pic}
 
