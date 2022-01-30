@@ -38,6 +38,7 @@ class User(db.Model, UserMixin, ActionMixin):
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
+    local_picture = db.Column(db.String(120), default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user', lazy=True)
