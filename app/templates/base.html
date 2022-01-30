@@ -48,10 +48,10 @@
 						{% if current_user.is_admin %}
 						<a class="nav-item" href="{{ url_for('posts.new_playlist') }}">New Playlist</a>
 						<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
+						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 						{% endif %}
 						<a class="nav-item" href="{{ url_for('users.favorites') }}">Favorites</a>
 						<a class="nav-item" href="{{ url_for('users.account') }}">Account</a>
-						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
 					</div>
 				</div>
