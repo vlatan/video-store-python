@@ -30,7 +30,6 @@
 					placeholder=g.search_form.q.label.text) }}
 				</form>
 				{% endif %}
-				<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
 					<button class="nav-item username drop-btn" onclick="dropDown()">
@@ -45,6 +44,7 @@
 						{% endif %}
 						<a class="nav-item" href="{{ url_for('users.favorites') }}">Favorites</a>
 						<a class="nav-item" href="{{ url_for('users.account') }}">Account</a>
+						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
 					</div>
 				</div>
