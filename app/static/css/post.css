@@ -222,7 +222,15 @@ button.cancel-button {
 .related_videos {
     display: flex;
     flex-direction: column;
-    row-gap: .5rem;
+    gap: .5rem;
+}
+
+@media screen and (max-width: 900px) and (min-width: 600px) {
+    .related_videos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: .8rem;
+    }
 }
 
 .related-video {
