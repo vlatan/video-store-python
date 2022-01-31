@@ -42,7 +42,7 @@
 					<button class="nav-item username drop-btn" onclick="dropDown()">
 						<img src="{{ url_for('static', filename='user_images/' + current_user.local_picture) }}"
 							class="drop-btn username-image" width="20" height="20" alt="">
-						{{ current_user.name }}
+						<span class="username-text drop-btn">{{ current_user.name }}</span>
 					</button>
 					<div class="dropdown-content">
 						{% if current_user.is_admin %}
@@ -142,13 +142,28 @@
 		}
 
 		window.addEventListener('click', function (event) {
-			console.log(event.target);
 			if (!event.target.matches('.drop-btn')) {
 				if (dropContent.classList.contains('show-dropdown')) {
 					dropContent.classList.remove('show-dropdown');
 				}
 			}
 		});
+
+		var searchFormInput = document.querySelector('.search-form-input');
+		if (window.getComputedStyle(searchFormInput).display === "none") {
+			var searchFormButton = document.querySelector('.search-button');
+			searchFormButton.type = "button";
+			searchFormButton.addEventListener('click', function () {
+				var siteHeader = document.querySelector('.site-header');
+				var searchForm = document.querySelector('.search-form');
+				siteHeader.classList.add('site-header-mobile');
+				searchForm.classList.add('search-form-mobile');
+				searchFormInput.style.display = "block";
+				searchFormButton.classList.remove('search-button');
+				searchFormButton.classList.add('search-button-mobile');
+				searchFormButton.type = "submit";
+			});
+		}
 	</script>
 </body>
 
