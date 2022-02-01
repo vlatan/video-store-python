@@ -25,7 +25,14 @@
 			<a class="logo" href="/">Doxder</a>
 			<nav class="navbar">
 				{% if g.search_form %}
-				<form class="search-form hide" method="get" action="{{ url_for('search.search_results') }}">
+				<form id="searchForm" class="search-form" method="get" action="{{ url_for('search.search_results') }}">
+					<button type="button" class="search-arrow">
+						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
+							clip-rule="evenodd">
+							<path fill="white"
+								d="M2.117 12l7.527 6.235-.644.765-9-7.521 9-7.479.645.764-7.529 6.236h21.884v1h-21.883z" />
+						</svg>
+					</button>
 					{{ g.search_form.q(size=20, class='search-form-input',
 					placeholder=g.search_form.q.label.text) }}
 					<button class="search-button">

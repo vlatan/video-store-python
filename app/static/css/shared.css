@@ -84,7 +84,8 @@ a.logo {
 
 /* ################# Search Box ################# */
 
-.search-form {
+.search-form,
+.search-form-mobile {
     flex: 1;
     height: 2.5rem;
     display: flex;
@@ -130,22 +131,30 @@ button.search-button  {
     background-color: var(--primary-border-color);
 }
 
-button.search-button-mobile {
+button.search-button-mobile,
+button.search-arrow {
     display: none;
     background-color: transparent;
     border: none;
 }
 
 button.search-button,
-button.search-button-mobile {
+button.search-button-mobile,
+button.search-arrow {
     align-items: center;
     justify-content: center;
     cursor: pointer;
 }
 
 button.search-button svg,
-button.search-button-mobile svg {
+button.search-button-mobile svg,
+button.search-arrow svg {
     width: 17px;
+}
+
+button.search-arrow {
+    margin-right: 10px;
+
 }
 
 
@@ -516,7 +525,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 @media screen and (max-width: 450px) {
-    .hide {
+    .search-form {
         display: none;
     }
 

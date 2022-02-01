@@ -6,7 +6,7 @@ window.addEventListener('click', function (event) {
     if (event.target.closest('#openModal')) {
         modal.style.display = 'flex'
     } else if (closeModal.includes(event.target)) {
-        modal.style.display = "none";
+        modal.removeAttribute('style');
     }
 
     // Dropdown menu
@@ -18,13 +18,21 @@ window.addEventListener('click', function (event) {
     }
 
     // Mobile search form
-    var searchForm = document.querySelector('.search-form');
+    var searchForm = document.getElementById('searchForm');
+    var logo = document.querySelector('a.logo');
+    var arrow = document.querySelector('button.search-arrow')
+    var arrowClicked = event.target.closest('button.search-arrow');
+    var outsideFormClicked = !event.target.closest('#searchForm');
     if (event.target.closest('.search-button-mobile')) {
-        searchForm.classList.remove('hide');
+        searchForm.classList.remove('search-form');
         searchForm.classList.add('search-form-mobile');
-    } else if (!event.target.closest('.search-form')) {
-        searchForm.classList.add('hide');
+        logo.style.display = "none";
+        arrow.style.display = "block";
+    } else if (arrowClicked || outsideFormClicked) {
+        searchForm.classList.add('search-form');
         searchForm.classList.remove('search-form-mobile');
+        logo.removeAttribute('style');
+        arrow.removeAttribute('style');
     }
 });
 
