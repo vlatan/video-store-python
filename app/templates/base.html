@@ -25,7 +25,7 @@
 			<a class="logo" href="/">Doxder</a>
 			<nav class="navbar">
 				{% if g.search_form %}
-				<form class="search-form" method="get" action="{{ url_for('search.search_results') }}">
+				<form class="search-form hide" method="get" action="{{ url_for('search.search_results') }}">
 					{{ g.search_form.q(size=20, class='search-form-input',
 					placeholder=g.search_form.q.label.text) }}
 					<button class="search-button">
@@ -36,13 +36,19 @@
 						</svg>
 					</button>
 				</form>
+				<button class="search-button-mobile">
+					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
+						<path fill="white"
+							d="M15.853 16.56c-1.683 1.517-3.911 2.44-6.353 2.44-5.243 0-9.5-4.257-9.5-9.5s4.257-9.5 9.5-9.5 9.5 4.257 9.5 9.5c0 2.442-.923 4.67-2.44 6.353l7.44 7.44-.707.707-7.44-7.44zm-6.353-15.56c4.691 0 8.5 3.809 8.5 8.5s-3.809 8.5-8.5 8.5-8.5-3.809-8.5-8.5 3.809-8.5 8.5-8.5z" />
+					</svg>
+				</button>
 				{% endif %}
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
-					<button class="nav-item username drop-btn" onclick="dropDown()">
+					<button class="nav-item username">
 						<img src="{{ url_for('static', filename='user_images/' + current_user.local_picture) }}"
-							class="drop-btn username-image" width="20" height="20" alt="">
-						<span class="username-text drop-btn">{{ current_user.name }}</span>
+							class="username-image" width="20" height="20" alt="">
+						<span class="username-text">{{ current_user.name }}</span>
 					</button>
 					<div class="dropdown-content">
 						{% if current_user.is_admin %}
@@ -135,36 +141,6 @@
 	<script async defer src="{{ url_for('static', filename='js/pop.js') }}"></script>
 	{% endif %}
 	<script async defer src="{{ url_for('static', filename='js/shared.js') }}"></script>
-	<script>
-		var dropContent = document.querySelector('.dropdown-content');
-		function dropDown() {
-			dropContent.classList.toggle('show-dropdown');
-		}
-
-		window.addEventListener('click', function (event) {
-			if (!event.target.matches('.drop-btn')) {
-				if (dropContent.classList.contains('show-dropdown')) {
-					dropContent.classList.remove('show-dropdown');
-				}
-			}
-		});
-
-		var searchFormInput = document.querySelector('.search-form-input');
-		if (window.getComputedStyle(searchFormInput).display === "none") {
-			var searchFormButton = document.querySelector('.search-button');
-			searchFormButton.type = "button";
-			searchFormButton.addEventListener('click', function () {
-				var siteHeader = document.querySelector('.site-header');
-				var searchForm = document.querySelector('.search-form');
-				siteHeader.classList.add('site-header-mobile');
-				searchForm.classList.add('search-form-mobile');
-				searchFormInput.style.display = "block";
-				searchFormButton.classList.remove('search-button');
-				searchFormButton.classList.add('search-button-mobile');
-				searchFormButton.type = "submit";
-			});
-		}
-	</script>
 </body>
 
 </html>
