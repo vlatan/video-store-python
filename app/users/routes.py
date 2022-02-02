@@ -7,6 +7,14 @@ from app.users.forms import UpdateAccountForm
 users = Blueprint('users', __name__)
 
 
+@users.route('/liked')
+@login_required
+def liked():
+    total = len(posts := [like.post for like in current_user.liked])
+    return render_template('content.html', posts=posts,
+                           total=total, title='Liked')
+
+
 @users.route('/favorites')
 @login_required
 def favorites():
