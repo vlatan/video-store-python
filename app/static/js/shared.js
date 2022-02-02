@@ -11,9 +11,11 @@ window.addEventListener('click', function (event) {
 
     // Dropdown menu
     var dropContent = document.querySelector('.dropdown-content');
-    if (event.target.closest('.username')) {
+    var isntDropped = !dropContent.classList.contains('show-dropdown');
+    var usernameClicked = event.target.closest('.username');
+    if (isntDropped && usernameClicked) {
         dropContent.classList.add('show-dropdown');
-    } else if (!event.target.closest('.dropdown')) {
+    } else if (!event.target.closest('.show-dropdown')) {
         dropContent.classList.remove('show-dropdown');
     }
 
