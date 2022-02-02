@@ -1,12 +1,24 @@
-window.addEventListener('click', function (event) {
-    // Modal
-    var modal = document.getElementById('modal');
-    var closeModal = [modal, document.getElementById('closeModal'),
-        document.getElementById('cancelModal')]
-    if (event.target.closest('#openModal')) {
+function useModal(event, openModalID, modal, closeModalElements) {
+    if (event.target.closest(openModalID)) {
         modal.style.display = 'flex'
-    } else if (closeModal.includes(event.target)) {
+    } else if (closeModalElements.includes(event.target)) {
         modal.removeAttribute('style');
+    }
+}
+
+window.addEventListener('click', function (event) {
+    const modals = [
+        ['#openLoginModal', 'loginModal', 'closeLoginModal', 'cancelLoginModal'],
+        ['#openAccountModal', 'deleteAccountModal', 'closeAccountModal', 'cancelAccountModal'],
+        ['#openVideoModal', 'deleteVideoModal', 'closeVideoModal', 'cancelVideoModal']
+    ]
+
+    for (var i = 0; i < 3; i++) {
+        var modal = document.getElementById(modals[i][1]);
+        var closeModal = document.getElementById(modals[i][2]);
+        var cancelModal = document.getElementById(modals[i][3]);
+        var closeModalElements = [modal, closeModal, cancelModal]
+        useModal(event, modals[i][0], modal, closeModalElements);
     }
 
     // Dropdown menu

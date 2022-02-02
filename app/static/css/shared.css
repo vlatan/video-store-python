@@ -251,6 +251,13 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     align-items: center;
 }
 
+.nav-item.delete-account {
+    color: lightslategray;
+    font-weight: bold;
+    padding-top: .5rem;;
+    border-top: 1px solid var(--primary-border-color);
+}
+
 
 /* ############# Alert Messages ############# */
 
@@ -362,6 +369,66 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     to {
         transform: translateX(0);
         opacity: 1;
+    }
+}
+
+
+/* ############# Delete Video/Account Modal ############# */
+
+/* Set a style for all modal buttons */
+button.modal-button {
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 20px;
+    border: none;
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+button.modal-button:hover {
+    opacity: 1;
+}
+
+.modal-buttons-wrap {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+/* Float cancel and delete buttons and add an equal width */
+button.cancel-button, button.delete-button {
+    width: 50%;
+    padding: .8rem 2rem;
+}
+
+/* Add a color to the cancel button */
+button.cancel-button {
+    background-color: #ccc;
+    color: black;
+}
+
+/* The Modal Close Button (x) */
+.close-modal {
+    position: absolute;
+    right: .6rem;
+    top: 0;
+    font-size: 2rem;
+    font-weight: bold;
+    color: black;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+    color: #f44336;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Change styles for cancel button and delete button on extra small screens */
+@media screen and (max-width: 300px) {
+    .cancelbtn, .deletebtn {
+        width: 100%;
     }
 }
 

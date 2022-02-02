@@ -66,17 +66,33 @@
 						<a class="nav-item" href="{{ url_for('users.favorites') }}">Watch Later</a>
 						<a class="nav-item" href="{{ url_for('users.liked') }}">Liked Docs</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
-						<a class="nav-item delete-account" href="{{ url_for('users.delete_account') }}">Delete
-							Account</a>
+						<a id="openAccountModal" class="nav-item delete-account" href="javascript:void(0)">
+							Delete Account
+						</a>
 					</div>
+				</div>
+
+				<div id="deleteAccountModal" class="modal">
+					<form class="modal-content" action="{{ url_for('users.delete_account') }}" method="POST">
+						<span id="closeAccountModal" class="close-modal" title="Close">&times;</span>
+						<h2>Delete Account</h2>
+						<p>Are you sure you want to delete your account?<br />
+							This will delete your "Watch Later" list.<br />
+							As well as your personal data.</p>
+						<div class="modal-buttons-wrap">
+							<button id="cancelAccountModal" type="button"
+								class="modal-button cancel-button">Cancel</button>
+							<button type="submit" class="modal-button delete-button">Delete</button>
+						</div>
+					</form>
 				</div>
 				{% else %}
 				<div class="login-wrap">
-					<a id="openModal" class="nav-item" href="javascript:void(0)">Log in</a>
+					<a id="openLoginModal" class="nav-item" href="javascript:void(0)">Log in</a>
 					<div class="need-login">Please login</div>
 				</div>
 
-				<div id="modal" class="modal">
+				<div id="loginModal" class="modal">
 					<div class="modal-content login-modal-content">
 						<h3 class="login-text">Sign in to</h3>
 						<div class="logo-text">Doxder</div>
