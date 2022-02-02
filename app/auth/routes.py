@@ -212,7 +212,7 @@ def facebook():
 @login_required
 def logout():
     logout_user()
-    login_needed = [url_for('users.account', _external=True),
+    login_needed = [url_for('users.liked', _external=True),
                     url_for('posts.new_post', _external=True),
                     url_for('posts.new_playlist', _external=True),
                     url_for('users.favorites', _external=True)]

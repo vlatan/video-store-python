@@ -63,9 +63,11 @@
 						<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
 						<a class="nav-item" href="{{ url_for('posts.playlists') }}">Sources</a>
 						{% endif %}
-						<a class="nav-item" href="{{ url_for('users.favorites') }}">Saved</a>
-						<a class="nav-item" href="{{ url_for('users.liked') }}">Liked</a>
+						<a class="nav-item" href="{{ url_for('users.favorites') }}">Watch Later</a>
+						<a class="nav-item" href="{{ url_for('users.liked') }}">Liked Docs</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
+						<a class="nav-item delete-account" href="{{ url_for('users.delete_account') }}">Delete
+							Account</a>
 					</div>
 				</div>
 				{% else %}
