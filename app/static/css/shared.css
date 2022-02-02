@@ -84,28 +84,13 @@ a.logo {
 
 /* ################# Search Box ################# */
 
-.search-form,
-.search-form-mobile {
+.search-form {
     flex: 1;
     height: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     margin-top: 1px;
-}
-
-.search-form-mobile {
-    position: absolute;
-    z-index: 10;
-    width: 100%;
-    top: 50%;
-    transform: translateY(-50%) scaleX(0);
-    left: 0;
-    animation: expandSearch 200ms ease-in forwards;
-}
-
-@keyframes expandSearch {
-    to {transform: translateY(-50%) scaleX(1);}
 }
 
 input.search-form-input {
@@ -527,6 +512,17 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 @media screen and (max-width: 450px) {
     .search-form {
         display: none;
+        position: absolute;
+        z-index: 10;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%) scaleX(0);
+        left: 0;
+        animation: expandSearch 200ms ease-in forwards;
+    }
+
+    @keyframes expandSearch {
+        to {transform: translateY(-50%) scaleX(1);}
     }
 
     button.search-button-mobile {

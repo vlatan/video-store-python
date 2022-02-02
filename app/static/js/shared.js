@@ -24,13 +24,11 @@ window.addEventListener('click', function (event) {
     var arrowClicked = event.target.closest('button.search-arrow');
     var outsideFormClicked = !event.target.closest('#searchForm');
     if (event.target.closest('.search-button-mobile')) {
-        searchForm.classList.remove('search-form');
-        searchForm.classList.add('search-form-mobile');
+        searchForm.style.display = 'flex'
         logo.style.display = "none";
         arrow.style.display = "block";
     } else if (arrowClicked || outsideFormClicked) {
-        searchForm.classList.add('search-form');
-        searchForm.classList.remove('search-form-mobile');
+        searchForm.removeAttribute('style');
         logo.removeAttribute('style');
         arrow.removeAttribute('style');
     }
