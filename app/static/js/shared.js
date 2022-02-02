@@ -23,11 +23,13 @@ window.addEventListener('click', function (event) {
 
     // Dropdown menu
     var dropContent = document.querySelector('.dropdown-content');
-    var isntDropped = !dropContent.classList.contains('show-dropdown');
+    var notDropped = !dropContent.classList.contains('show-dropdown');
     var usernameClicked = event.target.closest('.username');
-    if (isntDropped && usernameClicked) {
+    var deleteAccountClicked = event.target.closest('.delete-account');
+    var MenuNotClicked = !event.target.closest('.show-dropdown');
+    if (notDropped && usernameClicked) {
         dropContent.classList.add('show-dropdown');
-    } else if (!event.target.closest('.show-dropdown')) {
+    } else if (deleteAccountClicked || MenuNotClicked) {
         dropContent.classList.remove('show-dropdown');
     }
 
