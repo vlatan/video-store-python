@@ -23,7 +23,7 @@ def favorites():
                            total=total, title='Favorites')
 
 
-@users.route('/account/delete')
+@users.route('/account/delete', methods=['POST'])
 @login_required
 def delete_account():
     image_name = f'{current_user.id}.jpg'
