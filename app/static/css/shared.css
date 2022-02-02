@@ -34,6 +34,10 @@ ul, li {
     list-style: none;
 }
 
+p {
+    margin: .3rem 0;
+}
+
 
 /* ################# Header / Content ################# */
 
@@ -359,7 +363,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     border: 1px solid #888;
     color: black;
     gap: 1.2rem;
-    padding: var(--content-padding);
+    padding: calc(var(--content-padding) * 1.5);
     transform: translateX(30%);
     opacity: 0;
     animation: flyInRight 100ms ease-in 200ms forwards;
@@ -411,9 +415,9 @@ button.cancel-button {
 /* The Modal Close Button (x) */
 .close-modal {
     position: absolute;
-    right: .6rem;
-    top: 0;
-    font-size: 2rem;
+    right: 15px;
+    top: 5px;
+    font-size: 1.6rem;
     font-weight: bold;
     color: black;
 }

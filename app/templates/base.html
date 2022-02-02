@@ -76,9 +76,11 @@
 					<form class="modal-content" action="{{ url_for('users.delete_account') }}" method="POST">
 						<span id="closeAccountModal" class="close-modal" title="Close">&times;</span>
 						<h2>Delete Account</h2>
-						<p>Are you sure you want to delete your account?<br />
-							This will delete your "Watch Later" list.<br />
-							As well as your personal data.</p>
+						<div>
+							<p>Are you sure you want to delete your account?</p>
+							<p>This will delete your personal data.</p>
+							<p>(name, email, profile picture and watch later list).</p>
+						</div>
 						<div class="modal-buttons-wrap">
 							<button id="cancelAccountModal" type="button"
 								class="modal-button cancel-button">Cancel</button>
