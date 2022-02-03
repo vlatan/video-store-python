@@ -1,36 +1,28 @@
-function useModal(event, openModalID, modal, closeModalElements) {
-    if (event.target.closest(openModalID)) {
-        modal.style.display = 'flex'
-    } else if (closeModalElements.includes(event.target)) {
-        modal.removeAttribute('style');
-    }
-}
-
 window.addEventListener('click', function (event) {
-    const modals = [
-        ['#openLoginModal', 'loginModal', 'closeLoginModal', 'cancelLoginModal'],
-        ['#openAccountModal', 'deleteAccountModal', 'closeAccountModal', 'cancelAccountModal'],
-        ['#openVideoModal', 'deleteVideoModal', 'closeVideoModal', 'cancelVideoModal']
-    ]
-
-    for (var i = 0; i < 3; i++) {
-        var modal = document.getElementById(modals[i][1]);
-        var closeModal = document.getElementById(modals[i][2]);
-        var cancelModal = document.getElementById(modals[i][3]);
-        var closeModalElements = [modal, closeModal, cancelModal]
-        useModal(event, modals[i][0], modal, closeModalElements);
-    }
+    // Modals
+    document.querySelectorAll('[data-modal]').forEach(function (element) {
+        var modalName = element.dataset.modal;
+        var modalBody = document.querySelector(`[data-body="${modalName}"]`);
+        var closeModal = event.target.closest(`[data-close="${modalName}"]`);
+        if (event.target.closest(`[data-modal="${modalName}"]`)) {
+            modalBody.style.display = 'flex';
+        } else if (event.target === modalBody || closeModal) {
+            modalBody.removeAttribute('style');
+        }
+    });
 
     // Dropdown menu
     var dropContent = document.querySelector('.dropdown-content');
-    var notDropped = !dropContent.classList.contains('show-dropdown');
-    var usernameClicked = event.target.closest('.username');
-    var deleteAccountClicked = event.target.closest('.delete-account');
-    var menuNotClicked = !event.target.closest('.show-dropdown');
-    if (notDropped && usernameClicked) {
-        dropContent.classList.add('show-dropdown');
-    } else if (deleteAccountClicked || menuNotClicked) {
-        dropContent.classList.remove('show-dropdown');
+    if (dropContent) {
+        var notDropped = !dropContent.classList.contains('show-dropdown');
+        var usernameClicked = event.target.closest('.username');
+        var deleteAccountClicked = event.target.closest('.delete-account');
+        var menuNotClicked = !event.target.closest('.show-dropdown');
+        if (notDropped && usernameClicked) {
+            dropContent.classList.add('show-dropdown');
+        } else if (deleteAccountClicked || menuNotClicked) {
+            dropContent.classList.remove('show-dropdown');
+        }
     }
 
     // Mobile search form

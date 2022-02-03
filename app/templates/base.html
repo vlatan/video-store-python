@@ -66,22 +66,22 @@
 						<a class="nav-item" href="{{ url_for('users.favorites') }}">Watch Later</a>
 						<a class="nav-item" href="{{ url_for('users.liked') }}">Liked Docs</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
-						<a id="openAccountModal" class="nav-item delete-account" href="javascript:void(0)">
+						<a data-modal="account" class="nav-item delete-account" href="javascript:void(0)">
 							Delete Account
 						</a>
 					</div>
 				</div>
 
-				<div id="deleteAccountModal" class="modal">
+				<div data-body="account" class="modal">
 					<form class="modal-content" action="{{ url_for('users.delete_account') }}" method="POST">
-						<span id="closeAccountModal" class="close-modal" title="Close">&times;</span>
+						<span data-close="account" class="close-modal" title="Close">&times;</span>
 						<h2 class="modal-title">Delete Account</h2>
 						<div class="modal-text">
 							<p>Are you sure you want to delete your account?</p>
 							<p>This will delete your personal data.</p>
 						</div>
 						<div class="modal-buttons-wrap">
-							<button id="cancelAccountModal" type="button"
+							<button data-close="account" type="button"
 								class="modal-button cancel-button">Cancel</button>
 							<button type="submit" class="modal-button delete-button">Delete</button>
 						</div>
@@ -89,11 +89,11 @@
 				</div>
 				{% else %}
 				<div class="login-wrap">
-					<a id="openLoginModal" class="nav-item" href="javascript:void(0)">Log in</a>
+					<a class="nav-item" data-modal="login" href="javascript:void(0)">Log in</a>
 					<div class="need-login">Please login</div>
 				</div>
 
-				<div id="loginModal" class="modal">
+				<div data-body="login" class="modal">
 					<div class="modal-content login-modal-content">
 						<h3 class="login-text">Sign in to</h3>
 						<div class="logo-text">Doxder</div>
@@ -102,7 +102,7 @@
 							documentaries.
 						</p>
 						<div class="login-buttons">
-							<button class="brand-login-button google-login"
+							<button data-close="login" class="brand-login-button google-login"
 								onclick="popupWindow(`{{ url_for('auth.google') }}`, 'Google')">
 								<div class="brand-logo google-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3"
@@ -123,7 +123,7 @@
 								</div>
 								<div class="brand-text">Sign In with Google</div>
 							</button>
-							<button class=" brand-login-button facebook-login"
+							<button data-close="login" class="brand-login-button facebook-login"
 								onclick="popupWindow(`{{ url_for('auth.facebook') }}`)">
 								<div class="brand-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 67 400 368"

@@ -40,7 +40,7 @@ ul, li {
 .site-header-wrap {
     background-color: var(--secondary-background-color);
     margin-bottom: var(--content-padding);
-    z-index: 99999;
+    z-index: 101;
     position: sticky;
     top: 0;
     width: 100%;
@@ -330,7 +330,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     position: fixed; /* Stay in place */
     justify-content: center;
     align-items: center;
-    z-index: 101; /* Sit on top */
+    z-index: 102; /* Sit on top */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -354,7 +354,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     align-items: center;
     text-align: center;
     background-color: #fefefe;
-    border-radius: .5rem;
+    border-radius: 5px;
     margin: auto;
     border: 1px solid #888;
     color: black;
@@ -384,9 +384,9 @@ h2.modal-title {
     flex-direction: column;
     justify-content: center;
     gap: 0.3rem;
-    /* width: 90%; */
-    padding: 2rem;
-    background-color: lightgray;
+    padding: 1.5rem 2rem;
+    background-color: rgb(230, 230, 230);
+    border: 1px solid rgb(200, 200, 200);;
     border-radius: 5px;
 }
 
