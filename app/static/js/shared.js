@@ -26,10 +26,10 @@ window.addEventListener('click', function (event) {
     var notDropped = !dropContent.classList.contains('show-dropdown');
     var usernameClicked = event.target.closest('.username');
     var deleteAccountClicked = event.target.closest('.delete-account');
-    var MenuNotClicked = !event.target.closest('.show-dropdown');
+    var menuNotClicked = !event.target.closest('.show-dropdown');
     if (notDropped && usernameClicked) {
         dropContent.classList.add('show-dropdown');
-    } else if (deleteAccountClicked || MenuNotClicked) {
+    } else if (deleteAccountClicked || menuNotClicked) {
         dropContent.classList.remove('show-dropdown');
     }
 

@@ -34,10 +34,6 @@ ul, li {
     list-style: none;
 }
 
-p {
-    margin: .3rem 0;
-}
-
 
 /* ################# Header / Content ################# */
 
@@ -358,11 +354,11 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     align-items: center;
     text-align: center;
     background-color: #fefefe;
-    border-radius: 5px;
+    border-radius: .5rem;
     margin: auto;
     border: 1px solid #888;
     color: black;
-    gap: 1.2rem;
+    gap: var(--content-padding);
     padding: calc(var(--content-padding) * 1.5);
     transform: translateX(30%);
     opacity: 0;
@@ -377,7 +373,22 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 
-/* ############# Delete Video/Account Modal ############# */
+/* ############# Specific to delete Video/Account Modal ############# */
+
+h2.modal-title {
+    line-height: 1;
+}
+
+.modal-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.3rem;
+    /* width: 90%; */
+    padding: 2rem;
+    background-color: lightgray;
+    border-radius: 5px;
+}
 
 /* Set a style for all modal buttons */
 button.modal-button {
