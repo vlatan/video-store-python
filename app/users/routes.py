@@ -1,6 +1,7 @@
 import os
+import requests
 from flask import render_template, url_for, flash
-from flask import redirect, request, Blueprint, current_app
+from flask import redirect, Blueprint, session
 from flask_login import current_user, login_required
 from app import db
 
@@ -30,6 +31,14 @@ def delete_account():
     image_name = os.path.join('app/static/user_images/', image_name)
     if os.path.exists(image_name):
         os.remove(image_name)
+
+    if current_user.google_id:
+        # revoke Doxder app from user's Google account
+        # https://tinyurl.com/ymadyw2k
+        requests.post('https://oauth2.googleapis.com/revoke',
+                      params={'token': session['revoke_token']},
+                      headers={'content-type': 'application/x-www-form-urlencoded'})
+
     db.session.delete(current_user)
     db.session.commit()
     flash('Your account has been deleted', 'success')
