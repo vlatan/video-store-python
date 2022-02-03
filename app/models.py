@@ -41,7 +41,8 @@ class User(db.Model, UserMixin, ActionMixin):
     local_picture = db.Column(db.String(120), default='default.jpg')
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
-    liked = db.relationship('PostLike', backref='user', lazy=True)
+    liked = db.relationship('PostLike', backref='user',
+                            cascade='all,delete', lazy=True)
     faved = db.relationship('PostFave', backref='user',
                             cascade='all,delete', lazy='dynamic')
 
