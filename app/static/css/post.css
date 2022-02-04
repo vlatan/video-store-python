@@ -104,56 +104,36 @@ h1.video-title {
 }
 
 .likes, .faves {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
     min-width: 80px;
 }
 
-button.like, button.fave {
-    border: none;
+.like, .fave {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .23rem;
     cursor: pointer;
-    background: none;
-    padding-left: 1.3rem;
     font-size: .9rem;
 }
 
-button.like::before,
-button.fave::before {
-    position: absolute;
-    display: block;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
+.action-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 9px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
 }
 
-button.like::before {
-    top: 55%;
-    width: 15px;
+.like .action-icon {
+    width: 31px;
+    height: 31px;
 }
 
-button.fave::before {
-    width: 17px;
-}
-
-.like-yes::before,
-button.like:hover.like-no::before {
-    content: url(/static/images/like-yes.svg);
-}
-
-.fave-yes::before,
-button.fave:hover.fave-no::before {
-    content: url(/static/images/fave-yes.svg);
-}
-
-.like-no::before {
-    content: url(/static/images/like-no.svg);
-}
-
-.fave-no::before {
-    content: url(/static/images/fave-no.svg);
+.like:hover .action-icon,
+.fave:hover .action-icon {
+    background-color: var(--secondary-background-color);
 }
 
 

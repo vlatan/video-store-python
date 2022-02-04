@@ -1,8 +1,7 @@
 var needLogin = document.querySelector('.need-login');
-var login = document.querySelectorAll('[data-auth]');
 
 document.addEventListener('click', (event) => {
-    if (Array.from(login).includes(event.target)) {
+    if (event.target.closest('[data-auth]')) {
         needLogin.style.display = 'block';
     }
 
