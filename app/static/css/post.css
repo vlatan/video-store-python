@@ -120,15 +120,19 @@ h1.video-title {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 9px;
     border-radius: 50%;
     width: 32px;
     height: 32px;
 }
 
-.like .action-icon {
-    width: 31px;
-    height: 31px;
+.action-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.like .action-icon svg {
+    width: 12px;
+    height: 12px;
 }
 
 .like:hover .action-icon,
