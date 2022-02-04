@@ -34,7 +34,7 @@
 						<button class="like like-no like-counter">{{ likes }}</button>
 						{% endif %}
 						{% else %}
-						<button class="like like-no no-auth">{{ likes }}</button>
+						<button data-auth class="like like-no">{{ likes }}</button>
 						{% endif %}
 					</div>
 
@@ -46,7 +46,7 @@
 						<button class="fave fave-no fave-status">Save</button>
 						{% endif %}
 						{% else %}
-						<button class="fave fave-no no-auth">Save</button>
+						<button data-auth class="fave fave-no">Save</button>
 						{% endif %}
 					</div>
 				</div>

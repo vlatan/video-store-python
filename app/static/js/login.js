@@ -1,5 +1,5 @@
 var needLogin = document.querySelector('.need-login');
-var login = document.querySelectorAll('.no-auth');
+var login = document.querySelectorAll('[data-auth]');
 
 document.addEventListener('click', (event) => {
     if (Array.from(login).includes(event.target)) {
@@ -7,6 +7,6 @@ document.addEventListener('click', (event) => {
     }
 
     else if (needLogin.style.display === 'block' && event.target != needLogin) {
-        needLogin.style.display = 'none';
+        needLogin.removeAttribute('style');
     }
 });

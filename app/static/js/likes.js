@@ -22,7 +22,7 @@ function setLikeCounter(action) {
     } else if (counter === 1) {
         text = '1 Like';
     } else {
-        text = `${counter} Likes`
+        text = `${counter} Likes`;
     }
     document.querySelector(".like-counter").textContent = text;
 }
