@@ -559,6 +559,10 @@ button.cancel-button {
 }
 
 @media screen and (max-width: 700px) {
+    :root {
+        --content-padding: 1rem;
+    }
+
     .site-header {
         column-gap: var(--content-padding);
     }
