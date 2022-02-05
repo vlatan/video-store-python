@@ -104,7 +104,7 @@ h1.video-title {
 }
 
 .likes, .faves {
-    min-width: 80px;
+    min-width: 82px;
 }
 
 .like, .fave {
@@ -138,6 +138,10 @@ h1.video-title {
 .like:hover .action-icon,
 .fave:hover .action-icon {
     background-color: var(--secondary-background-color);
+}
+
+.amount-likes, .fave-status {
+    flex: 1;
 }
 
 
