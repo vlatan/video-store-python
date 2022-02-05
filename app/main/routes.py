@@ -10,10 +10,9 @@ main = Blueprint('main', __name__)
 # autoversion css/js files
 @main.app_template_filter('autoversion')
 def autoversion_filter(filename):
-    print(filename)
     fullpath = os.path.join('app/', filename[1:])
     try:
-        timestamp = str(os.path.getmtime(fullpath))
+        timestamp = os.path.getmtime(fullpath)
     except OSError:
         return filename
     return f'{filename}?v={timestamp}'
