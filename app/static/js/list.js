@@ -1,4 +1,3 @@
-// sleep time expects milliseconds
 document.addEventListener('click', (event) => {
     var remove = event.target.closest('.remove-option');
     if (remove) {
