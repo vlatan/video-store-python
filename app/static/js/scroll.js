@@ -49,6 +49,10 @@ async function loadItems(url = '', data = {}) {
                 thumb.src = data[i]['thumbnails']['medium']['url'];
                 thumb.alt = data[i]['title'];
                 template_clone.querySelector('.video-title').innerHTML = data[i]['title'];
+                let remove = template_clone.querySelector('.remove-option');
+                if (remove) {
+                    remove.setAttribute('data-id', `${data[i]['id']}`)
+                }
 
                 // Append template to dom
                 scroller.appendChild(template_clone);

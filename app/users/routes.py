@@ -31,7 +31,7 @@ def liked():
         time.sleep(0.4)
         return make_response(posts, 200)
 
-    return render_template('content.html', posts=posts, user_likes=True,
+    return render_template('user_content.html', posts=posts,
                            total=total, title='Liked')
 
 
@@ -57,7 +57,7 @@ def favorites():
         time.sleep(0.4)
         return make_response(posts, 200)
 
-    return render_template('content.html', posts=posts, user_faves=True,
+    return render_template('user_content.html', posts=posts,
                            total=total, title='Favorites')
 
 

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
+{% endblock css %}
+
+{% block content %}
+
+<div id="scroller" class="scroll-content">
+
+    {% for post in posts %}
+
+    <div class="video-block">
+        <span data-id="{{ post.id }}" class="remove-option">&times;</span>
+        <a class="video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
+            <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
+                width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
+                alt="{{ post.title }}">
+            <h2 class="video-title">{{ post.title }}</h2>
+        </a>
+    </div>
+
+    {% endfor %}
+
+    <template id="post_template">
+        <!-- template content -->
+        <div class="video-block">
+            <span class="remove-option">&times;</span>
+            <a class="video-link" href="#">
+                <img class="video-img" src="#">
+                <h2 class="video-title"></h2>
+            </a>
+        </div>
+    </template>
+
+</div>
+
+<!-- element to trigger the IntersectionObserver -->
+<div class="sentinel" id="sentinel">
+    <div id="spinner" role="status"></div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script async defer src="{{ url_for('static', filename='js/list.js') | autoversion }}"></script>
+{% if total > config['POSTS_PER_PAGE'] %}
+<script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
+{% endif %}
+{% endblock scripts %}
