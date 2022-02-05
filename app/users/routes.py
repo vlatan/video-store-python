@@ -1,25 +1,62 @@
 import os
+import time
 import requests
-from flask import render_template, url_for, flash
-from flask import redirect, Blueprint, session
+from flask import render_template, url_for, flash, request, jsonify
+from flask import redirect, Blueprint, session, current_app, make_response
 from flask_login import current_user, login_required
 from app import db
 
 users = Blueprint('users', __name__)
 
 
-@users.route('/liked')
+@users.route('/liked', methods=['GET', 'POST'])
 @login_required
 def liked():
-    total = len(posts := [like.post for like in current_user.liked])
+    """ Route to return the liked posts """
+    # posts per page
+    per_page = current_app.config['POSTS_PER_PAGE']
+    # if it's POST request this should contain data
+    frontend_data = request.get_json()
+    # if frontend_data get page number, else 1
+    page = frontend_data.get('page') if frontend_data else 1
+
+    total = current_user.liked.count()
+    items = current_user.liked.paginate(page, per_page, False).items
+    posts = [item.post for item in items]
+
+    if request.method == 'POST':
+        # if there are subsequent pages send posts as JSON object
+        posts = jsonify([post.serialize for post in posts])
+        # Simulate delay
+        time.sleep(0.4)
+        return make_response(posts, 200)
+
     return render_template('content.html', posts=posts, user_likes=True,
                            total=total, title='Liked')
 
 
-@users.route('/favorites')
+@users.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
-    total = len(posts := [fave.post for fave in current_user.faved])
+    """ Route to return the liked posts """
+    # posts per page
+    per_page = current_app.config['POSTS_PER_PAGE']
+    # if it's POST request this should contain data
+    frontend_data = request.get_json()
+    # if frontend_data get page number, else 1
+    page = frontend_data.get('page') if frontend_data else 1
+
+    total = current_user.faved.count()
+    items = current_user.faved.paginate(page, per_page, False).items
+    posts = [item.post for item in items]
+
+    if request.method == 'POST':
+        # if there are subsequent pages send posts as JSON object
+        posts = jsonify([post.serialize for post in posts])
+        # Simulate delay
+        time.sleep(0.4)
+        return make_response(posts, 200)
+
     return render_template('content.html', posts=posts, user_faves=True,
                            total=total, title='Favorites')
 

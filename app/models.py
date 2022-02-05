@@ -42,7 +42,7 @@ class User(db.Model, UserMixin, ActionMixin):
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user',
-                            cascade='all,delete', lazy=True)
+                            cascade='all,delete', lazy='dynamic')
     faved = db.relationship('PostFave', backref='user',
                             cascade='all,delete', lazy='dynamic')
 
@@ -123,7 +123,7 @@ class Post(db.Model, SearchableMixin):
     likes = db.relationship('PostLike', backref='post',
                             cascade='all,delete', lazy='dynamic')
     faves = db.relationship('PostFave', backref='post',
-                            cascade='all,delete', lazy=True)
+                            cascade='all,delete', lazy='dynamic')
 
     @property
     def serialize(self):
