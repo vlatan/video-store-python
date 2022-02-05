@@ -23,6 +23,10 @@
     }
 }
 
+.video-block {
+    position: relative;
+}
+
 a.video-link {
     display: flex;
     flex-direction: column;
@@ -32,6 +36,29 @@ a.video-link {
 
 a.video-link:hover {
     color: white;
+}
+
+.remove-option {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-background-color);
+    font-size: 1.2rem;
+    line-height: 1;
+    color: white;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+}
+
+.remove-option:hover {
+    color: black;
+    background-color: white;
 }
 
 img.video-img {

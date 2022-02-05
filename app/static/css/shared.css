@@ -292,7 +292,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .alert {
-    animation: fadeOut 3s ease-in forwards;
+    animation: fadeOut 2s ease-in forwards;
     animation-delay: .5s;
     position: fixed;
     bottom: 1.5rem;

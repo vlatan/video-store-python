@@ -12,7 +12,7 @@ users = Blueprint('users', __name__)
 @login_required
 def liked():
     total = len(posts := [like.post for like in current_user.liked])
-    return render_template('content.html', posts=posts,
+    return render_template('content.html', posts=posts, user_likes=True,
                            total=total, title='Liked')
 
 
@@ -20,7 +20,7 @@ def liked():
 @login_required
 def favorites():
     total = len(posts := [fave.post for fave in current_user.faved])
-    return render_template('content.html', posts=posts,
+    return render_template('content.html', posts=posts, user_faves=True,
                            total=total, title='Favorites')
 
 

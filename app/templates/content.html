@@ -14,21 +14,31 @@ Found <strong>{{ total }}</strong> results for this query.
 
 	{% for post in posts %}
 
-	<a class="video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
-		<img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
-			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-			alt="{{ post.title }}">
-		<h2 class="video-title">{{ post.title }}</h2>
-	</a>
+	<div class="video-block">
+		{% if user_faves or user_likes %}
+		<span data-id="{{ post.id }}" class="remove-option">&times;</span>
+		{% endif %}
+		<a class="video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
+			<img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
+				width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
+				alt="{{ post.title }}">
+			<h2 class="video-title">{{ post.title }}</h2>
+		</a>
+	</div>
 
 	{% endfor %}
 
 	<template id="post_template">
 		<!-- template content -->
-		<a class="video-link" href="#">
-			<img class="video-img" src="#">
-			<h2 class="video-title"></h2>
-		</a>
+		<div class="video-block">
+			{% if user_faves or user_likes %}
+			<span class="remove-option">&times;</span>
+			{% endif %}
+			<a class="video-link" href="#">
+				<img class="video-img" src="#">
+				<h2 class="video-title"></h2>
+			</a>
+		</div>
 	</template>
 
 </div>
@@ -40,6 +50,9 @@ Found <strong>{{ total }}</strong> results for this query.
 {% endblock content %}
 
 {% block scripts %}
+{% if user_faves or user_likes %}
+<script async defer src="{{ url_for('static', filename='js/list.js') | autoversion }}"></script>
+{% endif %}
 {% if total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}

@@ -1,3 +1,7 @@
+function sleep(time) {
+    return new Promise((resolve) => setTimeout(resolve, time));
+}
+
 window.addEventListener('click', function (event) {
     // Modals
     document.querySelectorAll('[data-modal]').forEach(function (element) {
