@@ -20,7 +20,8 @@ document.addEventListener('click', (event) => {
             } else {
                 alert.innerText = "Something went wrong!";
             }
-            shared.sleep(2000).then(() => {
+            // function sleep is defined in shared.js
+            sleep(2000).then(() => {
                 alert.remove();
             });
         });
