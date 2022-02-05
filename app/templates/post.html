@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/post.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/post.css') | autoversion }}">
 {% endblock css %}
 
 {% block content %}
@@ -136,9 +136,9 @@
 
 {% block scripts %}
 {% if current_user.is_authenticated %}
-<script async defer src="{{ url_for('static', filename='js/likes.js') }}"></script>
+<script async defer src="{{ url_for('static', filename='js/likes.js') | autoversion }}"></script>
 {% else %}
-<script async defer src="{{ url_for('static', filename='js/login.js') }}"></script>
+<script async defer src="{{ url_for('static', filename='js/login.js') | autoversion }}"></script>
 {% endif %}
-<script async defer src="{{ url_for('static', filename='js/play.js') }}"></script>
+<script async defer src="{{ url_for('static', filename='js/play.js') | autoversion }}"></script>
 {% endblock scripts %}

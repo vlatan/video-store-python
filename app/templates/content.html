@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block css %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
 {% endblock css %}
 
 {% block content %}
@@ -41,6 +41,6 @@ Found <strong>{{ total }}</strong> results for this query.
 
 {% block scripts %}
 {% if total > config['POSTS_PER_PAGE'] %}
-<script async defer src="{{ url_for('static', filename='js/scroll.js') }}"></script>
+<script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}
 {% endblock scripts %}
