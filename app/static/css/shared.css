@@ -306,7 +306,10 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 @keyframes fadeOut {
-    to {opacity: 0;}
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 /* .alert-info {
