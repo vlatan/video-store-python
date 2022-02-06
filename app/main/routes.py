@@ -29,7 +29,7 @@ def home():
     page = frontend_data.get('page') if frontend_data else 1
     # query the Post table in descending order
     posts = Post.query.order_by(Post.id.desc())
-    total = posts.count()
+    total = posts.count() if request.method == 'GET' else None
     posts = posts.paginate(page, per_page, False).items
 
     if request.method == 'POST':

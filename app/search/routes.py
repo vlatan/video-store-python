@@ -44,7 +44,7 @@ def search_results():
         # if there are subsequent posts send content to frontend
         if total > (page - 1) * per_page:
             # get the search results
-            posts, total = Post.search(keyword, page, per_page)
+            posts, _ = Post.search(keyword, page, per_page)
             # posts as JSON object
             posts = jsonify([post.serialize for post in posts])
             # Simulate delay
