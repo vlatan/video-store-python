@@ -12,7 +12,7 @@ search = Blueprint('search', __name__)
 def before_request():
     # before the request make this search form available application wide
     # stored in the global flask variable g
-    # the form will send GET request and it's not be protected by a CSRF token
+    # the form will send GET request and it's not protected by a CSRF token
     g.search_form = SearchForm(formdata=request.args, meta={'csrf': False})
 
 
