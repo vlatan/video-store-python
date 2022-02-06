@@ -20,7 +20,6 @@ def liked():
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
 
-    total = current_user.liked.count() if request.method == 'GET' else None
     items = current_user.liked.paginate(page, per_page, False).items
     posts = [item.post for item in items]
 
@@ -31,6 +30,7 @@ def liked():
         time.sleep(0.4)
         return make_response(posts, 200)
 
+    total = current_user.liked.count()
     return render_template('user_content.html', posts=posts,
                            total=total, title='Liked')
 
@@ -46,7 +46,6 @@ def favorites():
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
 
-    total = current_user.faved.count() if request.method == 'GET' else None
     items = current_user.faved.paginate(page, per_page, False).items
     posts = [item.post for item in items]
 
@@ -57,6 +56,7 @@ def favorites():
         time.sleep(0.4)
         return make_response(posts, 200)
 
+    total = current_user.faved.count()
     return render_template('user_content.html', posts=posts,
                            total=total, title='Favorites')
 
