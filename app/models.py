@@ -39,6 +39,7 @@ class User(db.Model, UserMixin, ActionMixin):
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
     local_picture = db.Column(db.String(120), default='default.jpg')
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user',
@@ -150,12 +151,14 @@ class PostLike(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class PostFave(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # listen for commit and make changes to search index
