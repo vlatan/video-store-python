@@ -2,7 +2,8 @@ import os
 import time
 from flask import render_template, request, current_app
 from flask import Blueprint, jsonify, make_response
-from app.models import Post
+from app.models import Post, PostLike
+from sqlalchemy import func
 
 main = Blueprint('main', __name__)
 
@@ -27,8 +28,16 @@ def home():
     frontend_data = request.get_json()
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
-    # query the Post table in descending order
-    posts_query = Post.query.order_by(Post.id.desc())
+
+    if 'likes' in request.args:
+        # query posts by likes (outerjoin)
+        # https://stackoverflow.com/q/63889938)
+        posts_query = Post.query.outerjoin(PostLike).group_by(
+            Post.id).order_by(func.count().desc())
+    else:
+        # query posts in descending order
+        posts_query = Post.query.order_by(Post.id.desc())
+
     posts = posts_query.paginate(page, per_page, False).items
 
     if request.method == 'POST':

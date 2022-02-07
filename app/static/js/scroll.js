@@ -70,7 +70,7 @@ if ('IntersectionObserver' in window) {
         // If there are still posts and the entry is intersecting
         if (the_end === false && entry.isIntersecting) {
             // Call the loadItems function
-            loadItems(`${window.location.pathname}`, { page: page });
+            loadItems(`${window.location.href}`, { page: page });
             // Unobserve the entry
             // intersectionObserver.unobserve(entry);
         }
