@@ -22,7 +22,7 @@ def validate_video(response):
         raise ValidationError('This video is not embeddable.')
 
     if response['contentDetails'].get('regionRestriction'):
-        raise ValidationError('This video is region-restricted')
+        raise ValidationError('This video is region-restricted.')
 
     text_language = response['snippet'].get('defaultLanguage')
     if text_language and not text_language.startswith('en'):

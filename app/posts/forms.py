@@ -20,7 +20,7 @@ class PostForm(FlaskForm):
 
         # check if the video is already posted
         if Post.query.filter_by(video_id=video_id).first():
-            raise ValidationError('Video already posted')
+            raise ValidationError('Video already posted.')
 
         # construct youtube API service
         api_key = current_app.config['YOUTUBE_API_KEY']
@@ -58,7 +58,7 @@ class PlaylistForm(FlaskForm):
 
         # check if the playlits is already posted
         if Playlist.query.filter_by(playlist_id=playlist_id).first():
-            raise ValidationError('Playlist already in the database')
+            raise ValidationError('Playlist already in the database.')
 
         # construct youtube API service
         api_key = current_app.config['YOUTUBE_API_KEY']
