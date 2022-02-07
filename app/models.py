@@ -11,6 +11,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class Base(db.Model):
+    __abstract__ = True
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
+                           onupdate=datetime.utcnow)
+
+
 class ActionMixin(object):
     def cast(self, post, action):
         if not self.has_casted(post, action):
@@ -29,43 +36,6 @@ class ActionMixin(object):
         return model.query.filter(
             model.user_id == self.id,
             model.post_id == post.id).count() > 0
-
-
-class User(db.Model, UserMixin, ActionMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    google_id = db.Column(db.String(256), unique=True, nullable=True)
-    facebook_id = db.Column(db.String(256), unique=True, nullable=True)
-    name = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    picture = db.Column(db.String(512))
-    local_picture = db.Column(db.String(120), default='default.jpg')
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='author', lazy=True)
-    playlists = db.relationship('Playlist', backref='author', lazy=True)
-    liked = db.relationship('PostLike', backref='user',
-                            cascade='all,delete', lazy='dynamic')
-    faved = db.relationship('PostFave', backref='user',
-                            cascade='all,delete', lazy='dynamic')
-
-    @property
-    def is_admin(self):
-        admin_openid = current_app.config['ADMIN_OPENID']
-        if self.google_id == admin_openid:
-            return True
-        return False
-
-
-class Playlist(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
-    channel_id = db.Column(db.String(50), unique=True, nullable=False)
-    title = db.Column(db.String(256), nullable=False)
-    thumbnails = db.Column(db.PickleType, nullable=False)
-    channel_thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text)
-    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='playlist', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 class SearchableMixin(object):
@@ -104,7 +74,42 @@ class SearchableMixin(object):
             add_to_index(cls.__tablename__, obj)
 
 
-class Post(db.Model, SearchableMixin):
+class User(Base, UserMixin, ActionMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.String(256), unique=True, nullable=True)
+    facebook_id = db.Column(db.String(256), unique=True, nullable=True)
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120))
+    picture = db.Column(db.String(512))
+    local_picture = db.Column(db.String(120), default='default.jpg')
+    posts = db.relationship('Post', backref='author', lazy=True)
+    playlists = db.relationship('Playlist', backref='author', lazy=True)
+    liked = db.relationship('PostLike', backref='user',
+                            cascade='all,delete-orphan', lazy='dynamic')
+    faved = db.relationship('PostFave', backref='user',
+                            cascade='all,delete-orphan', lazy='dynamic')
+
+    @property
+    def is_admin(self):
+        admin_openid = current_app.config['ADMIN_OPENID']
+        if self.google_id == admin_openid:
+            return True
+        return False
+
+
+class Playlist(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
+    channel_id = db.Column(db.String(50), unique=True, nullable=False)
+    title = db.Column(db.String(256), nullable=False)
+    thumbnails = db.Column(db.PickleType, nullable=False)
+    channel_thumbnails = db.Column(db.PickleType, nullable=False)
+    description = db.Column(db.Text)
+    posts = db.relationship('Post', backref='playlist', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
+class Post(Base, SearchableMixin):
     __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
@@ -116,15 +121,14 @@ class Post(db.Model, SearchableMixin):
     tags = db.Column(db.Text)
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
-    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
     related_posts = db.Column(db.PickleType, default=[])
     likes = db.relationship('PostLike', backref='post',
-                            cascade='all,delete', lazy='dynamic')
+                            cascade='all,delete-orphan', lazy='dynamic')
     faves = db.relationship('PostFave', backref='post',
-                            cascade='all,delete', lazy='dynamic')
+                            cascade='all,delete-orphan', lazy='dynamic')
 
     @property
     def serialize(self):
@@ -147,18 +151,16 @@ class Post(db.Model, SearchableMixin):
         }
 
 
-class PostLike(db.Model):
+class PostLike(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class PostFave(db.Model):
+class PostFave(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
-    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 # listen for commit and make changes to search index
