@@ -31,7 +31,7 @@ def home():
 
     if request.args.get('order_by') == 'likes':
         # query posts by likes (outerjoin)
-        # https://stackoverflow.com/q/63889938)
+        # https://stackoverflow.com/q/63889938
         posts_query = Post.query.outerjoin(PostLike).group_by(
             Post.id).order_by(func.count().desc())
     else:
