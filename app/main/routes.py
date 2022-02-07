@@ -29,7 +29,7 @@ def home():
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
 
-    if 'likes' in request.args:
+    if request.args.get('order_by') == 'likes':
         # query posts by likes (outerjoin)
         # https://stackoverflow.com/q/63889938)
         posts_query = Post.query.outerjoin(PostLike).group_by(
