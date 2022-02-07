@@ -12,7 +12,6 @@ document.addEventListener('click', (event) => {
         var url = `/post/${remove.dataset.id}/${action}`;
         fetch(url, { method: 'POST' }).then(response => {
             var alert = document.createElement('div');
-            document.body.appendChild(alert);
             alert.classList.add('alert');
             if (response.ok) {
                 remove.parentElement.remove();
@@ -20,6 +19,7 @@ document.addEventListener('click', (event) => {
             } else {
                 alert.innerText = "Something went wrong!";
             }
+            document.body.appendChild(alert);
             // function sleep is defined in shared.js
             sleep(2000).then(() => {
                 alert.remove();
