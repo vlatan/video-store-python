@@ -144,7 +144,8 @@ class Post(Base, SearchableMixin):
             'tags': self.tags,
             'duration': self.duration,
             'upload_date': dump_datetime(self.upload_date),
-            'date_posted': dump_datetime(self.date_posted),
+            # from the Base class
+            'created_at': dump_datetime(self.created_at),
             'last_checked': dump_datetime(self.last_checked),
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
