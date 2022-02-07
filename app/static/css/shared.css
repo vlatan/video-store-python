@@ -220,6 +220,11 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     transform: scaleX(1);
 }
 
+.nav-item.support {
+    color: #F4511E;
+    font-weight: bold;
+}
+
 .nav-item.username {
     gap: 0.5rem;
     padding-right: 1.15rem;
