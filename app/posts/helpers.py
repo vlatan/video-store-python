@@ -26,11 +26,12 @@ def validate_video(response):
 
     text_language = response['snippet'].get('defaultLanguage')
     if text_language and not text_language.startswith('en'):
-        raise ValidationError('This video\'s title/desc is not in English')
+        raise ValidationError(
+            'This video\'s title and/or description is not in English.')
 
     audio_language = response['snippet'].get('defaultAudioLanguage')
     if audio_language and not audio_language.startswith('en'):
-        raise ValidationError('This video\'s audio is not in English')
+        raise ValidationError('This video\'s audio is not in English.')
 
     duration = convertDuration(response['contentDetails']['duration'])
     if duration.seconds < 1800:
@@ -180,23 +181,24 @@ def validate_playlist(playlist_id, youtube):
 
 def parse_video(url):
     parsed = urlparse(url)
-    if parsed.hostname == 'youtu.be':
+    if parsed.hostname and parsed.hostname == 'youtu.be':
         return parsed.path[1:]
-    elif 'youtube.com' in parsed.hostname:
+    elif parsed.hostname and 'youtube.com' in parsed.hostname:
         if parsed.path == '/watch':
             if (query := parse_qs(parsed.query).get('v')):
                 return query[0]
         elif parsed.path[:7] == '/embed/':
             return parsed.path.split('/')[2]
-    raise ValidationError('Unable to parse the URL')
+    raise ValidationError('Unable to parse the URL.')
 
 
 def parse_playlist(url):
     parsed = urlparse(url)
-    if parsed.hostname in ('www.youtube.com', 'youtube.com', 'youtu.be'):
+    youtube_hostnames = ('www.youtube.com', 'youtube.com', 'youtu.be')
+    if parsed.hostname and parsed.hostname in youtube_hostnames:
         if (query := parse_qs(parsed.query).get('list')):
             return query[0]
-    raise ValidationError('Unable to parse the URL')
+    raise ValidationError('Unable to parse the URL.')
 
 
 class convertDuration(object):

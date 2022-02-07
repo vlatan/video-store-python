@@ -12,20 +12,18 @@
             <legend class="form-legend">{{ legend }}</legend>
             <div class="form-group">
                 {{ form.content.label(class="form-label") }}
-                {% if form.content.errors %}
                 {{ form.content(class="form-input", placeholder="URL here...") }}
-                <div class="form-invalid-feedback">
-                    {% for error in form.content.errors %}
-                    <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                {{ form.content(class="form-input", placeholder="URL here...") }}
-                {% endif %}
             </div>
         </fieldset>
-        <div class="form-group">
+        <div class="form-group button-group">
             {{ form.submit(class="form-button") }}
+            {% if form.content.errors %}
+            <div class="form-invalid-feedback">
+                {% for error in form.content.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </form>
 </div>

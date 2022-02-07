@@ -12,20 +12,20 @@
 }
 
 .form-content fieldset {
-    border: 1px solid rgb(88, 88, 150);
+    border: 1px solid var(--primary-border-color);
     border-radius: 5px;
     padding: var(--content-padding);
     margin-bottom: var(--content-padding);
-    background: rgb(236, 236, 236);
+    background-color: var(--secondary-background-color);
 }
 
 .form-legend {
     font-weight: bold;
     font-size: 1.2rem;
     padding: .3rem 1rem;
-    border: 1px solid rgb(88, 88, 150);
+    border: 1px solid var(--primary-border-color);
     border-radius: 5px;
-    background: rgb(236, 236, 236);
+    background-color: var(--secondary-background-color);
 }
 
 .form-label {
@@ -37,18 +37,39 @@
     padding: .5rem;
     font-size: 1rem;
     width: 100%;
+    background-color: var(--primary-background-color);
+    border: 1px solid var(--primary-border-color);
 }
 
-.form-invalid-feedback {
-    color: red;
-    margin-top: 1rem;
+.form-input:focus {
+    border: 1px solid transparent;
+    outline: 1px solid rgb(88, 88, 150);
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .form-button {
     padding: .5rem 1rem;
     font-size: 1rem;
-    border: 1px solid rgb(88, 88, 150);
+    border: 1px solid var(--primary-border-color);
     border-radius: 5px;
-    background: rgb(236, 236, 236);
+    background-color: var(--secondary-background-color);
     cursor: pointer;
+}
+
+.form-button:hover {
+    background-color: var(--primary-background-color);
+}
+
+.form-invalid-feedback {
+    display: flex;
+    align-items: center;
+    color: white;
+    padding-left: 8px;
+    font-size: 0.9rem;
+    border-left: 4px solid red;
 }

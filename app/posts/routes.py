@@ -60,8 +60,8 @@ def new_post():
         flash('Your post has been created!', 'success')
         return redirect(url_for('main.home'))
 
-    return render_template('form.html', title='Suggest Documentary',
-                           form=form, legend='Suggest Documentary')
+    return render_template('form.html', title='Suggest YouTube Documentary',
+                           form=form, legend='Documentary')
 
 
 @posts.route('/playlist/new', methods=['GET', 'POST'])
@@ -83,8 +83,8 @@ def new_playlist():
         flash('Playlist has been added to the database!', 'success')
         return redirect(url_for('posts.playlists'))
 
-    return render_template('form.html', title='Suggest Playlist',
-                           form=form, legend='Suggest YouTube Playlist')
+    return render_template('form.html', title='Suggest YouTube Playlist',
+                           form=form, legend='Playlist')
 
 
 @posts.route('/playlists')
