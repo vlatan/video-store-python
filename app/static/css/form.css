@@ -42,8 +42,8 @@
 }
 
 .form-input:focus {
-    border: 1px solid transparent;
-    outline: 1px solid rgb(88, 88, 150);
+    outline: none;
+    border-color: rgb(88, 88, 150);
 }
 
 .button-group {
@@ -71,5 +71,5 @@
     color: white;
     padding-left: 8px;
     font-size: 0.9rem;
-    border-left: 4px solid red;
+    border-left: 4px solid #F4511E;
 }

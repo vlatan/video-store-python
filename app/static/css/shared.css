@@ -106,6 +106,7 @@ input.search-form-input {
 
 input.search-form-input:focus {
     outline: none;
+    border-color: rgb(88, 88, 150);
 }
 
 button.search-button  {
@@ -252,7 +253,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .nav-item.delete-account {
-    color: lightslategray;
+    color: #F4511E;
     font-weight: bold;
     padding-top: .5rem;;
     border-top: 1px solid var(--primary-border-color);
