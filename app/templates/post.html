@@ -103,6 +103,7 @@
 	</div>
 
 	<div class="related_videos">
+		{% if post.related_posts %}
 		{% for related_post in post.related_posts %}
 		{% set thumb = related_post.thumbnails['medium'] %}
 		<a href="{{ url_for('posts.post', post_id=related_post.id) }}" class="related-video">
@@ -113,6 +114,7 @@
 			</h2>
 		</a>
 		{% endfor %}
+		{% endif %}
 	</div>
 </article>
 
