@@ -4,7 +4,7 @@ from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user
-from elasticsearch import Elasticsearch, ImproperlyConfigured, ElasticsearchException
+from elasticsearch import ImproperlyConfigured, ElasticsearchException
 
 
 def admin_required(func):
