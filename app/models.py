@@ -40,14 +40,12 @@ class ActionMixin(object):
 
 class SearchableMixin(object):
     @classmethod
-    def search(cls, keyword, page, per_page, session=None):
-        # check if scopped session is in use
-        search_query = session.query(cls) if session else cls.query
+    def search(cls, keyword, page, per_page):
         ids, total = query_index(cls.__tablename__, keyword, page, per_page)
         if total == 0:
-            return search_query.filter_by(id=0), 0
+            return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
-        return search_query.filter(cls.id.in_(ids)).order_by(
+        return cls.query.filter(cls.id.in_(ids)).order_by(
             db.case(when, value=cls.id)), total
 
     @classmethod

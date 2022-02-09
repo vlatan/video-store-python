@@ -32,20 +32,9 @@ def dump_datetime(value):
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
 
 
-def prep_elastic():
-    try:
-        return current_app.elasticsearch
-    except RuntimeError:
-        # we're out of the app context, set up elasticsearch manually
-        elastic_url = os.environ.get('ELASTIC_URL')
-        http_auth = (os.environ.get('ELASTIC_USERNAME'),
-                     os.environ.get('ELASTIC_PASSWORD'))
-        return Elasticsearch(elastic_url, http_auth=http_auth)
-
-
 def add_to_index(index, model):
     try:
-        es = prep_elastic()
+        es = current_app.elasticsearch
         payload = {field: getattr(model, field)
                    for field in model.__searchable__}
         es.index(index=index, id=model.id, document=payload)
@@ -55,7 +44,7 @@ def add_to_index(index, model):
 
 def remove_from_index(index, model):
     try:
-        es = prep_elastic()
+        es = current_app.elasticsearch
         es.delete(index=index, id=model.id)
     except (AttributeError, ImproperlyConfigured, ElasticsearchException):
         return
@@ -63,7 +52,7 @@ def remove_from_index(index, model):
 
 def query_index(index, query, page, per_page):
     try:
-        es = prep_elastic()
+        es = current_app.elasticsearch
         payload = {'query': {'multi_match': {'query': query, 'fields': ['*']}},
                    'from': (page - 1) * per_page, 'size': per_page}
         search = es.search(index=index, body=payload)
