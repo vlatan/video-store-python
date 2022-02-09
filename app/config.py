@@ -13,13 +13,17 @@ class Config:
     # Admin Google openid
     ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
 
-    # SQLAlchemy stuff
+    # SQLAlchemy
     SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
     SCOPPED_SESSION_DB_URI = os.environ.get('SCOPPED_SESSION_DB_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Other stuff
-    ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+    # Elasticsearch
+    ELASTIC_URL = os.environ.get('ELASTIC_URL')
+    ELASTIC_USERNAME = os.environ.get('ELASTIC_USERNAME')
+    ELASTIC_PASSWORD = os.environ.get('ELASTIC_PASSWORD')
+
+    # Other
     POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))
     APP_NAME = os.environ.get('APP_NAME')

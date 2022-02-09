@@ -37,8 +37,10 @@ def prep_elastic():
         return current_app.elasticsearch
     except RuntimeError:
         # we're out of the app context, set up elasticsearch manually
-        elastic_url = os.environ.get('ELASTICSEARCH_URL')
-        return Elasticsearch(elastic_url) if elastic_url else None
+        elastic_url = os.environ.get('ELASTIC_URL')
+        http_auth = (os.environ.get['ELASTIC_USERNAME'],
+                     os.environ.get['ELASTIC_PASSWORD'])
+        return Elasticsearch(elastic_url, http_auth=http_auth)
 
 
 def add_to_index(index, model):

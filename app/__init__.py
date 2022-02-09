@@ -29,8 +29,10 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    elastic_url = app.config['ELASTICSEARCH_URL']
-    app.elasticsearch = Elasticsearch(elastic_url) if elastic_url else None
+    elastic_url = app.config['ELASTIC_URL']
+    http_auth = (app.config['ELASTIC_USERNAME'],
+                 app.config['ELASTIC_PASSWORD'])
+    app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
 
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
