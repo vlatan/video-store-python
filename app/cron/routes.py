@@ -1,36 +1,28 @@
-import threading
 import random
-from flask import url_for, Blueprint, redirect, current_app
-from flask_login import login_required
+import atexit
+from flask import Blueprint, current_app
 from app import db
 from app.models import Post, Playlist, SearchableMixin
-from app.helpers import admin_required
 from app.cron.helpers import get_playlist_videos
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from googleapiclient.discovery import build
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 cron = Blueprint('cron', __name__)
 
 
-@cron.route('/pingapi')
-@login_required
-@admin_required
-def cronjob():
-    """ Route to fetch videos from the YT chanels.
-        This view is called from CRON.
-        Check basic authentication to secure this view.
-        https://stackoverflow.com/a/55740595 """
+@cron.before_app_first_request
+def init_scheduler():
+    # https://stackoverflow.com/a/38501328
 
     API_KEY = current_app.config['YOUTUBE_API_KEY']
-    # number of related posts to fetch
-    per_page = current_app.config['NUM_RELATED_POSTS']
-    # we need the full DB uri relative to the app
-    # so we can properly create the engine
-    DB = current_app.config['SCOPPED_SESSION_DB_URI']
-    engine = create_engine(DB)
+    PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+    DB_URI = current_app.config['SCOPPED_SESSION_DB_URI']
+
+    engine = create_engine(DB_URI)
     session_factory = sessionmaker(bind=engine)
 
     def post_videos():
@@ -81,7 +73,7 @@ def cronjob():
                     # create object from Model
                     post = Post(**video)
                     # search for related videos using the post title
-                    if (related_posts := Post.search(post.title, 1, per_page, session=session)[0].all()):
+                    if (related_posts := Post.search(post.title, 1, PER_PAGE, session=session)[0].all()):
                         post.related_posts = related_posts
 
                     # add post to database
@@ -91,10 +83,7 @@ def cronjob():
             # lastly remove the Session no matter what
             Session.remove()
 
-    # start the post_videos() function in a thread if it's not already running
-    if 'YouTube' not in [t.name for t in threading.enumerate()]:
-        thread = threading.Thread(target=post_videos, name='YouTube')
-        thread.start()
-
-    # redirect to home, we're not waiting for the thread
-    return redirect(url_for('main.home'))
+    scheduler = BackgroundScheduler(timezone=current_app.config['TIMEZONE'])
+    scheduler.add_job(func=post_videos, trigger='interval', days=3)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())

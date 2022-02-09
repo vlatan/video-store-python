@@ -38,8 +38,8 @@ def prep_elastic():
     except RuntimeError:
         # we're out of the app context, set up elasticsearch manually
         elastic_url = os.environ.get('ELASTIC_URL')
-        http_auth = (os.environ.get['ELASTIC_USERNAME'],
-                     os.environ.get['ELASTIC_PASSWORD'])
+        http_auth = (os.environ.get('ELASTIC_USERNAME'),
+                     os.environ.get('ELASTIC_PASSWORD'))
         return Elasticsearch(elastic_url, http_auth=http_auth)
 
 
