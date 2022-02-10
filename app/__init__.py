@@ -2,13 +2,14 @@
 import os
 import json
 import atexit
+import logging
+from logging.config import dictConfig
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
-from logging.config import dictConfig
 from apscheduler.schedulers.background import BackgroundScheduler
 
 db = SQLAlchemy()
@@ -41,7 +42,8 @@ def create_app(config_class=Config):
     # set up scheduler object
     app.scheduler = BackgroundScheduler(timezone=app.config['TIMEZONE'])
     app.scheduler.start()
-    atexit.register(lambda: app.scheduler.shutdown())
+    atexit.register(lambda: app.scheduler.shutdown(wait=False))
+    logging.getLogger('apscheduler').setLevel(logging.WARNING)
 
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
