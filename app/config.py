@@ -15,7 +15,6 @@ class Config:
 
     # SQLAlchemy
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
-    SCOPPED_SESSION_DB_URI = os.getenv('SCOPPED_SESSION_DB_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Elasticsearch
