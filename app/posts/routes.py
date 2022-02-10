@@ -5,8 +5,7 @@ from app import db
 from app.helpers import admin_required
 from app.models import Post, Playlist
 from app.posts.forms import PostForm, PlaylistForm
-from app.posts.helpers import convertDuration, revalidate_video
-from datetime import datetime, timedelta
+from app.posts.helpers import convertDuration
 
 posts = Blueprint('posts', __name__)
 
@@ -14,13 +13,6 @@ posts = Blueprint('posts', __name__)
 @posts.route('/post/<int:post_id>/')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-
-    # revalidate video every third day from the last visit
-    if post.last_checked + timedelta(days=3) < datetime.utcnow():
-        revalidate_video(post)
-        # update last checked
-        post.last_checked = datetime.utcnow()
-        db.session.commit()
 
     # get standard size thumb, if doesn't exist get high size
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))

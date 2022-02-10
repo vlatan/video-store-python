@@ -1,9 +1,13 @@
 import random
+from datetime import datetime, timedelta
 from flask import Blueprint, current_app
+from wtforms.validators import ValidationError
 from app import db
 from app.models import Post, Playlist
 from app.cron.helpers import get_playlist_videos
+from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 
 cron = Blueprint('cron', __name__)
@@ -56,11 +60,61 @@ def post_new_videos(app):
                 db.session.commit()
 
 
+def revalidate_video(post, api_key, per_page):
+    with build('youtube', 'v3', developerKey=api_key) as youtube:
+        try:
+            scope = {'id': post.video_id,
+                     'part': ['status', 'snippet', 'contentDetails']}
+            req = youtube.videos().list(**scope)
+            # this will raise IndexError if ['items'] is empty list
+            # which means the video does not exist
+            res = req.execute()['items'][0]
+            # this will raise ValidationError if video's invalid
+            if validate_video(res):
+                # get related posts by searching the index using the title of this post
+                related_posts = Post.search(
+                    post.title, 1, per_page + 1)[0].all()[1:]
+                # if there's change in the related posts
+                if related_posts and post.related_posts != related_posts:
+                    post.related_posts = related_posts
+                    db.session.commit()
+
+        # video is not validated or doesn't exist at YouTube
+        except (IndexError, ValidationError):
+            db.session.delete(post)
+            db.session.commit()
+            return
+        except HttpError:
+            # we couldn't connect to YouTube API,
+            # so we can't evaluate the video
+            pass
+
+        # set last_checked time in the db for this post
+        post.last_checked = datetime.utcnow()
+        db.session.commit()
+
+
+def revalidate_videos(app):
+    with app.app_context():
+        API_KEY = current_app.config['YOUTUBE_API_KEY']
+        PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+        time_flag = datetime.utcnow() - timedelta(days=3)
+        posts = Post.query.filter(Post.last_checked < time_flag)
+        for post in posts:
+            revalidate_video(post, API_KEY, PER_PAGE)
+
+
 @cron.before_app_first_request
 def init_scheduler():
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
 
+    # add background job that posts new videos once a day
     current_app.scheduler.add_job(func=post_new_videos,
+                                  args=[current_app._get_current_object()],
+                                  trigger='interval', days=1)
+
+    # add background job that revalidates all eligible videos every two days
+    current_app.scheduler.add_job(func=revalidate_videos,
                                   args=[current_app._get_current_object()],
                                   trigger='interval', days=2)
