@@ -4,6 +4,7 @@ import json
 import atexit
 import logging
 from logging.config import dictConfig
+from pytz import utc
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -32,15 +33,15 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
-    # set up elasticsearch object
+    # configure elasticsearch
     elastic_url = app.config['ELASTIC_URL']
     elastic_name = app.config['ELASTIC_USERNAME']
     elastic_pass = app.config['ELASTIC_PASSWORD']
     http_auth = (elastic_name, elastic_pass)
     app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
 
-    # set up scheduler object
-    app.scheduler = BackgroundScheduler(timezone=app.config['TIMEZONE'])
+    # configure scheduler
+    app.scheduler = BackgroundScheduler(timezone=utc)
     app.scheduler.start()
     atexit.register(lambda: app.scheduler.shutdown(wait=False))
     logging.getLogger('apscheduler').setLevel(logging.WARNING)

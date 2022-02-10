@@ -26,7 +26,6 @@ class Config:
     # Other
     POSTS_PER_PAGE = int(os.getenv('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.getenv('NUM_RELATED_POSTS'))
-    TIMEZONE = os.getenv('TIMEZONE')
     APP_NAME = os.getenv('APP_NAME')
 
     # Facebook authentication
