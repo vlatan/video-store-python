@@ -94,7 +94,7 @@ def revalidate_video(post, api_key, per_page):
         db.session.commit()
 
 
-def revalidate_videos(app):
+def revalidate_existing_videos(app):
     with app.app_context():
         API_KEY = current_app.config['YOUTUBE_API_KEY']
         PER_PAGE = current_app.config['NUM_RELATED_POSTS']
@@ -105,7 +105,7 @@ def revalidate_videos(app):
 
 
 @cron.before_app_first_request
-def init_scheduler():
+def init_scheduler_jobs():
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
 
@@ -115,6 +115,6 @@ def init_scheduler():
                                   trigger='interval', days=1)
 
     # add background job that revalidates all eligible videos every two days
-    current_app.scheduler.add_job(func=revalidate_videos,
+    current_app.scheduler.add_job(func=revalidate_existing_videos,
                                   args=[current_app._get_current_object()],
                                   trigger='interval', days=2)
