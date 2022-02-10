@@ -1,11 +1,9 @@
 import random
-import atexit
 from flask import Blueprint, current_app
 from app import db
 from app.models import Post, Playlist
 from app.cron.helpers import get_playlist_videos
 from googleapiclient.discovery import build
-from apscheduler.schedulers.background import BackgroundScheduler
 
 
 cron = Blueprint('cron', __name__)
@@ -61,13 +59,8 @@ def post_new_videos(app):
 @cron.before_app_first_request
 def init_scheduler():
     # https://stackoverflow.com/a/38501328
-
-    scheduler = BackgroundScheduler(timezone=current_app.config['TIMEZONE'])
-
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
-    scheduler.add_job(func=post_new_videos,
-                      args=[current_app._get_current_object()],
-                      trigger='interval', days=2)
 
-    scheduler.start()
-    atexit.register(lambda: scheduler.shutdown())
+    current_app.scheduler.add_job(func=post_new_videos,
+                                  args=[current_app._get_current_object()],
+                                  trigger='interval', days=2)

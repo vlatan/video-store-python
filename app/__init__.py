@@ -1,6 +1,7 @@
 # import os
 import os
 import json
+import atexit
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -8,6 +9,7 @@ from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
 from logging.config import dictConfig
+from apscheduler.schedulers.background import BackgroundScheduler
 
 db = SQLAlchemy()
 # search = Search()
@@ -29,10 +31,17 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    # set up elasticsearch object
     elastic_url = app.config['ELASTIC_URL']
-    http_auth = (app.config['ELASTIC_USERNAME'],
-                 app.config['ELASTIC_PASSWORD'])
+    elastic_name = app.config['ELASTIC_USERNAME']
+    elastic_pass = app.config['ELASTIC_PASSWORD']
+    http_auth = (elastic_name, elastic_pass)
     app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
+
+    # set up scheduler object
+    app.scheduler = BackgroundScheduler(timezone=app.config['TIMEZONE'])
+    app.scheduler.start()
+    atexit.register(lambda: app.scheduler.shutdown())
 
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
