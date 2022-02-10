@@ -24,7 +24,7 @@ login_manager.login_message_category = 'warning'
 def create_app(config_class=Config):
     # config logger
     # https://flask.palletsprojects.com/en/2.0.x/logging/
-    # with open(os.environ.get('LOG_CONFIG'), 'r') as j:
+    # with open(os.getenv('LOG_CONFIG'), 'r') as j:
     #     dictConfig(json.load(j))
 
     # create application object

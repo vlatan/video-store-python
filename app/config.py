@@ -8,36 +8,36 @@ class Config:
     load_dotenv()
 
     # Flask app secret key
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY')
 
     # Admin Google openid
-    ADMIN_OPENID = os.environ.get('ADMIN_OPENID')
+    ADMIN_OPENID = os.getenv('ADMIN_OPENID')
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
-    SCOPPED_SESSION_DB_URI = os.environ.get('SCOPPED_SESSION_DB_URI')
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SCOPPED_SESSION_DB_URI = os.getenv('SCOPPED_SESSION_DB_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Elasticsearch
-    ELASTIC_URL = os.environ.get('ELASTIC_URL')
-    ELASTIC_USERNAME = os.environ.get('ELASTIC_USERNAME')
-    ELASTIC_PASSWORD = os.environ.get('ELASTIC_PASSWORD')
+    ELASTIC_URL = os.getenv('ELASTIC_URL')
+    ELASTIC_USERNAME = os.getenv('ELASTIC_USERNAME')
+    ELASTIC_PASSWORD = os.getenv('ELASTIC_PASSWORD')
 
     # Other
-    POSTS_PER_PAGE = int(os.environ.get('POSTS_PER_PAGE'))
-    NUM_RELATED_POSTS = int(os.environ.get('NUM_RELATED_POSTS'))
-    TIMEZONE = os.environ.get('TIMEZONE')
-    APP_NAME = os.environ.get('APP_NAME')
+    POSTS_PER_PAGE = int(os.getenv('POSTS_PER_PAGE'))
+    NUM_RELATED_POSTS = int(os.getenv('NUM_RELATED_POSTS'))
+    TIMEZONE = os.getenv('TIMEZONE')
+    APP_NAME = os.getenv('APP_NAME')
 
     # Facebook authentication
-    FB_CLIENT_ID = os.environ.get('FB_CLIENT_ID')
-    FB_CLIENT_SECRET = os.environ.get('FB_CLIENT_SECRET')
+    FB_CLIENT_ID = os.getenv('FB_CLIENT_ID')
+    FB_CLIENT_SECRET = os.getenv('FB_CLIENT_SECRET')
 
     # Google/Youtube authentication
-    YOUTUBE_API_KEY = os.environ.get('YOUTUBE_API_KEY')
-    GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
-    GOOGLE_SCOPES = json.loads(os.environ.get('GOOGLE_SCOPES'))
+    YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+    GOOGLE_SCOPES = json.loads(os.getenv('GOOGLE_SCOPES'))
     GOOGLE_CLIENT_CONFIG = {
         "web": {
             "client_id": GOOGLE_CLIENT_ID,
