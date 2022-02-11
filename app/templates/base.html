@@ -22,7 +22,11 @@
 <body>
 	<div class="site-header-wrap">
 		<header class="site-header">
-			<a class="logo" href="/">Doxder</a>
+			{% if title %}
+			<a class="logo" href="/">{{ config['APP_NAME'] }}</a>
+			{% else %}
+			<h1><a class="logo" href="/">{{ config['APP_NAME'] }}</a></h1>
+			{% endif %}
 			<nav class="navbar">
 				{% if g.search_form %}
 				<form id="searchForm" class="search-form" method="get" action="{{ url_for('search.search_results') }}">
