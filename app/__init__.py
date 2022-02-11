@@ -1,17 +1,13 @@
 # import os
 import os
 import json
-import atexit
-import logging
 from logging.config import dictConfig
-from pytz import utc
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
-from apscheduler.schedulers.background import BackgroundScheduler
 
 db = SQLAlchemy()
 # search = Search()
@@ -40,12 +36,6 @@ def create_app(config_class=Config):
     http_auth = (elastic_name, elastic_pass)
     app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
 
-    # configure scheduler
-    app.scheduler = BackgroundScheduler(timezone=utc)
-    app.scheduler.start()
-    atexit.register(lambda: app.scheduler.shutdown(wait=False))
-    logging.getLogger('apscheduler').setLevel(logging.WARNING)
-
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
     login_manager.init_app(app)
@@ -63,8 +53,8 @@ def create_app(config_class=Config):
     app.register_blueprint(auth)
     app.register_blueprint(errors)
 
+    from app.cron.handlers import init_scheduler
     with app.app_context():
-        from app.cron.handlers import init_scheduler_jobs
-        init_scheduler_jobs()
+        init_scheduler()
 
     return app

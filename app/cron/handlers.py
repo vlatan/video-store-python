@@ -1,4 +1,7 @@
 import random
+import atexit
+import logging
+from pytz import utc
 from datetime import datetime, timedelta
 from flask import current_app
 from wtforms.validators import ValidationError
@@ -8,6 +11,7 @@ from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from apscheduler.schedulers.background import BackgroundScheduler
 
 
 def post_new_videos(app):
@@ -101,16 +105,24 @@ def revalidate_existing_videos(app):
             revalidate_video(post, API_KEY, PER_PAGE)
 
 
-def init_scheduler_jobs():
+def init_scheduler():
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
 
+    # configure scheduler
+    scheduler = BackgroundScheduler(timezone=utc)
+    scheduler.start()
+    logging.getLogger('apscheduler').setLevel(logging.WARNING)
+    atexit.register(lambda: scheduler.shutdown(wait=False))
+
     # add background job that posts new videos once a day
-    current_app.scheduler.add_job(func=post_new_videos,
-                                  args=[current_app._get_current_object()],
-                                  trigger='interval', days=1)
+    scheduler.add_job(func=post_new_videos,
+                      args=[current_app._get_current_object()],
+                      trigger='interval', days=1,
+                      id='post', replace_existing=True)
 
     # add background job that revalidates all eligible videos every two days
-    current_app.scheduler.add_job(func=revalidate_existing_videos,
-                                  args=[current_app._get_current_object()],
-                                  trigger='interval', days=2)
+    scheduler.add_job(func=revalidate_existing_videos,
+                      args=[current_app._get_current_object()],
+                      trigger='interval', days=2,
+                      id='revalidate', replace_existing=True)
