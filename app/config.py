@@ -10,6 +10,10 @@ class Config:
     # Flask app secret key
     SECRET_KEY = os.getenv('SECRET_KEY')
 
+    # cache
+    CACHE_TYPE = 'SimpleCache'  # Flask-Caching related configs
+    CACHE_DEFAULT_TIMEOUT = 300
+
     # Admin Google openid
     ADMIN_OPENID = os.getenv('ADMIN_OPENID')
 

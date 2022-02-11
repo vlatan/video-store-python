@@ -3,23 +3,25 @@ import os
 import json
 from logging.config import dictConfig
 from flask import Flask
+from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
 
+cache = Cache()
 db = SQLAlchemy()
-# search = Search()
 migrate = Migrate()
 login_manager = LoginManager()
+
 # where the user will be redirected if she's not logged in
 login_manager.login_view = 'main.home'
 # the class/category of the flash message when the user is not logged in
 login_manager.login_message_category = 'warning'
 
 
-def create_app(config_class=Config):
+def create_app(default_config=Config):
     # config logger
     # https://flask.palletsprojects.com/en/2.0.x/logging/
     # with open(os.getenv('LOG_CONFIG'), 'r') as j:
@@ -27,7 +29,7 @@ def create_app(config_class=Config):
 
     # create application object
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(default_config)
 
     # configure elasticsearch
     elastic_url = app.config['ELASTIC_URL']
@@ -36,6 +38,7 @@ def create_app(config_class=Config):
     http_auth = (elastic_name, elastic_pass)
     app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
 
+    cache.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
     login_manager.init_app(app)
