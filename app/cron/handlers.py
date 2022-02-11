@@ -1,6 +1,6 @@
 import random
 from datetime import datetime, timedelta
-from flask import Blueprint, current_app
+from flask import current_app
 from wtforms.validators import ValidationError
 from app import db
 from app.models import Post, Playlist
@@ -8,9 +8,6 @@ from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-
-cron = Blueprint('cron', __name__)
 
 
 def post_new_videos(app):
@@ -104,7 +101,6 @@ def revalidate_existing_videos(app):
             revalidate_video(post, API_KEY, PER_PAGE)
 
 
-@cron.before_app_first_request
 def init_scheduler_jobs():
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
