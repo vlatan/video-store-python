@@ -40,7 +40,7 @@ Found <strong>{{ total }}</strong> results for this query.
 {% endblock content %}
 
 {% block scripts %}
-{% if total > config['POSTS_PER_PAGE'] %}
+{% if total and total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}
 {% endblock scripts %}

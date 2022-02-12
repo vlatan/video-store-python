@@ -47,10 +47,9 @@ def home():
         time.sleep(0.4)
         return make_response(posts, 200)
 
-    total = posts_query.count()
     # render template on the first view (GET method)
     return render_template('content.html', posts=posts,
-                           total=total)
+                           total=per_page + 1)
 
 
 @main.route('/about')
