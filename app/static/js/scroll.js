@@ -44,7 +44,7 @@ async function loadItems(url = '', data = {}) {
                 let template_clone = template.content.cloneNode(true);
 
                 // Query & update the template content
-                template_clone.querySelector('.video-link').href = `/post/${data[i]['id']}/`;
+                template_clone.querySelector('.video-link').href = `/video/${data[i]['video_id']}/`;
                 let thumb = template_clone.querySelector('.video-img');
                 thumb.src = data[i]['thumbnails']['medium']['url'];
                 thumb.alt = data[i]['title'];

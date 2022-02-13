@@ -10,8 +10,8 @@
     {% for post in posts %}
 
     <div class="video-block">
-        <span data-id="{{ post.id }}" class="remove-option">&times;</span>
-        <a class="video-link" href="{{ url_for('posts.post', post_id=post.id) }}">
+        <span data-id="{{ post.video_id }}" class="remove-option">&times;</span>
+        <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
             <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
                 width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
                 alt="{{ post.title }}">

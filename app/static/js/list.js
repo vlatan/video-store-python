@@ -9,7 +9,7 @@ document.addEventListener('click', (event) => {
             var action = 'unlike';
             var messageText = "Succesfully unliked.";
         }
-        var url = `/post/${remove.dataset.id}/${action}`;
+        var url = `/video/${remove.dataset.id}/${action}`;
         fetch(url, { method: 'POST' }).then(response => {
             var alert = document.createElement('div');
             alert.classList.add('alert');

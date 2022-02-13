@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block canonical %}
-<link rel="canonical" href="{{ url_for('posts.post', post_id=post.id, _external=True) }}" />
+<link rel="canonical" href="{{ url_for('posts.post', video_id=post.video_id, _external=True) }}" />
 {% endblock canonical %}
 
 {% block css %}
@@ -67,7 +67,7 @@
 		{% if post.related_posts %}
 		{% for related_post in post.related_posts %}
 		{% set thumb = related_post.thumbnails['medium'] %}
-		<a href="{{ url_for('posts.post', post_id=related_post.id) }}" class="related-video">
+		<a href="{{ url_for('posts.post', video_id=related_post.video_id) }}" class="related-video">
 			<img class="related-img" src="{{ thumb['url'] }}" width="{{ thumb['width'] }}"
 				height="{{ thumb['height'] }}" alt="{{ related_post.title }}">
 			<h2 class="related-post-title">
@@ -81,7 +81,7 @@
 
 {% if current_user.is_authenticated and current_user.is_admin %}
 <div data-body="video" class="modal">
-	<form class="modal-content" action="{{ url_for('posts.perform_action', post_id=post.id, action='delete') }}"
+	<form class="modal-content" action="{{ url_for('posts.perform_action', video_id=post.video_id, action='delete') }}"
 		method="POST">
 		<span data-close="video" class="close-modal" title="Close">&times;</span>
 		<h2>Delete Video</h2>

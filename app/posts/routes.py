@@ -10,9 +10,9 @@ from app.posts.helpers import convertDuration
 posts = Blueprint('posts', __name__)
 
 
-@posts.route('/post/<int:post_id>/')
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
+@posts.route('/video/<string:video_id>/')
+def post(video_id):
+    post = Post.query.filter_by(video_id=video_id).first_or_404()
 
     # get standard size thumb, if doesn't exist get high size
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
@@ -28,7 +28,7 @@ def post(post_id):
                            duration=duration.human, likes=likes, title=post.title)
 
 
-@posts.route('/post/new', methods=['GET', 'POST'])
+@posts.route('/video/new', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def new_post():
@@ -87,10 +87,10 @@ def playlists():
     return render_template('playlists.html', posts=playlists, title='Playlists')
 
 
-@posts.route('/post/<int:post_id>/<string:action>', methods=['POST'])
+@posts.route('/video/<string:video_id>/<string:action>', methods=['POST'])
 @login_required
-def perform_action(post_id, action):
-    if (post := Post.query.get(post_id)):
+def perform_action(video_id, action):
+    if (post := Post.query.filter_by(video_id=video_id).first()):
         if action == 'like':
             current_user.cast(post, 'like')
             db.session.commit()
