@@ -15,16 +15,8 @@
 		</div>
 
 		<header class="metadata">
-			<h1 class="video-title">{{ post.title }}</h1>
-			<div class="other-metadata">
-				<div class="metadata-block">
-					<div class="video-duration">
-						Duration: {{ duration }}
-					</div>
-					{% if current_user.is_authenticated and current_user.is_admin %}
-					<button data-modal="video" class="modal-button">Delete</button>
-					{% endif %}
-				</div>
+			<div class="metadata-block">
+				<h1 class="video-title">{{ post.title }}</h1>
 				<div class="social">
 					<div class="likes">
 						{% if current_user.is_authenticated %}
@@ -97,6 +89,16 @@
 						</div>
 						{% endif %}
 					</div>
+				</div>
+			</div>
+			<div class="other-metadata">
+				<div class="metadata-block">
+					<div class="video-duration">
+						Duration: {{ duration }}
+					</div>
+					{% if current_user.is_authenticated and current_user.is_admin %}
+					<button data-modal="video" class="modal-button">Delete</button>
+					{% endif %}
 				</div>
 			</div>
 		</header>

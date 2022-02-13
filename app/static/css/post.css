@@ -95,12 +95,30 @@ h1.video-title {
     gap: var(--content-padding);
 }
 
+@media screen and (max-width: 700px) {
+    .metadata {
+        gap: var(--content-padding);
+    }
+
+    h1.video-title {
+        padding-bottom: var(--content-padding);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .metadata-block {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
 /* ############# Social (Likes and Faves) ############# */
 
 .social {
+    align-self: flex-start;
     display: flex;
     align-items: center;
-    gap: var(--content-padding);
+    gap: .5rem;
 }
 
 .likes, .faves {
@@ -121,8 +139,8 @@ h1.video-title {
     justify-content: center;
     align-items: center;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
 }
 
 .action-icon svg {
