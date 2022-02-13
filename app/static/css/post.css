@@ -121,45 +121,21 @@ h1.video-title {
     gap: .5rem;
 }
 
-.likes, .faves {
-    min-width: 82px;
-}
-
 .like, .fave {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: .23rem;
     cursor: pointer;
-    font-size: .9rem;
-}
-
-.action-icon {
+    border: 1px solid var(--primary-border-color);
+    border-radius: 1rem;
+    background: var(--secondary-background-color);
     display: flex;
-    justify-content: center;
     align-items: center;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    justify-content: center;
+    gap: 4px;
+    min-height: 2rem;
+    min-width: 5.5rem;
 }
 
-.action-icon svg {
-    width: 14px;
-    height: 14px;
-}
-
-.like .action-icon svg {
-    width: 12px;
-    height: 12px;
-}
-
-.like:hover .action-icon,
-.fave:hover .action-icon {
-    background-color: var(--secondary-background-color);
-}
-
-.amount-likes, .fave-status {
-    flex: 1;
+.like:hover, .fave:hover {
+    background: var(--primary-background-color);
 }
 
 
