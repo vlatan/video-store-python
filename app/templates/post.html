@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block canonical %}
+<link rel="canonical" href="{{ url_for('posts.post', post_id=post.id, _external=True) }}" />
+{% endblock canonical %}
+
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/post.css') | autoversion }}">
 {% endblock css %}
