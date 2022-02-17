@@ -74,8 +74,10 @@ class SearchableMixin(object):
 
 class User(Base, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
-    google_id = db.Column(db.String(256), unique=True, nullable=True)
-    facebook_id = db.Column(db.String(256), unique=True, nullable=True)
+    google_id = db.Column(db.String(256), unique=True,
+                          nullable=True, index=True)
+    facebook_id = db.Column(db.String(256), unique=True,
+                            nullable=True, index=True)
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
@@ -111,7 +113,8 @@ class Post(Base, SearchableMixin):
     __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True)
     provider = db.Column(db.String(7), default='YouTube')
-    video_id = db.Column(db.String(20), unique=True, nullable=False)
+    video_id = db.Column(db.String(20), unique=True,
+                         nullable=False, index=True)
     playlist_id = db.Column(db.String(50))
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
@@ -120,9 +123,9 @@ class Post(Base, SearchableMixin):
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
     last_checked = db.Column(db.DateTime, default=datetime.utcnow)
+    related_posts = db.Column(db.PickleType, default=[])
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
-    related_posts = db.Column(db.PickleType, default=[])
     likes = db.relationship('PostLike', backref='post',
                             cascade='all,delete-orphan', lazy='dynamic')
     faves = db.relationship('PostFave', backref='post',
