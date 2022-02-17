@@ -1,3 +1,4 @@
+import os
 import requests
 from flask import current_app
 from functools import wraps
@@ -44,7 +45,8 @@ def add_to_index(index, model):
 def remove_from_index(index, model):
     try:
         es = current_app.elasticsearch
-        es.delete(index=index, id=model.id)
+        if es.exists(index=index, id=model.id):
+            es.delete(index=index, id=model.id)
     except (AttributeError, ImproperlyConfigured, ElasticsearchException):
         return
 
