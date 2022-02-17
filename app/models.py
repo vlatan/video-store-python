@@ -97,18 +97,6 @@ class User(Base, UserMixin, ActionMixin):
         return False
 
 
-class Playlist(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
-    channel_id = db.Column(db.String(50), unique=True, nullable=False)
-    title = db.Column(db.String(256), nullable=False)
-    thumbnails = db.Column(db.PickleType, nullable=False)
-    channel_thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text)
-    posts = db.relationship('Post', backref='playlist', lazy=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
-
 class Post(Base, SearchableMixin):
     __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True)
@@ -153,6 +141,18 @@ class Post(Base, SearchableMixin):
         }
 
 
+class Playlist(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
+    channel_id = db.Column(db.String(50), unique=True, nullable=False)
+    title = db.Column(db.String(256), nullable=False)
+    thumbnails = db.Column(db.PickleType, nullable=False)
+    channel_thumbnails = db.Column(db.PickleType, nullable=False)
+    description = db.Column(db.Text)
+    posts = db.relationship('Post', backref='playlist', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+
 class PostLike(Base):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -166,5 +166,5 @@ class PostFave(Base):
 
 
 # listen for commit and make changes to search index
-db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+db.event.listen(db.session, 'before_commit', Post.before_commit)
+db.event.listen(db.session, 'after_commit', Post.after_commit)
