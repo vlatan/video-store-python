@@ -36,14 +36,14 @@ def new_post():
     # the form will not validate if the video is already in the database,
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
-        # create object from Model
-        # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(**form.content.data, author=current_user)
-        # number of related posts to fetch
         per_page = current_app.config['NUM_RELATED_POSTS']
-        # search for related videos using the post title
-        if (related_posts := Post.search(post.title, 1, per_page)[0].all()):
-            post.related_posts = related_posts
+        post_title = form.content.data['title']
+        related_posts = Post.search(post_title, 1, per_page)[0].all()
+
+        # form.content.data is a dict, just unpack to transform into kwargs
+        post = Post(**form.content.data,
+                    related_posts=related_posts,
+                    author=current_user)
 
         # add post to database
         db.session.add(post)
