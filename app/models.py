@@ -166,5 +166,5 @@ class PostFave(Base):
 
 
 # listen for commit and make changes to search index
-db.event.listen(db.session, 'before_commit', Post.before_commit)
-db.event.listen(db.session, 'after_commit', Post.after_commit)
+db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
