@@ -1,7 +1,9 @@
-# import os
 import os
-import json
-from logging.config import dictConfig
+import sys
+import logging
+import atexit
+import signal
+from pytz import utc
 from flask import Flask
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
@@ -9,23 +11,28 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from app.config import Config
 from elasticsearch import Elasticsearch
+from apscheduler.schedulers.background import BackgroundScheduler
 
 cache = Cache()
 db = SQLAlchemy()
 migrate = Migrate()
-login_manager = LoginManager()
 
+login_manager = LoginManager()
 # where the user will be redirected if she's not logged in
 login_manager.login_view = 'main.home'
 # the class/category of the flash message when the user is not logged in
 login_manager.login_message_category = 'warning'
 
+# config logger
+# logging.basicConfig(filename=os.getenv('LOG_FILE'), level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+logging.getLogger('apscheduler').setLevel(logging.INFO)
+logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
+logging.getLogger('elasticsearch').setLevel(logging.INFO)
+
 
 def create_app(default_config=Config):
-    # config logger
-    # https://flask.palletsprojects.com/en/2.0.x/logging/
-    # with open(os.getenv('LOG_CONFIG'), 'r') as j:
-    #     dictConfig(json.load(j))
+    """Create a new app instance."""
 
     # create application object
     app = Flask(__name__)
@@ -48,16 +55,31 @@ def create_app(default_config=Config):
     from app.main.routes import main
     from app.search.routes import search
     from app.auth.routes import auth
+    from app.cron.handlers import cron
     from app.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
     app.register_blueprint(search)
     app.register_blueprint(auth)
+    app.register_blueprint(cron)
     app.register_blueprint(errors)
 
-    from app.cron.handlers import init_scheduler
+    # configure scheduler
+    app.scheduler = BackgroundScheduler(timezone=utc, daemon=False)
+
+    def kill_scheduler(signum=None, frame=None):
+        try:
+            app.scheduler.shutdown(wait=False)
+        finally:
+            exit(0)
+
+    signal.signal(signal.SIGTERM, kill_scheduler)
+    signal.signal(signal.SIGINT, kill_scheduler)
+
     with app.app_context():
-        init_scheduler()
+        from app.cron.handlers import init_scheduler_jobs
+        app.scheduler.start()
+        init_scheduler_jobs()
 
     return app
