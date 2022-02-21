@@ -99,7 +99,7 @@ class User(Base, UserMixin, ActionMixin):
 
 class Post(Base, SearchableMixin):
     __searchable__ = ['title', 'description', 'tags']
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, index=True)
     provider = db.Column(db.String(7), default='YouTube')
     video_id = db.Column(db.String(20), unique=True,
                          nullable=False, index=True)
