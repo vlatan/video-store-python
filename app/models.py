@@ -22,22 +22,20 @@ class Base(db.Model):
 
 class ActionMixin(object):
     def cast(self, post, action):
+        obj = PostLike if action in ['like', 'unlike'] else PostFave
+        # if user hasn't liked/faved the post record her like/fave
         if not self.has_casted(post, action):
-            model = PostLike if action == 'like' else PostFave
-            cast = model(user_id=self.id, post_id=post.id)
+            cast = obj(user_id=self.id, post_id=post.id)
             db.session.add(cast)
-
-    def uncast(self, post, action):
-        if self.has_casted(post, action):
-            model = PostLike if action == 'like' else PostFave
-            cast = model.query.filter_by(user_id=self.id, post_id=post.id)
+        # if user already liked/faved this post delete her like/fave
+        else:
+            cast = obj.query.filter_by(user_id=self.id, post_id=post.id)
             cast.delete()
 
     def has_casted(self, post, action):
-        model = PostLike if action == 'like' else PostFave
-        return model.query.filter(
-            model.user_id == self.id,
-            model.post_id == post.id).count() > 0
+        obj = PostLike if action in ['like', 'unlike'] else PostFave
+        return obj.query.filter(obj.user_id == self.id,
+                                obj.post_id == post.id).count() > 0
 
 
 class SearchableMixin(object):

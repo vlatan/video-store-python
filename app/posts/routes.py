@@ -90,26 +90,14 @@ def playlists():
 @posts.route('/video/<string:video_id>/<string:action>', methods=['POST'])
 @login_required
 def perform_action(video_id, action):
-    if (post := Post.query.filter_by(video_id=video_id).first()):
-        if action == 'like':
-            current_user.cast(post, 'like')
-            db.session.commit()
-            return make_response('Success', 200)
-        elif action == 'unlike':
-            current_user.uncast(post, 'like')
-            db.session.commit()
-            return make_response('Success', 200)
-        elif action == 'fave':
-            current_user.cast(post, 'fave')
-            db.session.commit()
-            return make_response('Success', 200)
-        elif action == 'unfave':
-            current_user.uncast(post, 'fave')
-            db.session.commit()
-            return make_response('Success', 200)
-        elif action == 'delete' and current_user.is_admin:
-            db.session.delete(post)
-            db.session.commit()
-            flash('The video has been deleted', 'success')
-            return redirect(url_for('main.home'))
-    return make_response('Post not found', 404)
+    post = Post.query.filter_by(video_id=video_id).first_or_404()
+    if action in ['like', 'unlike', 'fave', 'unfave']:
+        current_user.cast(post, action)
+        db.session.commit()
+        return make_response('Success', 200)
+    elif action == 'delete' and current_user.is_admin:
+        db.session.delete(post)
+        db.session.commit()
+        flash('The video has been deleted', 'success')
+        return redirect(url_for('main.home'))
+    return make_response('Sorry, can\'t resolve the request', 400)
