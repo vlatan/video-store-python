@@ -125,21 +125,9 @@ class Post(Base, SearchableMixin):
     def serialize(self):
         """ Return object data in easily serializable format. """
         return {
-            'id': self.id,
-            'provider': self.provider,
             'video_id': self.video_id,
-            'playlist_id': self.playlist_id,
             'title': self.title,
-            'thumbnails': self.thumbnails,
-            'description': self.description,
-            'tags': self.tags,
-            'duration': self.duration,
-            'upload_date': dump_datetime(self.upload_date),
-            # from the Base class
-            'created_at': dump_datetime(self.created_at),
-            'last_checked': dump_datetime(self.last_checked),
-            'user_id': self.user_id,
-            'playlist_db_id': self.playlist_db_id
+            'thumbnails': self.thumbnails
         }
 
     @classmethod
