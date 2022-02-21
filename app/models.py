@@ -2,8 +2,10 @@ from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
 from flask import current_app
+from app import cache
 from app.helpers import dump_datetime, add_to_index
 from app.helpers import remove_from_index, query_index
+from sqlalchemy import func
 
 
 @login_manager.user_loader
@@ -139,6 +141,24 @@ class Post(Base, SearchableMixin):
             'user_id': self.user_id,
             'playlist_db_id': self.playlist_db_id
         }
+
+    @classmethod
+    @cache.memoize(600)
+    def get_posts(cls, page, per_page):
+        query = cls.query.order_by(cls.id.desc())
+        posts = query.paginate(page, per_page, False).items
+        return [post.serialize for post in posts]
+
+    @classmethod
+    @cache.memoize(600)
+    def get_posts_by_likes(cls, page, per_page):
+        """ query posts by likes (outerjoin)
+            https://stackoverflow.com/q/63889938 """
+
+        query = cls.query.outerjoin(PostLike).group_by(
+            cls.id).order_by(func.count().desc())
+        posts = query.paginate(page, per_page, False).items
+        return [post.serialize for post in posts]
 
 
 class Playlist(Base):
