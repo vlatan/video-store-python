@@ -3,7 +3,7 @@ from app import db, login_manager
 from flask_login import UserMixin
 from flask import current_app
 from app import cache
-from app.helpers import dump_datetime, add_to_index
+from app.helpers import add_to_index
 from app.helpers import remove_from_index, query_index
 from sqlalchemy import func
 
