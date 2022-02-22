@@ -39,9 +39,9 @@ def post_new_videos(app):
     with app.app_context():
         API_KEY = current_app.config['YOUTUBE_API_KEY']
         PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+        # get all VALID videos from our playlists from YouTube
+        all_videos = get_all_videos(API_KEY)
 
-    # get all VALID videos from our playlists from YouTube
-    all_videos = get_all_videos(API_KEY)
     # shuffle videos so they don't get posted uniformly
     random.shuffle(all_videos)
 
@@ -197,7 +197,7 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     current_app.scheduler.add_job(func=post_new_videos,
                                   args=[current_app._get_current_object()],
-                                  trigger='cron', minute=49,
+                                  trigger='cron', minute=5,
                                   id='post', replace_existing=True)
 
     # add background job that revalidates all eligible videos every two days
