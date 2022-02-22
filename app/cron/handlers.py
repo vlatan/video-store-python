@@ -52,7 +52,7 @@ def post_new_videos(app):
             # to ensure db is left in a healthy state if exception is raised
             # transactions commited ор rolled back and session closed
             with db.session.begin():
-                # if video is already posted (by a form submit as single video)
+                # if video is already posted
                 if (posted := Post.query.filter_by(video_id=video['video_id']).first()):
                     # if it doesn't have playlist id
                     if not posted.playlist_id:
@@ -64,6 +64,7 @@ def post_new_videos(app):
                     # search for related videos using the post title
                     if not (related_posts := Post.search(
                             video['title'], 1, PER_PAGE)[0].all()):
+                        # if no related get random
                         related_posts = Post.query.order_by(
                             func.random()).limit(PER_PAGE).all()
                     # create object from Model
@@ -126,7 +127,8 @@ def revalidate_existing_videos(app):
         print(posts[:10])
         part = ['status', 'snippet', 'contentDetails']
 
-        with build('youtube', 'v3', developerKey=API_KEY, cache_discovery=False) as youtube:
+        with build('youtube', 'v3', developerKey=API_KEY,
+                   cache_discovery=False) as youtube:
             # you can get max 50 videos per call from YouTube API
             for i in range(0, len(posts), 50):
                 track_posts = {post.video_id: post for post in posts[i:i+50]}
