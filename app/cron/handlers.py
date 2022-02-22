@@ -14,29 +14,35 @@ from sqlalchemy import func
 cron = Blueprint('cron', __name__)
 
 
-def post_new_videos(app):
-    with app.app_context():
-        API_KEY = current_app.config['YOUTUBE_API_KEY']
-        PER_PAGE = current_app.config['NUM_RELATED_POSTS']
-        # get all playlists from db
-        playlists, all_videos = Playlist.query.all(), []
-
+def get_all_videos(api_key):
+    # get all playlists from db
+    playlists, all_videos = Playlist.query.all(), []
     # construct youtube API service
-    with build('youtube', 'v3', developerKey=API_KEY,
+    with build('youtube', 'v3', developerKey=api_key,
                cache_discovery=False) as youtube:
         # loop through the playlists
         for playlist in playlists:
-            # get playlist videos from YT
+            # get playlist VALID videos from YT
             playlist_videos = get_playlist_videos(
                 playlist.playlist_id, youtube)
+
             # loop through the videos in this playlist
             for video in playlist_videos:
                 # add relationship with this playlist to the video metadata
                 video['playlist'] = playlist
             # add this batch of videos to the total list of videos
             all_videos += playlist_videos
+    return all_videos
 
-    # shuffle videos so the don't get posted uniformly
+
+def post_new_videos(app):
+    with app.app_context():
+        API_KEY = current_app.config['YOUTUBE_API_KEY']
+        PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+
+    # get all VALID videos from our playlists from YouTube
+    all_videos = get_all_videos(API_KEY)
+    # shuffle videos so they don't get posted uniformly
     random.shuffle(all_videos)
 
     # loop through total number of videos
@@ -46,7 +52,7 @@ def post_new_videos(app):
             # to ensure db is left in a healthy state if exception is raised
             # transactions commited ор rolled back and session closed
             with db.session.begin():
-                # if video is already posted
+                # if video is already posted (by a form submit as single video)
                 if (posted := Post.query.filter_by(video_id=video['video_id']).first()):
                     # if it doesn't have playlist id
                     if not posted.playlist_id:
@@ -56,8 +62,10 @@ def post_new_videos(app):
                         posted.playlist = video['playlist']
                 else:
                     # search for related videos using the post title
-                    related_posts = Post.search(
-                        video['title'], 1, PER_PAGE)[0].all()
+                    if not (related_posts := Post.search(
+                            video['title'], 1, PER_PAGE)[0].all()):
+                        related_posts = Post.query.order_by(
+                            func.random()).limit(PER_PAGE).all()
                     # create object from Model
                     post = Post(**video, related_posts=related_posts)
                     # add post to database
@@ -187,10 +195,10 @@ def init_scheduler_jobs():
     # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
 
     # add background job that posts new videos once a day
-    # current_app.scheduler.add_job(func=post_new_videos,
-    #                               args=[current_app._get_current_object()],
-    #                               trigger='cron', minute=59,
-    #                               id='post', replace_existing=True)
+    current_app.scheduler.add_job(func=post_new_videos,
+                                  args=[current_app._get_current_object()],
+                                  trigger='cron', minute=49,
+                                  id='post', replace_existing=True)
 
     # add background job that revalidates all eligible videos every two days
     # current_app.scheduler.add_job(func=revalidate_existing_videos,
