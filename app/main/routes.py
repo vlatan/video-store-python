@@ -1,10 +1,8 @@
 import os
 import time
 from flask import render_template, request, current_app
-from flask import Blueprint, jsonify, make_response
-from app.models import Post, PostLike
-from app import cache
-from sqlalchemy import func
+from flask import Blueprint, jsonify, make_response, url_for
+from app.models import Post
 
 main = Blueprint('main', __name__)
 
@@ -30,8 +28,14 @@ def home():
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
 
-    posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
-        'order_by') == 'likes' else Post.get_posts(page, per_page)
+    if request.referrer == url_for('posts.new_post', _external=True):
+        # https://flask-caching.readthedocs.io/en/latest/api.html#flask_caching.Cache.memoize
+        uncached_posts = Post.get_posts.uncached
+        posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
+            'order_by') == 'likes' else uncached_posts(Post, page, per_page)
+    else:
+        posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
+            'order_by') == 'likes' else Post.get_posts(page, per_page)
 
     if request.method == 'POST':
         time.sleep(0.4)
