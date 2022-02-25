@@ -5,7 +5,7 @@ from flask import current_app
 from app import cache
 from app.helpers import add_to_index
 from app.helpers import remove_from_index, query_index
-from sqlalchemy import func
+from sqlalchemy import func, inspect
 
 
 @login_manager.user_loader
@@ -49,21 +49,27 @@ class SearchableMixin(object):
             db.case(when, value=cls.id)), total
 
     @classmethod
+    def fields_dirty(cls, obj):
+        if isinstance(obj, cls):
+            insp = inspect(obj)
+            attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
+            return any([attr.history.has_changes() for attr in attrs])
+        return False
+
+    @classmethod
     def before_commit(cls, session):
         session._changes = {
-            'add': list(session.new),
-            'update': list(session.dirty),
-            'delete': list(session.deleted)
+            'add': [obj for obj in session.new if isinstance(obj, cls)],
+            'update': [obj for obj in session.dirty if cls.fields_dirty(obj)],
+            'delete': [obj for obj in session.deleted if isinstance(obj, cls)]
         }
 
     @classmethod
     def after_commit(cls, session):
         for obj in session._changes['add'] + session._changes['update']:
-            if isinstance(obj, SearchableMixin):
-                add_to_index(obj.__tablename__, obj)
+            add_to_index(obj.__tablename__, obj)
         for obj in session._changes['delete']:
-            if isinstance(obj, SearchableMixin):
-                remove_from_index(obj.__tablename__, obj)
+            remove_from_index(obj.__tablename__, obj)
         session._changes = None
 
     @classmethod
