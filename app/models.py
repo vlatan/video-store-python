@@ -51,6 +51,7 @@ class SearchableMixin(object):
     @classmethod
     def fields_dirty(cls, obj):
         if isinstance(obj, cls):
+            # https://stackoverflow.com/a/28353846
             insp = inspect(obj)
             attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
             return any([attr.history.has_changes() for attr in attrs])
