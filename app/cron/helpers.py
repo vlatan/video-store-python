@@ -5,7 +5,7 @@ from googleapiclient.errors import HttpError
 
 def get_playlist_videos(playlist_id, youtube):
     # videos epmty list and first page token is None
-    videos, next_page_token = [], None
+    videos, next_page_token, complete = [], None, False
 
     # iterate through all the items in the Uploads playlist
     while True:
@@ -47,6 +47,7 @@ def get_playlist_videos(playlist_id, youtube):
 
         # if no more pages break the while loop, we're done
         if next_page_token is None:
+            complete = True
             break
 
-    return videos
+    return videos, complete
