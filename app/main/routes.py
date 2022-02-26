@@ -2,6 +2,7 @@ import os
 import time
 from flask import render_template, request, current_app
 from flask import Blueprint, jsonify, make_response, url_for
+from flask_login import current_user
 from app.models import Post
 
 main = Blueprint('main', __name__)
@@ -28,7 +29,7 @@ def home():
     # if frontend_data get page number, else 1
     page = frontend_data.get('page') if frontend_data else 1
 
-    if request.referrer == url_for('posts.new_post', _external=True):
+    if current_user.is_authenticated and current_user.is_admin:
         # https://flask-caching.readthedocs.io/en/latest/api.html#flask_caching.Cache.memoize
         uncached_posts = Post.get_posts.uncached
         posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
