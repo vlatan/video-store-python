@@ -137,14 +137,14 @@ class Post(Base, SearchableMixin):
         }
 
     @classmethod
-    @cache.memoize(600)
+    @cache.memoize(86400)
     def get_posts(cls, page, per_page):
         query = cls.query.order_by(cls.id.desc())
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
     @classmethod
-    @cache.memoize(600)
+    @cache.memoize(86400)
     def get_posts_by_likes(cls, page, per_page):
         """ query posts by likes (outerjoin)
             https://stackoverflow.com/q/63889938 """
@@ -155,7 +155,7 @@ class Post(Base, SearchableMixin):
         return [post.serialize for post in posts]
 
     @classmethod
-    @cache.memoize(600)
+    @cache.memoize(86400)
     def get_related_posts(cls, title, per_page):
         # search for related videos using the post title
         if not (related_posts := cls.search(title, 1, per_page + 1)[0].all()[1:]):
