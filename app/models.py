@@ -89,6 +89,7 @@ class User(Base, UserMixin, ActionMixin):
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
     local_picture = db.Column(db.String(120), default='default.jpg')
+
     posts = db.relationship('Post', backref='author', lazy=True)
     playlists = db.relationship('Playlist', backref='author', lazy=True)
     liked = db.relationship('PostLike', backref='user',
@@ -117,10 +118,13 @@ class Post(Base, SearchableMixin):
     tags = db.Column(db.Text)
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
-    last_checked = db.Column(db.DateTime, default=datetime.utcnow)
-    related_posts = db.Column(db.PickleType, default=[])
+
+    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
+
+    children = db.relationship(
+        'Post', backref=db.backref('parent', remote_side=[id]))
     likes = db.relationship('PostLike', backref='post',
                             cascade='all,delete-orphan', lazy='dynamic')
     faves = db.relationship('PostFave', backref='post',
@@ -162,8 +166,9 @@ class Playlist(Base):
     thumbnails = db.Column(db.PickleType, nullable=False)
     channel_thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
-    posts = db.relationship('Post', backref='playlist', lazy=True)
+
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    posts = db.relationship('Post', backref='playlist', lazy=True)
 
 
 class PostLike(Base):
