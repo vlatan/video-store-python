@@ -119,12 +119,9 @@ class Post(Base, SearchableMixin):
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
 
-    parent_id = db.Column(db.Integer, db.ForeignKey('post.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
 
-    children = db.relationship(
-        'Post', backref=db.backref('parent', remote_side=[id]))
     likes = db.relationship('PostLike', backref='post',
                             cascade='all,delete-orphan', lazy='dynamic')
     faves = db.relationship('PostFave', backref='post',
