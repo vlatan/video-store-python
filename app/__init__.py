@@ -65,21 +65,23 @@ def create_app(default_config=Config):
     app.register_blueprint(cron)
     app.register_blueprint(errors)
 
-    # configure scheduler
-    app.scheduler = BackgroundScheduler(timezone=utc, daemon=False)
-
-    def kill_scheduler(signum=None, frame=None):
-        try:
-            app.scheduler.shutdown(wait=False)
-        finally:
-            exit(0)
-
-    signal.signal(signal.SIGTERM, kill_scheduler)
-    signal.signal(signal.SIGINT, kill_scheduler)
-
     with app.app_context():
-        from app.cron.handlers import init_scheduler_jobs
-        app.scheduler.start()
-        init_scheduler_jobs()
+        db.create_all()
+
+    # configure scheduler (3 workers)
+    # app.scheduler = BackgroundScheduler(
+    #     timezone=utc,
+    #     executors={'default': {'type': 'threadpool', 'max_workers': 1}}
+    # )
+
+    # def kill_scheduler(signum=None, frame=None):
+    #     try:
+    #         app.scheduler.shutdown(wait=False)
+    #     finally:
+    #         exit(0)
+
+    # signal.signal(signal.SIGTERM, kill_scheduler)
+    # signal.signal(signal.SIGINT, kill_scheduler)
+    # app.scheduler.start()
 
     return app
