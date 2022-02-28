@@ -154,6 +154,16 @@ class Post(Base, SearchableMixin):
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
+    @classmethod
+    @cache.memoize(600)
+    def get_related_posts(cls, title, per_page):
+        # search for related videos using the post title
+        if not (related_posts := cls.search(title, 1, per_page + 1)[0].all()[1:]):
+            # if no related get random
+            related_posts = cls.query.order_by(
+                func.random()).limit(per_page).all()
+        return [post.serialize for post in related_posts]
+
 
 class Playlist(Base):
     id = db.Column(db.Integer, primary_key=True)
