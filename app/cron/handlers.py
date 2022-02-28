@@ -1,6 +1,6 @@
 import time
 import random
-from datetime import datetime
+import atexit
 from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
 from app import db
@@ -9,7 +9,8 @@ from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from sqlalchemy import func
+from apscheduler.schedulers.background import BackgroundScheduler
+from pytz import utc
 
 cron = Blueprint('cron', __name__)
 
@@ -37,27 +38,7 @@ def get_youtube_videos(api_key):
     return all_videos, complete
 
 
-def update_related_posts(post, per_page):
-    # get related posts by searching the index,
-    # using the title of this post
-    if related_posts := (Post.search(post.title, 1, per_page + 1)[0].all()[1:]):
-        if post.related_posts != related_posts:
-            post.related_posts = related_posts
-    else:
-        post.related_posts = Post.query.order_by(
-            func.random()).limit(per_page).all()
-
-
-def get_related_posts(title, per_page):
-    # search for related videos using the post title
-    if not (related_posts := Post.search(title, 1, per_page)[0].all()):
-        # if no related get random
-        related_posts = Post.query.order_by(
-            func.random()).limit(per_page).all()
-    return related_posts
-
-
-def revalidate_single_video(post, api_key, per_page):
+def revalidate_single_video(post, api_key):
     with build('youtube', 'v3', developerKey=api_key,
                cache_discovery=False) as youtube:
         try:
@@ -69,8 +50,6 @@ def revalidate_single_video(post, api_key, per_page):
             res = req.execute()['items'][0]
             # this will raise ValidationError if video's invalid
             validate_video(res)
-            update_related_posts(post, per_page)
-            db.session.commit()
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
             db.session.delete(post)
@@ -88,12 +67,11 @@ def process_videos(app):
         # get all VALID videos from our playlists from YouTube
         all_videos, complete = get_youtube_videos(API_KEY)
 
-    # shuffle videos so they don't get posted uniformly
-    random.shuffle(all_videos)
+        # shuffle videos so they don't get posted uniformly
+        random.shuffle(all_videos)
 
-    # loop through total number of videos
-    for video in all_videos:
-        with app.app_context():
+        # loop through total number of videos
+        for video in all_videos:
             # if video is already posted
             if (posted := Post.query.filter_by(video_id=video['video_id']).first()):
                 # if it doesn't have playlist id
@@ -102,48 +80,47 @@ def process_videos(app):
                     posted.playlist_id = video['playlist_id']
                     # asscoiate with existing playlist in our db
                     posted.playlist = video['playlist']
-                update_related_posts(posted, PER_PAGE)
-                db.session.commit()
+                    db.sessioncommit()
+                    time.sleep(1)
             else:
-                related_posts = get_related_posts(video['title'], PER_PAGE)
                 # create object from Model
-                post = Post(**video, related_posts=related_posts)
+                post = Post(**video)
                 # add post to database
                 db.session.add(post)
                 db.session.commit()
-        time.sleep(5)
+                time.sleep(1)
 
-    # delete missing videos if all VALID videos are fetched from YT
-    if complete:
-        fetched_ids = {video['video_id'] for video in all_videos}
-        with app.app_context():
+        # delete missing videos if all VALID videos are fetched from YT
+        if complete:
+            fetched_ids = {video['video_id'] for video in all_videos}
             posted = Post.query.filter(Post.playlist_id != None).all()
-        posted_ids = {post.video_id for post in posted}
-        with app.app_context():
+            posted_ids = {post.video_id for post in posted}
             to_delete = Post.query.filter(
                 Post.video_id.in_(posted_ids - fetched_ids)).all()
-        for post in to_delete:
-            with app.app_context():
+            for post in to_delete:
                 db.session.delete(post)
                 db.session.commit()
-            time.sleep(5)
+                time.sleep(1)
 
-    # revalidate orphan videos (not attached to playlist)
-    with app.app_context():
-        orphan_posts = Post.query.filter_by(playlist_id=None).all()
-    for post in orphan_posts:
-        with app.app_context():
+        # revalidate orphan videos (not attached to playlist)
+        for post in Post.query.filter_by(playlist_id=None).all():
             revalidate_single_video(post, API_KEY, PER_PAGE)
-        time.sleep(5)
+            time.sleep(1)
 
 
+@cron.before_app_first_request
 def init_scheduler_jobs():
     # https://stackoverflow.com/a/38501328
-    # https://flask.palletsprojects.com/en/0.12.x/reqcontext/#notes-on-proxies
+    # https://flask.palletsprojects.com/en/2.0.x/reqcontext/#notes-on-proxies
+
+    scheduler = BackgroundScheduler(timezone=utc)
 
     # add background job that posts new videos once a day
-    # current_app.scheduler.add_job(func=process_videos,
-    #                               args=[current_app._get_current_object()],
-    #                               trigger='cron', minute=3,
-    #                               id='post', replace_existing=True)
+    scheduler.add_job(func=process_videos,
+                      args=[current_app._get_current_object()],
+                      trigger='cron', minute=25,
+                      id='post', replace_existing=True)
+
+    atexit.register(lambda: scheduler.shutdown(wait=False))
+    scheduler.start()
     pass
