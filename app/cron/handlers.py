@@ -80,7 +80,7 @@ def process_videos(app):
                     posted.playlist_id = video['playlist_id']
                     # asscoiate with existing playlist in our db
                     posted.playlist = video['playlist']
-                    db.sessioncommit()
+                    db.session.commit()
                     time.sleep(1)
             else:
                 # create object from Model
@@ -118,9 +118,8 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     scheduler.add_job(func=process_videos,
                       args=[current_app._get_current_object()],
-                      trigger='cron', minute=25,
+                      trigger='cron', hour=17,
                       id='post', replace_existing=True)
 
     atexit.register(lambda: scheduler.shutdown(wait=False))
     scheduler.start()
-    pass
