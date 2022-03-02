@@ -38,29 +38,6 @@ a.video-link:hover {
     color: white;
 }
 
-.remove-option {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--secondary-background-color);
-    font-size: 1.2rem;
-    line-height: 1;
-    color: white;
-    top: 5px;
-    right: 5px;
-    z-index: 1;
-    cursor: pointer;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-}
-
-.remove-option:hover {
-    color: black;
-    background-color: white;
-}
-
 img.video-img {
     width: 100%;
     height: auto;
@@ -91,4 +68,37 @@ h2.video-title {
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+  }
+
+
+  /* ################# Specific to User Library ################# */
+
+  .remove-option {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-background-color);
+    font-size: 1.2rem;
+    line-height: 1;
+    color: white;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+}
+
+.remove-option:hover {
+    color: black;
+    background-color: white;
+}
+
+  .library-title {
+      font-size: 1rem;
+      line-height: normal;
+      font-weight: normal;
+      margin-bottom: var(--content-padding);
   }

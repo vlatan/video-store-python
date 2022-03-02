@@ -9,7 +9,7 @@ from app import db
 users = Blueprint('users', __name__)
 
 
-@users.route('/liked', methods=['GET', 'POST'])
+@users.route('/liked/', methods=['GET', 'POST'])
 @login_required
 def liked():
     """ Route to return the liked posts """
@@ -32,10 +32,11 @@ def liked():
 
     total = current_user.liked.count()
     return render_template('user_content.html', posts=posts,
-                           total=total, title='Liked')
+                           total=total, title='Liked',
+                           content_title='Documentaries You Liked:')
 
 
-@users.route('/favorites', methods=['GET', 'POST'])
+@users.route('/favorites/', methods=['GET', 'POST'])
 @login_required
 def favorites():
     """ Route to return the liked posts """
@@ -58,10 +59,11 @@ def favorites():
 
     total = current_user.faved.count()
     return render_template('user_content.html', posts=posts,
-                           total=total, title='Favorites')
+                           total=total, title='Favorites',
+                           content_title='Your Favorite Documentaries:')
 
 
-@users.route('/account/delete', methods=['POST'])
+@users.route('/account/delete/', methods=['POST'])
 @login_required
 def delete_account():
     image_name = f'{current_user.id}.jpg'
