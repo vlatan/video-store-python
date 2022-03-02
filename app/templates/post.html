@@ -6,7 +6,14 @@
 {% endblock css %}
 
 {% block meta %}
-<link rel="canonical" href="{{ url_for('posts.post', video_id=post.video_id, _external=True) }}" />
+{% set post_url = url_for('posts.post', video_id=post.video_id, _external=True) %}
+<link rel="canonical" href="{{ post_url }}" />
+<meta property='og:title' content='{{ post.title }}'>
+<meta property='og:type' content='video.movie'>
+<meta property='og:url' content='{{ post_url }}'>
+<meta property='og:image' content='{{ thumb }}'>
+<meta name='thumbnail' content='{{ thumb }}'>
+<meta property='og:site_name' content='{{ config["APP_NAME"] }}'>
 {% endblock meta %}
 
 {% block content %}
