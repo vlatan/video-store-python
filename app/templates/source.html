@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
+{% endblock css %}
+
+{% block meta %}
+<link rel="canonical" href="{{ url_for('lists.playlist_videos', playlist_id=playlist_id, _external=True) }}" />
+{% endblock meta %}
+
+{% block content %}
+{% include 'content.html' %}
+{% endblock content %}
+
+{% block scripts %}
+<script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
+{{ super() }}
+{% endblock scripts %}

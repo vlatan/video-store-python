@@ -11,7 +11,7 @@
 
     {% for post in posts %}
 
-    <a class="playlist-link" target="_blank" href="https://www.youtube.com/playlist?list={{ post.playlist_id }}">
+    <a class="playlist-link" href="{{ url_for('lists.playlist_videos', playlist_id=post.playlist_id) }}">
         <img class="channel-img" src="{{ post.channel_thumbnails['medium']['url'] }}"
             width="{{ post.channel_thumbnails['medium']['width'] }}"
             height="{{ post.channel_thumbnails['medium']['height'] }}" alt="{{ post.title }}">
