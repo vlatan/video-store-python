@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block css %}
+{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
 {% endblock css %}
 
@@ -22,7 +24,6 @@
     {% endfor %}
 
     <template id="post_template">
-        <!-- template content -->
         <div class="video-block">
             <span class="remove-option">&times;</span>
             <a class="video-link" href="#">
@@ -34,10 +35,10 @@
 
 </div>
 
-<!-- element to trigger the IntersectionObserver -->
 <div class="sentinel" id="sentinel">
     <div id="spinner" role="status"></div>
 </div>
+
 {% endblock content %}
 
 {% block scripts %}
@@ -45,4 +46,5 @@
 {% if total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}
+{{ super() }}
 {% endblock scripts %}

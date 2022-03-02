@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+
 {% block css %}
+{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/playlists.css') | autoversion }}">
 {% endblock css %}
 
 {% block content %}
 
-<!-- div to contain the content -->
 <div class="playlists-content">
 
     {% for post in posts %}

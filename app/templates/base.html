@@ -8,9 +8,13 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+
+	{% block css %}
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/shared.css') | autoversion }}">
-	{% block canonical %}{% endblock canonical %}
-	{% block css %}{% endblock css %}
+	{% endblock css %}
+
+	{% block meta %}{% endblock meta %}
+
 	<title>
 		{% if title %}
 		{{ title }} | {{ config['APP_NAME'] }}
@@ -162,11 +166,12 @@
 	{% endif %}
 	{% endwith %}
 
-	{% block scripts %}{% endblock scripts %}
+	{% block scripts %}
 	{% if not current_user.is_authenticated %}
 	<script async defer src="{{ url_for('static', filename='js/pop.js') | autoversion }}"></script>
 	{% endif %}
 	<script async defer src="{{ url_for('static', filename='js/shared.js') | autoversion }}"></script>
+	{% endblock scripts %}
 </body>
 
 </html>

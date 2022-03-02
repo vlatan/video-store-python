@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block css %}
+{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
 {% endblock css %}
 
@@ -24,7 +26,6 @@ Found <strong>{{ total }}</strong> results for this query.
 	{% endfor %}
 
 	<template id="post_template">
-		<!-- template content -->
 		<a class="video-link" href="#">
 			<img class="video-img" src="#">
 			<h2 class="video-title"></h2>
@@ -33,14 +34,15 @@ Found <strong>{{ total }}</strong> results for this query.
 
 </div>
 
-<!-- element to trigger the IntersectionObserver -->
 <div class="sentinel" id="sentinel">
 	<div id="spinner" role="status"></div>
 </div>
+
 {% endblock content %}
 
 {% block scripts %}
 {% if total and total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}
+{{ super() }}
 {% endblock scripts %}

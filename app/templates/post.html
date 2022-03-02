@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
-{% block canonical %}
-<link rel="canonical" href="{{ url_for('posts.post', video_id=post.video_id, _external=True) }}" />
-{% endblock canonical %}
-
 {% block css %}
+{{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/post.css') | autoversion }}">
 {% endblock css %}
+
+{% block meta %}
+<link rel="canonical" href="{{ url_for('posts.post', video_id=post.video_id, _external=True) }}" />
+{% endblock meta %}
 
 {% block content %}
 <article class="media-content">
@@ -100,4 +101,5 @@
 <script async defer src="{{ url_for('static', filename='js/login.js') | autoversion }}"></script>
 {% endif %}
 <script async defer src="{{ url_for('static', filename='js/play.js') | autoversion }}"></script>
+{{ super() }}
 {% endblock scripts %}
