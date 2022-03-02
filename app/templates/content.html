@@ -7,9 +7,8 @@
 
 {% block content %}
 
-{% if 'Search' in title %}
-Found <strong>{{ total }}</strong> results for this query.
-<br><br>
+{% if title and 'Search' in title %}
+<h1 class="library-title">Found <strong>{{ total }}</strong> results for this query:</h1>
 {% endif %}
 
 <div id="scroller" class="scroll-content">
