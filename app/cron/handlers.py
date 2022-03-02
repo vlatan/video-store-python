@@ -66,9 +66,7 @@ def process_videos(app):
         PER_PAGE = current_app.config['NUM_RELATED_POSTS']
         # get all VALID videos from our playlists from YouTube
         all_videos, complete = get_youtube_videos(API_KEY)
-
-        # shuffle videos so they don't get posted uniformly
-        random.shuffle(all_videos)
+        all_videos = sorted(all_videos, key=lambda d: d['upload_date'])
 
         # loop through total number of videos
         for video in all_videos:
