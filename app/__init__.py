@@ -50,16 +50,18 @@ def create_app(default_config=Config):
     migrate.init_app(app, db, render_as_batch=True, compare_type=True)
     login_manager.init_app(app)
 
+    from app.main.routes import main
     from app.users.routes import users
     from app.posts.routes import posts
-    from app.main.routes import main
+    from app.lists.routes import lists
     from app.search.routes import search
     from app.auth.routes import auth
     from app.cron.handlers import cron
     from app.errors.handlers import errors
+    app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(posts)
-    app.register_blueprint(main)
+    app.register_blueprint(lists)
     app.register_blueprint(search)
     app.register_blueprint(auth)
     app.register_blueprint(cron)

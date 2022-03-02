@@ -1,0 +1,32 @@
+from app.models import Playlist
+from app.lists.helpers import parse_playlist, validate_playlist
+from flask import current_app
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, URL, ValidationError
+from googleapiclient.discovery import build
+
+
+class PlaylistForm(FlaskForm):
+    content = StringField('Post YouTube Playlist URL',
+                          validators=[DataRequired(), URL(message='')])
+    submit = SubmitField('Submit')
+
+    def validate_content(self, content):
+        # parse url, it will raise ValidationError if unable
+        playlist_id = parse_playlist(content.data)
+
+        # check if the playlits is already posted
+        if Playlist.query.filter_by(playlist_id=playlist_id).first():
+            raise ValidationError('Playlist already in the database.')
+
+        # construct youtube API service
+        api_key = current_app.config['YOUTUBE_API_KEY']
+        with build('youtube', 'v3', developerKey=api_key,
+                   cache_discovery=False) as youtube:
+            # get the playlist's metadata
+            # this will raise ValidationError if unable to fetch data
+            playlist_info = validate_playlist(playlist_id, youtube)
+
+        # transform the form data
+        content.data = playlist_info
