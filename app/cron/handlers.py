@@ -1,5 +1,4 @@
 import time
-import random
 import atexit
 from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
