@@ -31,7 +31,7 @@ def liked():
         return make_response(posts, 200)
 
     total = current_user.liked.count()
-    return render_template('user_content.html', posts=posts,
+    return render_template('library.html', posts=posts,
                            total=total, title='Liked',
                            content_title='Documentaries You Liked:')
 
@@ -58,7 +58,7 @@ def favorites():
         return make_response(posts, 200)
 
     total = current_user.faved.count()
-    return render_template('user_content.html', posts=posts,
+    return render_template('library.html', posts=posts,
                            total=total, title='Favorites',
                            content_title='Your Favorite Documentaries:')
 
