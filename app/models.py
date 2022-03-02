@@ -139,7 +139,7 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_posts(cls, page, per_page):
-        query = cls.query.order_by(cls.id.desc())
+        query = cls.query.order_by(cls.upload_date.desc())
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
