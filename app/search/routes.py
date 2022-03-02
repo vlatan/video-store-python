@@ -16,7 +16,7 @@ def before_request():
     g.search_form = SearchForm(formdata=request.args, meta={'csrf': False})
 
 
-@search.route('/search', methods=['GET', 'POST'])
+@search.route('/search/', methods=['GET', 'POST'])
 def search_results():
     """ Route to return search results using Elasticsearch """
     # posts per page
@@ -33,7 +33,7 @@ def search_results():
         # save keyword and the total number of posts in session
         session['keyword'], session['total'] = keyword, total
         # render the template
-        return render_template('content.html', posts=posts,
+        return render_template('search.html', posts=posts,
                                total=total, title='Search')
 
     keyword, total = session['keyword'], session['total']

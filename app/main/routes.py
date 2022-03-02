@@ -43,8 +43,7 @@ def home():
         return make_response(jsonify(posts), 200)
 
     # render template on the first view (GET method)
-    return render_template('content.html', posts=posts,
-                           total=per_page + 1)
+    return render_template('home.html', posts=posts)
 
 
 @main.route('/about')

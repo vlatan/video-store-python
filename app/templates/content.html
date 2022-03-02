@@ -1,47 +1,25 @@
-{% extends "base.html" %}
-
-{% block css %}
-{{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
-{% endblock css %}
-
-{% block content %}
-
-{% if title and 'Search' in title %}
-<h1 class="content-title">Found <strong>{{ total }}</strong> results for this query:</h1>
-{% endif %}
-
 <div id="scroller" class="scroll-content">
 
-	{% for post in posts %}
+    {% for post in posts %}
 
-	<a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
-		<img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
-			width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-			alt="{{ post.title }}">
-		<h2 class="video-title">{{ post.title }}</h2>
-	</a>
+    <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
+        <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
+            width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
+            alt="{{ post.title }}">
+        <h2 class="video-title">{{ post.title }}</h2>
+    </a>
 
-	{% endfor %}
+    {% endfor %}
 
-	<template id="post_template">
-		<a class="video-link" href="#">
-			<img class="video-img" src="#">
-			<h2 class="video-title"></h2>
-		</a>
-	</template>
+    <template id="post_template">
+        <a class="video-link" href="#">
+            <img class="video-img" src="#">
+            <h2 class="video-title"></h2>
+        </a>
+    </template>
 
 </div>
 
 <div class="sentinel" id="sentinel">
-	<div id="spinner" role="status"></div>
+    <div id="spinner" role="status"></div>
 </div>
-
-{% endblock content %}
-
-{% block scripts %}
-{% if total and total > config['POSTS_PER_PAGE'] %}
-<script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
-{% endif %}
-{{ super() }}
-{% endblock scripts %}
