@@ -27,7 +27,7 @@ def new_playlist():
         db.session.commit()
 
         flash('Playlist has been added to the database!', 'success')
-        return redirect(url_for('posts.playlists'))
+        return redirect(url_for('lists.playlists'))
 
     return render_template('form.html', title='Suggest YouTube Playlist',
                            form=form, legend='Playlist')
