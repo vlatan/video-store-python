@@ -59,7 +59,18 @@
 					</svg>
 				</button>
 				<!-- <a class="nav-item support" href="https://www.patreon.com/">Support</a> -->
-				<a class="nav-item" href="{{ url_for('lists.playlists') }}">Sources</a>
+				<div class="hamburger-dropdown">
+					<button class="hamburger-button">
+						<span></span>
+						<span></span>
+						<span></span>
+					</button>
+					<div class="hamburger-dropdown-content">
+						<a class="nav-item" href="{{ url_for('lists.playlists') }}">Sources</a>
+						<a class="nav-item" href="{{ url_for('main.about') }}">About</a>
+						<a class="nav-item" href="{{ url_for('main.about') }}">Privacy</a>
+					</div>
+				</div>
 				{% endif %}
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">

@@ -4,6 +4,7 @@ function sleep(time) {
 }
 
 window.addEventListener('click', function (event) {
+
     // Modals
     document.querySelectorAll('[data-modal]').forEach(function (element) {
         var modalName = element.dataset.modal;
@@ -27,6 +28,19 @@ window.addEventListener('click', function (event) {
             dropContent.classList.add('show-dropdown');
         } else if (deleteAccountClicked || menuNotClicked) {
             dropContent.classList.remove('show-dropdown');
+        }
+    }
+
+    // Hamburger Dropdown menu
+    var hamburgerDropContent = document.querySelector('.hamburger-dropdown-content');
+    if (hamburgerDropContent) {
+        var notDropped = !hamburgerDropContent.classList.contains('show-dropdown');
+        var hamburgerButton = event.target.closest('.hamburger-button');
+        var menuNotClicked = !event.target.closest('.show-dropdown');
+        if (notDropped && hamburgerButton) {
+            hamburgerDropContent.classList.add('show-dropdown');
+        } else if (menuNotClicked) {
+            hamburgerDropContent.classList.remove('show-dropdown');
         }
     }
 
@@ -63,5 +77,6 @@ if (loginState) {
         alert.remove();
     });
 }
+
 // remove login state
 localStorage.removeItem('LoggedIn');
