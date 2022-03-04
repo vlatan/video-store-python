@@ -178,7 +178,6 @@ button.search-arrow {
     padding: var(--content-padding) calc(var(--content-padding) + .5rem);
     background-color: var(--secondary-background-color);
     border: 1px solid var(--primary-border-color);
-    /* border-radius: 1rem; */
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     flex-direction: column;
