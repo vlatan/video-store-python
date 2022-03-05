@@ -34,6 +34,10 @@ ul, li {
     list-style: none;
 }
 
+a {
+    text-decoration: none;
+}
+
 
 /* ################# Header / Content ################# */
 
@@ -67,7 +71,6 @@ ul, li {
 a.logo {
     font-size: 1.8rem;
     font-weight: 900;
-    text-decoration: none;
     letter-spacing: -.06rem;
     line-height: 1;
     display: block;
@@ -146,57 +149,24 @@ button.search-arrow {
 
 /* ################# Dropdown Menu ################# */
 
-.hamburger-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
-
-.hamburger-button span {
-    width: 22px;
-    height: 2px;
-    background-color: #FFF;
-}
-
-.dropdown,
-.hamburger-dropdown {
+.dropdown {
     position: relative;
     display: flex;
     min-height: 1.70rem;
 }
 
-.dropdown-content,
-.hamburger-dropdown-content {
+.dropdown-content {
     display: none;
     position: absolute;
-    top: 160%;
+    top: 154%;
     right: 0;
     padding: var(--content-padding) calc(var(--content-padding) + .5rem);
     background-color: var(--secondary-background-color);
-    border: 1px solid var(--primary-border-color);
+    border-top: none;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     flex-direction: column;
     row-gap: .5rem;
-}
-
-.dropdown-content::after,
-.hamburger-dropdown-content::after {
-	/* content: ""; */
-	position: absolute;
-	top: 0;
-	right: 10%;
-	width: 0;
-	height: 0;
-	border: 10px solid transparent;
-	border-bottom-color: var(--primary-border-color);
-	border-top: 0;
-	margin-left: -10px;
-	margin-top: -10px;
 }
 
 .show-dropdown {
@@ -217,14 +187,12 @@ button.search-arrow {
     overflow: hidden;
     display: inline-flex;
     align-items: center;
-    text-decoration: none;
     line-height: 1.55;
 }
 
-.dropdown-content .nav-item,
-.hamburger-dropdown-content .nav-item {
+.dropdown-content .nav-item {
     white-space: nowrap;
-    margin-left: auto;
+    margin: auto;
 }
 
 a.nav-item::after {
@@ -456,7 +424,6 @@ button.cancel-button {
 .close-modal:hover,
 .close-modal:focus {
     color: #f44336;
-    text-decoration: none;
     cursor: pointer;
 }
 
@@ -574,6 +541,41 @@ button.cancel-button {
     background-color: #555;
 }
 
+
+/* ############# Footer ############# */
+
+.site-footer-wrap {
+    position: sticky;
+    z-index: 101;
+    bottom: 0;
+    max-width: var(--content-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    visibility: hidden;
+}
+
+.site-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--primary-background-color);
+    padding: .4rem 1rem;
+    width: max-content;
+    border: 1px solid var(--primary-border-color);
+    border-bottom: none;
+    font-size: .75rem;
+    visibility: visible;
+}
+
+.site-footer > * {
+    display: block;
+}
+
+.site-copy {
+    color: var(--primary-border-color);
+}
 
 /* ############# Media Queries ############# */
 
