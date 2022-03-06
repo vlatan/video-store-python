@@ -291,7 +291,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
     animation: fadeOut 2s ease-in forwards;
     animation-delay: .5s;
     position: fixed;
-    bottom: 1.5rem;
+    bottom: 2rem;
     right: 3rem;
     z-index: 100;
     border-radius: 1rem;
@@ -561,7 +561,7 @@ button.cancel-button {
     align-items: center;
     gap: 1rem;
     background-color: var(--primary-background-color);
-    padding: .4rem 1rem;
+    padding: .3rem .6rem;
     width: max-content;
     border: 1px solid var(--primary-border-color);
     border-bottom: none;
