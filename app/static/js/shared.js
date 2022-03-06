@@ -31,19 +31,6 @@ window.addEventListener('click', function (event) {
         }
     }
 
-    // Hamburger Dropdown menu
-    var hamburgerDropContent = document.querySelector('.hamburger-dropdown-content');
-    if (hamburgerDropContent) {
-        var notDropped = !hamburgerDropContent.classList.contains('show-dropdown');
-        var hamburgerButton = event.target.closest('.hamburger-button');
-        var menuNotClicked = !event.target.closest('.show-dropdown');
-        if (notDropped && hamburgerButton) {
-            hamburgerDropContent.classList.add('show-dropdown');
-        } else if (menuNotClicked) {
-            hamburgerDropContent.classList.remove('show-dropdown');
-        }
-    }
-
     // Mobile search form
     var searchForm = document.getElementById('searchForm');
     var logo = document.querySelector('a.logo');
