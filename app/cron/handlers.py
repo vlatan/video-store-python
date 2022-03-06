@@ -71,9 +71,9 @@ def process_videos(app):
         for video in all_videos:
             # if video is already posted
             if (posted := Post.query.filter_by(video_id=video['video_id']).first()):
-                # if it doesn't have playlist id
-                if not posted.playlist_id:
-                    # add playlist id
+                # if it doesn't match the playlist id
+                if posted.playlist_id != video['playlist_id']:
+                    # match playlist id
                     posted.playlist_id = video['playlist_id']
                     # asscoiate with existing playlist in our db
                     posted.playlist = video['playlist']
