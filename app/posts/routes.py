@@ -46,7 +46,7 @@ def new_post():
         db.session.commit()
 
         flash('Your post has been created!', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('posts.post', video_id=post.video_id))
 
     return render_template('form.html', title='Suggest YouTube Documentary',
                            form=form, legend='Documentary')
