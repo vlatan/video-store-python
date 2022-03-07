@@ -14,7 +14,7 @@ pages = Blueprint('pages', __name__)
 def new_page():
     form = PageForm()
     if form.validate_on_submit():
-        page = Page(title=form.title.data, text=form.content.data)
+        page = Page(title=form.title.data, content=form.content.data)
         db.session.add(page)
         flash('Your page has been created!', 'success')
         return render_template('page.html', page=page)
@@ -35,7 +35,7 @@ def edit_page(page_id):
     form = PageForm()
     form.title.data, form.content.data = page.title, page.text
     if form.validate_on_submit():
-        page = Page(title=form.title.data, text=form.content.data)
+        page = Page(title=form.title.data, content=form.content.data)
         db.session.add(page)
         flash('Your page has been updated!', 'success')
         return render_template('page.html', page=page)
