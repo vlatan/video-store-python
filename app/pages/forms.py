@@ -4,7 +4,9 @@ from wtforms.validators import DataRequired
 
 
 class PageForm(FlaskForm):
-    title = StringField(label='Title', validators=[DataRequired()])
-    content = TextAreaField(label='Text', validators=[DataRequired()],
-                            render_kw={'placeholder': 'Enter text...You can use markdown.'})
+    title = StringField(label='Title', validators=[DataRequired()],
+                        render_kw={'placeholder': 'Your title...'})
+    content = TextAreaField(label='Content', validators=[DataRequired()],
+                            render_kw={'placeholder': 'You can use markdown...',
+                                       'rows': 12})
     submit = SubmitField(label='Submit')
