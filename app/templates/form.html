@@ -11,9 +11,17 @@
         {{ form.hidden_tag() }}
         <fieldset class="form-group">
             <legend class="form-legend">{{ legend }}</legend>
+            {% if form.title %}
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                {{ form.title(class="form-input",
+                placeholder=form.title.render_kw.placeholder) }}
+            </div>
+            {% endif %}
             <div class="form-group">
                 {{ form.content.label(class="form-label") }}
-                {{ form.content(class="form-input", placeholder=form.content.render_kw.placeholder) }}
+                {{ form.content(class="form-input", rows=form.content.render_kw.rows,
+                placeholder=form.content.render_kw.placeholder) }}
             </div>
         </fieldset>
         <div class="form-group button-group">
