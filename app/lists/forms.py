@@ -9,7 +9,8 @@ from googleapiclient.discovery import build
 
 class PlaylistForm(FlaskForm):
     content = StringField('Post YouTube Playlist URL',
-                          validators=[DataRequired(), URL(message='')])
+                          validators=[DataRequired(), URL(message='')],
+                          render_kw={'placeholder': 'Playlist URL here...'})
     submit = SubmitField('Submit')
 
     def validate_content(self, content):

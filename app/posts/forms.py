@@ -10,7 +10,8 @@ from googleapiclient.discovery import build
 
 class PostForm(FlaskForm):
     content = StringField('Post YouTube Video URL',
-                          validators=[DataRequired(), URL(message='')])
+                          validators=[DataRequired(), URL(message='')],
+                          render_kw={'placeholder': 'Video URL here...'})
     submit = SubmitField('Submit')
 
     def validate_content(self, content):

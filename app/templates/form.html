@@ -13,7 +13,7 @@
             <legend class="form-legend">{{ legend }}</legend>
             <div class="form-group">
                 {{ form.content.label(class="form-label") }}
-                {{ form.content(class="form-input", placeholder="URL here...") }}
+                {{ form.content(class="form-input", placeholder=form.content.render_kw.placeholder) }}
             </div>
         </fieldset>
         <div class="form-group button-group">
