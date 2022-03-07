@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+<style>
+    .page {
+        padding: calc(var(--content-padding) * 1.5);
+        background: var(--secondary-background-color);
+        line-height: 1.4;
+        border-radius: 1rem;
+        margin: 0 auto;
+        max-width: 800px;
+    }
+
+    .page a {
+        text-decoration: underline;
+        font-weight: bold;
+    }
+
+    .page p {
+        margin: 1rem 0;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div class="page">
+    <h1>{{ title }}</h1>
+    {{ page_content | safe }}
+</div>
+
+{% endblock content %}
