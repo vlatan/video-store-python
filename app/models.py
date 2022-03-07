@@ -173,6 +173,12 @@ class Post(Base, SearchableMixin):
         return [post.serialize for post in posts]
 
 
+class Page(Base):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(256), nullable=False)
+    content = db.Column(db.Text)
+
+
 class Playlist(Base):
     id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.String(50), unique=True, nullable=False)

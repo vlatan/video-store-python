@@ -53,6 +53,7 @@ def create_app(default_config=Config):
     from app.main.routes import main
     from app.users.routes import users
     from app.posts.routes import posts
+    from app.pages.routes import pages
     from app.lists.routes import lists
     from app.search.routes import search
     from app.auth.routes import auth
@@ -61,6 +62,7 @@ def create_app(default_config=Config):
     app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(posts)
+    app.register_blueprint(pages)
     app.register_blueprint(lists)
     app.register_blueprint(search)
     app.register_blueprint(auth)
