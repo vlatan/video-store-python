@@ -33,7 +33,6 @@ def post(video_id):
 
 
 @posts.route('/video/new', methods=['GET', 'POST'])
-@login_required
 @admin_required
 def new_post():
     form = PostForm()

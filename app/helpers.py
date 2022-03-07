@@ -3,12 +3,13 @@ import requests
 from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
-from flask_login import current_user
+from flask_login import current_user, login_required
 from elasticsearch import ImproperlyConfigured, ElasticsearchException
 
 
 def admin_required(func):
     @wraps(func)
+    @login_required
     def only_admin(*args, **kwargs):
         admin_openid = current_app.config['ADMIN_OPENID']
         if current_user.google_id != admin_openid:

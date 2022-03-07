@@ -1,7 +1,7 @@
 import time
 from flask import render_template, url_for, flash
 from flask import redirect, Blueprint, current_app, request, jsonify, make_response
-from flask_login import current_user, login_required
+from flask_login import current_user
 from app import db
 from app.models import Post, Playlist
 from app.helpers import admin_required
@@ -11,7 +11,6 @@ lists = Blueprint('lists', __name__)
 
 
 @lists.route('/source/new', methods=['GET', 'POST'])
-@login_required
 @admin_required
 def new_playlist():
     form = PlaylistForm()
