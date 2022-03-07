@@ -3,19 +3,24 @@
     justify-content: center;
     align-items: center;
     min-height: 500px;
-    width: 50%;
+    max-width: 700px;
     margin: 0 auto;
 }
 
 .form-content form {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-padding);
 }
 
 .form-content fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--content-padding);
     border: 1px solid var(--primary-border-color);
     border-radius: 5px;
     padding: var(--content-padding);
-    margin-bottom: var(--content-padding);
     background-color: var(--secondary-background-color);
 }
 
