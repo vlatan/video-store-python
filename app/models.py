@@ -1,12 +1,10 @@
-import markdown
-from datetime import datetime
-from app import db, login_manager
-from flask_login import UserMixin
-from flask import current_app
-from app import cache
-from app.helpers import add_to_index
-from app.helpers import remove_from_index, query_index
+from markdown import markdown
 from sqlalchemy import func, inspect
+from datetime import datetime
+from flask import current_app
+from flask_login import UserMixin
+from app import db, login_manager, cache
+from app.helpers import add_to_index, remove_from_index, query_index
 
 
 @login_manager.user_loader
@@ -180,8 +178,9 @@ class Page(Base):
     content = db.Column(db.Text)
 
     @property
+    @cache.memoize(86400)
     def html_content(self):
-        return markdown.markdown(self.content)
+        return markdown(self.content)
 
 
 class Playlist(Base):
