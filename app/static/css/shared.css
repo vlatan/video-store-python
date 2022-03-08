@@ -574,7 +574,7 @@ button.cancel-button {
 }
 
 .site-copy {
-    color: var(--primary-border-color);
+    color: rgb(120, 120, 120);
 }
 
 /* ############# Media Queries ############# */
