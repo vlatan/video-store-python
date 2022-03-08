@@ -6,7 +6,12 @@
 {% endblock css %}
 
 {% block meta %}
-<link rel="canonical" href="{{ url_for('main.home', _external=True) }}" />
+{% set url = url_for('main.home', _external=True) %}
+<link rel="canonical" href="{{ url }}" />
+<meta property='og:title' content='{{ config["APP_NAME"] }}'>
+<meta property="og:type" content="website" />
+<meta property='og:url' content='{{ url }}'>
+<meta property='og:site_name' content='{{ config["APP_NAME"] }}'>
 {% endblock meta %}
 
 {% block content %}

@@ -5,6 +5,10 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
 {% endblock css %}
 
+{% block title_tag %}
+{{ title }} | {{ super() }}
+{% endblock title_tag %}
+
 {% block content %}
 
 <h1 class="content-title">{{ content_title }}</h1>

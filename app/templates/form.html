@@ -5,6 +5,10 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form.css') }}">
 {% endblock css %}
 
+{% block title_tag %}
+{{ title }} | {{ super() }}
+{% endblock title_tag %}
+
 {% block content %}
 <div class="form-content">
     <form method="POST" action="">

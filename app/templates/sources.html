@@ -5,6 +5,19 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/playlists.css') | autoversion }}">
 {% endblock css %}
 
+{% block meta %}
+{% set url = url_for('lists.playlists', _external=True) %}
+<link rel="canonical" href="{{ url }}" />
+<meta property='og:title' content='{{ title }}'>
+<meta property='og:type' content='article'>
+<meta property='og:url' content='{{ url }}'>
+{{ super() }}
+{% endblock meta %}
+
+{% block title_tag %}
+{{ title }} | {{ super() }}
+{% endblock title_tag %}
+
 {% block content %}
 
 <div class="playlists-content">

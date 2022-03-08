@@ -13,8 +13,12 @@
 <meta property='og:url' content='{{ post_url }}'>
 <meta property='og:image' content='{{ thumb }}'>
 <meta name='thumbnail' content='{{ thumb }}'>
-<meta property='og:site_name' content='{{ config["APP_NAME"] }}'>
+{{ super() }}
 {% endblock meta %}
+
+{% block title_tag %}
+{{ post.title }} | {{ super() }}
+{% endblock title_tag %}
 
 {% block content %}
 <article class="media-content">

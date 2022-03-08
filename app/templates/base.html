@@ -13,14 +13,16 @@
 	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/shared.css') | autoversion }}">
 	{% endblock css %}
 
-	{% block meta %}{% endblock meta %}
+	{% set app_name = config["APP_NAME"] %}
+
+	{% block meta %}
+	<meta property='og:site_name' content='{{ app_name }}'>
+	{% endblock meta %}
 
 	<title>
-		{% if title %}
-		{{ title }} | {{ config['APP_NAME'] }}
-		{% else %}
-		{{ config['APP_NAME'] }}
-		{% endif %}
+		{% block title_tag %}
+		{{ app_name }}
+		{% endblock title_tag %}
 	</title>
 </head>
 
@@ -28,9 +30,9 @@
 	<div class="site-header-wrap">
 		<header class="site-header">
 			{% if title %}
-			<a class="logo" href="/">{{ config['APP_NAME'] }}</a>
+			<a class="logo" href="/">{{ app_name }}</a>
 			{% else %}
-			<h1><a class="logo" href="/">{{ config['APP_NAME'] }}</a></h1>
+			<h1><a class="logo" href="/">{{ app_name }}</a></h1>
 			{% endif %}
 			<nav class="navbar">
 				{% if g.search_form %}
@@ -158,7 +160,7 @@
 
 	<div class="site-footer-wrap">
 		<footer class="site-footer">
-			<span class="site-copy">{{ config['APP_NAME'] }} &copy; 2022</span>
+			<span class="site-copy">{{ app_name }} &copy; 2022</span>
 			<a class="nav-item" href="{{ url_for('lists.playlists') }}">Sources</a>
 			<a class="nav-item" href="{{ url_for('pages.page', id=2) }}">About</a>
 			<a class="nav-item" href="{{ url_for('pages.page', id=3) }}">Privacy</a>

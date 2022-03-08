@@ -11,8 +11,12 @@
 <meta property='og:title' content='{{ page.title }}'>
 <meta property='og:type' content='article'>
 <meta property='og:url' content='{{ page_url }}'>
-<meta property='og:site_name' content='{{ config["APP_NAME"] }}'>
+{{ super() }}
 {% endblock meta %}
+
+{% block title_tag %}
+{{ page.title }} | {{ super() }}
+{% endblock title_tag %}
 
 {% block content %}
 <div class="page">

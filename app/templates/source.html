@@ -6,8 +6,17 @@
 {% endblock css %}
 
 {% block meta %}
-<link rel="canonical" href="{{ url_for('lists.playlist_videos', playlist_id=playlist_id, _external=True) }}" />
+{% set url = url_for('lists.playlist_videos', playlist_id=playlist_id, _external=True) %}
+<link rel="canonical" href="{{ url }}" />
+<meta property='og:title' content='{{ title }}'>
+<meta property='og:type' content='article'>
+<meta property='og:url' content='{{ url }}'>
+{{ super() }}
 {% endblock meta %}
+
+{% block title_tag %}
+{{ title }} | {{ super() }}
+{% endblock title_tag %}
 
 {% block content %}
 <h1 class="content-title">{{ title }}</h1>
