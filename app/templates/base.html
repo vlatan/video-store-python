@@ -71,6 +71,7 @@
 						{% if current_user.is_admin %}
 						<a class="nav-item" href="{{ url_for('posts.new_post') }}">New Video</a>
 						<a class="nav-item" href="{{ url_for('lists.new_playlist') }}">New Source</a>
+						<a class="nav-item" href="{{ url_for('pages.new_page') }}">New Page</a>
 						{% endif %}
 						<a class="nav-item" href="{{ url_for('users.favorites') }}">Watch Later</a>
 						<a class="nav-item" href="{{ url_for('auth.logout') }}">Log out</a>
