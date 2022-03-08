@@ -1,5 +1,4 @@
 
-import markdown
 from flask import redirect, render_template, flash, url_for, Blueprint
 from app import db
 from app.models import Page
@@ -12,8 +11,7 @@ pages = Blueprint('pages', __name__)
 @pages.route('/page/<int:id>/')
 def page(id):
     page = Page.query.get_or_404(id)
-    return render_template('page.html', title=page.title,
-                           page_content=markdown.markdown(page.content))
+    return render_template('page.html', page=page)
 
 
 @pages.route('/page/new', methods=['GET', 'POST'])

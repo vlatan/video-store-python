@@ -1,3 +1,4 @@
+import markdown
 from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
@@ -177,6 +178,10 @@ class Page(Base):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text)
+
+    @property
+    def html_content(self):
+        return markdown.markdown(self.content)
 
 
 class Playlist(Base):
