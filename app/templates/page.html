@@ -5,11 +5,18 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/page.css') | autoversion }}">
 {% endblock css %}
 
+{% block meta %}
+{% set page_url = url_for('pages.page', id=page.id, _external=True) %}
+<link rel="canonical" href="{{ page_url }}" />
+<meta property='og:title' content='{{ page.title }}'>
+<meta property='og:type' content='article'>
+<meta property='og:url' content='{{ page_url }}'>
+<meta property='og:site_name' content='{{ config["APP_NAME"] }}'>
+{% endblock meta %}
+
 {% block content %}
-
 <div class="page">
-    <h1>{{ title }}</h1>
-    {{ page_content | safe }}
+    <h1>{{ page.title }}</h1>
+    {{ page.html_content | safe }}
 </div>
-
 {% endblock content %}
