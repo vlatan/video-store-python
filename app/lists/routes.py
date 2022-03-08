@@ -62,4 +62,4 @@ def playlists():
     """ Route to return the channels """
     # Query the Playlist table
     playlists = Playlist.query.order_by(Playlist.id.desc())
-    return render_template('sources.html', posts=playlists, title='Playlists')
+    return render_template('sources.html', posts=playlists, title='Sources')
