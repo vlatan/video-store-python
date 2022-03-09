@@ -182,6 +182,7 @@ class Page(Base):
         return markdown(self.content)
 
     def delete_cache(self):
+        # https://flask-caching.readthedocs.io/en/latest/#deleting-memoize-cache
         cache.delete_memoized(self.html_content)
 
 
