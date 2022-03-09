@@ -23,8 +23,11 @@ html, button, input, textarea, a {
   color: var(--primary-font-color);
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  min-height: 100vh;
   background-color: var(--primary-background-color);
 }
 
@@ -53,7 +56,7 @@ a {
 }
 
 .content-wrap {
-  min-height: 105vh;
+  min-height: 100%;
 }
 
 .site-header {
