@@ -1,0 +1,104 @@
+.scroll-content {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(50px, 320px));
+    justify-content: stretch;
+    gap: var(--content-padding);
+}
+
+@media screen and (max-width: 1024px) {
+    .scroll-content {
+        grid-template-columns: repeat(3, minmax(50px, 320px));
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .scroll-content {
+        grid-template-columns: repeat(2, minmax(50px, 320px));
+    }
+}
+
+@media screen and (max-width: 360px) {
+    .scroll-content {
+        grid-template-columns: minmax(50px, 320px);
+    }
+}
+
+.video-block {
+    position: relative;
+}
+
+a.video-link {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--content-padding) / 2);
+    text-decoration: none;
+}
+
+a.video-link:hover {
+    color: white;
+}
+
+img.video-img {
+    width: 100%;
+    height: auto;
+}
+
+h2.video-title {
+    font-weight: normal;
+    font-size: .9rem;
+}
+
+.sentinel {
+    margin: 4rem auto;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+}
+
+.spinner {
+    border: 7px solid var(--primary-background-color);
+    border-top: 7px solid var(--primary-font-color);
+    border-bottom: 7px solid var(--primary-font-color);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+
+  /* ################# Specific to User Library ################# */
+
+  .remove-option {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-background-color);
+    font-size: 1.2rem;
+    line-height: 1;
+    color: white;
+    top: 5px;
+    right: 5px;
+    z-index: 1;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+}
+
+.remove-option:hover {
+    color: black;
+    background-color: white;
+}
+
+  .content-title {
+      font-size: 1rem;
+      line-height: normal;
+      font-weight: normal;
+      margin-bottom: var(--content-padding);
+  }
