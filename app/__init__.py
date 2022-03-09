@@ -9,15 +9,17 @@ from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_minify import Minify
 from app.config import Config
 from elasticsearch import Elasticsearch
 from apscheduler.schedulers.background import BackgroundScheduler
 
 cache = Cache()
 db = SQLAlchemy()
-migrate = Migrate()
-
+migrate = Migrate(render_as_batch=True, compare_type=True)
+minify = Minify(html=True, js=True, cssless=True)
 login_manager = LoginManager()
+
 # where the user will be redirected if she's not logged in
 login_manager.login_view = 'main.home'
 # the class/category of the flash message when the user is not logged in
@@ -47,7 +49,8 @@ def create_app(default_config=Config):
 
     cache.init_app(app)
     db.init_app(app)
-    migrate.init_app(app, db, render_as_batch=True, compare_type=True)
+    migrate.init_app(app, db)
+    minify.init_app(app)
     login_manager.init_app(app)
 
     from app.main.routes import main
