@@ -1,6 +1,6 @@
 
 from flask import redirect, render_template, flash, url_for, Blueprint
-from app import db
+from app import db, cache
 from app.models import Page
 from app.pages.forms import PageForm
 from app.helpers import admin_required
@@ -36,6 +36,7 @@ def edit_page(id):
     if form.validate_on_submit():
         page.title, page.content = form.title.data, form.content.data
         db.session.commit()
+        page.delete_cache()
         flash('Your page has been updated!', 'success')
         return redirect(url_for('pages.page', id=page.id))
     form.title.data, form.content.data = page.title, page.content

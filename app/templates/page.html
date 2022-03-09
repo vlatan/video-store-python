@@ -21,6 +21,6 @@
 {% block content %}
 <div class="page">
     <h1>{{ page.title }}</h1>
-    {{ page.html_content | safe }}
+    {{ page.html_content() | safe }}
 </div>
 {% endblock content %}

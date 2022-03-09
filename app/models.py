@@ -177,10 +177,12 @@ class Page(Base):
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text)
 
-    @property
     @cache.memoize(86400)
     def html_content(self):
         return markdown(self.content)
+
+    def delete_cache(self):
+        cache.delete_memoized(self.html_content)
 
 
 class Playlist(Base):
