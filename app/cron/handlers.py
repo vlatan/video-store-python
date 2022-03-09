@@ -62,7 +62,6 @@ def revalidate_single_video(post, api_key):
 def process_videos(app):
     with app.app_context():
         API_KEY = current_app.config['YOUTUBE_API_KEY']
-        PER_PAGE = current_app.config['NUM_RELATED_POSTS']
         # get all VALID videos from our playlists from YouTube
         all_videos, complete = get_youtube_videos(API_KEY)
         all_videos = sorted(all_videos, key=lambda d: d['upload_date'])
@@ -101,7 +100,7 @@ def process_videos(app):
 
         # revalidate orphan videos (not attached to playlist)
         for post in Post.query.filter_by(playlist_id=None).all():
-            revalidate_single_video(post, API_KEY, PER_PAGE)
+            revalidate_single_video(post, API_KEY)
             time.sleep(1)
 
 
