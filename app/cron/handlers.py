@@ -99,7 +99,8 @@ def process_videos(app):
                 time.sleep(1)
 
         # revalidate orphan videos (not attached to playlist)
-        for post in Post.query.filter_by(playlist_id=None).all():
+        orphan_posts = Post.query.filter_by(playlist_id=None).all()
+        for post in orphan_posts:
             revalidate_single_video(post, API_KEY)
             time.sleep(1)
 
