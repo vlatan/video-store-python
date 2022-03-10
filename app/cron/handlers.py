@@ -86,10 +86,13 @@ def process_videos(app):
                 db.session.commit()
                 time.sleep(1)
 
+        # get sources ids
+        sources = [pl.playlist_id for pl in Playlist.query.all()]
+
         # delete missing videos if all VALID videos are fetched from YT
         if complete:
             fetched_ids = {video['video_id'] for video in all_videos}
-            posted = Post.query.filter(Post.playlist_id != None).all()
+            posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
             posted_ids = {post.video_id for post in posted}
             to_delete = Post.query.filter(
                 Post.video_id.in_(posted_ids - fetched_ids)).all()
@@ -98,8 +101,9 @@ def process_videos(app):
                 db.session.commit()
                 time.sleep(1)
 
-        # revalidate orphan videos (not attached to playlist)
-        orphan_posts = Post.query.filter_by(playlist_id=None).all()
+        # revalidate orphan videos (not attached to any source/playlist)
+        orphan_posts = Post.query.filter((Post.playlist_id == None) | (
+            Post.playlist_id.not_in(sources))).all()
         for post in orphan_posts:
             revalidate_single_video(post, API_KEY)
             time.sleep(1)
@@ -115,7 +119,7 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     scheduler.add_job(func=process_videos,
                       args=[current_app._get_current_object()],
-                      trigger='cron', hour=17,
+                      trigger='cron', hour=15,
                       id='post', replace_existing=True)
 
     atexit.register(lambda: scheduler.shutdown(wait=False))
