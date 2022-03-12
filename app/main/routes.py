@@ -74,4 +74,5 @@ def sitemap_page(what, page):
 
 @main.route('/<path:name>')
 def favicons(name):
+    """ Serve favicon icons as if from root """
     return send_from_directory('static/favicons/', name)
