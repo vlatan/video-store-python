@@ -2,7 +2,7 @@ import math
 from markdown import markdown
 from sqlalchemy import func, inspect
 from datetime import datetime
-from flask import current_app
+from flask import current_app, escape
 from flask_login import UserMixin
 from app import db, login_manager, cache
 from app.helpers import add_to_index, remove_from_index, query_index
@@ -144,7 +144,7 @@ class Post(Base, SearchableMixin, SitemapMixin):
         """ Return object data in easily serializable format. """
         return {
             'video_id': self.video_id,
-            'title': self.title,
+            'title': escape(self.title),
             'thumbnails': self.thumbnails
         }
 
