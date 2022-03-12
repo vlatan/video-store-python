@@ -1,9 +1,9 @@
 import os
 import time
-from flask import render_template, request, current_app
-from flask import Blueprint, jsonify, make_response, url_for
+from flask import render_template, request, current_app, abort
+from flask import Blueprint, jsonify, make_response
 from flask_login import current_user
-from app.models import Post
+from app.models import Playlist, Post, Page
 
 main = Blueprint('main', __name__)
 
@@ -44,3 +44,29 @@ def home():
 
     # render template on the first view (GET method)
     return render_template('home.html', posts=posts)
+
+
+@main.route('/sitemap.xml')
+def sitemap_index():
+    per_page = current_app.config['POSTS_PER_PAGE'] * 2
+    posts = Post.get_sitemap(per_page)
+    sources = Playlist.get_sitemap(per_page)
+    pages = Page.get_sitemap(per_page)
+    return render_template('sitemap_index.xml', posts=posts,
+                           sources=sources, pages=pages)
+
+
+@main.route('/<string:what>-sitemap-<int:page>.xml')
+def sitemap_page(what, page):
+    per_page = current_app.config['POSTS_PER_PAGE'] * 2
+    if what == 'post':
+        posts, tp = Post.get_sitemap(per_page), 'posts'
+    elif what == 'page':
+        posts, tp = Page.get_sitemap(per_page), 'pages'
+    elif what == 'source':
+        posts, tp = Playlist.get_sitemap(per_page), 'sources'
+
+    if not (posts := posts.get(page)):
+        abort(404)
+
+    return render_template('sitemap_page.xml', posts=posts, type=tp)

@@ -1,3 +1,4 @@
+import math
 from markdown import markdown
 from sqlalchemy import func, inspect
 from datetime import datetime
@@ -78,6 +79,18 @@ class SearchableMixin(object):
             add_to_index(cls.__tablename__, obj)
 
 
+class SitemapMixin(object):
+    @classmethod
+    @cache.memoize(86400)
+    def get_sitemap(cls, per_page):
+        query = cls.query.order_by(cls.updated_at.desc())
+        num_pages = math.ceil(query.count() / per_page)
+        sitemap = {}
+        for i in range(1, num_pages + 1):
+            sitemap[i] = query.paginate(i, per_page, False).items
+        return sitemap
+
+
 class User(Base, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
     google_id = db.Column(db.String(256), unique=True,
@@ -104,7 +117,7 @@ class User(Base, UserMixin, ActionMixin):
         return False
 
 
-class Post(Base, SearchableMixin):
+class Post(Base, SearchableMixin, SitemapMixin):
     __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True, index=True)
     provider = db.Column(db.String(7), default='YouTube')
@@ -172,7 +185,7 @@ class Post(Base, SearchableMixin):
         return [post.serialize for post in posts]
 
 
-class Page(Base):
+class Page(Base, SitemapMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text)
@@ -186,7 +199,7 @@ class Page(Base):
         cache.delete_memoized(self.html_content)
 
 
-class Playlist(Base):
+class Playlist(Base, SitemapMixin):
     id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.String(50), unique=True, nullable=False)
     channel_id = db.Column(db.String(50), unique=True, nullable=False)
