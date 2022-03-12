@@ -1,7 +1,7 @@
 import os
 import time
 from flask import render_template, request, current_app, abort
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
 from app.models import Playlist, Post, Page
 
@@ -70,3 +70,8 @@ def sitemap_page(what, page):
         abort(404)
 
     return render_template('sitemap_page.xml', posts=posts, type=tp)
+
+
+@main.route('/<path:name>')
+def favicons(name):
+    return send_from_directory('static/favicons/', name)
