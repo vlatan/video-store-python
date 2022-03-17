@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <?xml-stylesheet type="text/xsl" href="{{ url_for('static', filename='css/sitemap.xsl') }}"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-  {% for post in posts %}
+    {% for loc, lastmod in data.items() %}
     <url>
-      {% if type == 'posts' %}
-      <loc>{{ url_for('posts.post', video_id=post.video_id, _external=True) }}</loc>
-      {% elif type == 'pages' %}
-      <loc>{{ url_for('pages.page', id=post.id, _external=True) }}</loc>
-      {% elif type == 'sources' %}
-      <loc>{{ url_for('lists.playlist_videos', playlist_id=post.playlist_id, _external=True) }}</loc>
-      {% endif %}
-      <lastmod>{{ post.updated_at }}</lastmod>
+        <loc>{{ loc }}</loc>
+        <lastmod>{{ lastmod }}</lastmod>
     </url>
-  {% endfor %}
+    {% endfor %}
 </urlset>

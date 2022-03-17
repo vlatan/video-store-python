@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="{{ url_for('static', filename='css/sitemap.xsl') }}"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    {% for page_num, posts in posts.items() %}
+    {% for loc, lastmod in data.items() %}
     <sitemap>
-        <loc>{{ url_for('main.sitemap_page', what='post', page=page_num, _external=True) }}</loc>
-        <lastmod>{{ posts[0].updated_at }}</lastmod>
-    </sitemap>
-    {% endfor %}
-
-    {% for page_num, sources in sources.items() %}
-    <sitemap>
-        <loc>{{ url_for('main.sitemap_page', what='source', page=page_num, _external=True) }}</loc>
-        <lastmod>{{ sources[0].updated_at }}</lastmod>
-    </sitemap>
-    {% endfor %}
-
-    {% for page_num, pages in pages.items() %}
-    <sitemap>
-        <loc>{{ url_for('main.sitemap_page', what='page', page=page_num, _external=True) }}</loc>
-        <lastmod>{{ pages[0].updated_at }}</lastmod>
+        <loc>{{ loc }}</loc>
+        <lastmod>{{ lastmod }}</lastmod>
     </sitemap>
     {% endfor %}
 </sitemapindex>

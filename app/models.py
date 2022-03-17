@@ -1,8 +1,8 @@
-import math
+from collections import OrderedDict
 from markdown import markdown
 from sqlalchemy import func, inspect
 from datetime import datetime
-from flask import current_app, escape
+from flask import current_app, escape, url_for
 from flask_login import UserMixin
 from app import db, login_manager, cache
 from app.helpers import add_to_index, remove_from_index, query_index
@@ -82,13 +82,51 @@ class SearchableMixin(object):
 class SitemapMixin(object):
     @classmethod
     @cache.memoize(86400)
-    def get_sitemap(cls, per_page):
-        query = cls.query.order_by(cls.updated_at.desc())
-        num_pages = math.ceil(query.count() / per_page)
-        sitemap = {}
-        for i in range(1, num_pages + 1):
-            sitemap[i] = query.paginate(i, per_page, False).items
-        return sitemap
+    def get_index(cls, order_by='id'):
+        per_page = current_app.config['POSTS_PER_PAGE'] * 2
+        data = OrderedDict()
+
+        query, i = cls.query.order_by(getattr(cls, order_by).desc()), 1
+        while True:
+            pagination = query.paginate(i, per_page, False)
+            url = url_for('main.sitemap_page', what=cls.__tablename__,
+                          page=i, _external=True)
+            if hasattr(cls, 'posts'):
+                lastmods = []
+                for item in pagination.items:
+                    freshest = max(item.posts, key=lambda x: x.upload_date)
+                    lastmods.append(freshest.created_at)
+                data[url] = max(lastmods).strftime('%Y-%m-%d')
+            else:
+                lastmod = max([obj.updated_at for obj in pagination.items])
+                data[url] = lastmod.strftime('%Y-%m-%d')
+            if not pagination.has_next:
+                break
+            i += 1
+        return data
+
+    @classmethod
+    @cache.memoize(86400)
+    def get_sitemap_page(cls, page, order_by='id'):
+        per_page = current_app.config['POSTS_PER_PAGE'] * 2
+        data = OrderedDict()
+
+        objects = cls.query.order_by(getattr(cls, order_by).desc())
+        objects = objects.paginate(page, per_page, False).items
+        for obj in objects:
+            if hasattr(obj, 'video_id'):
+                url = url_for(
+                    'posts.post', video_id=obj.video_id, _external=True)
+                data[url] = obj.updated_at.strftime('%Y-%m-%d')
+            elif hasattr(obj, 'playlist_id'):
+                url = url_for('lists.playlist_videos',
+                              playlist_id=obj.playlist_id, _external=True)
+                lastmod = max(obj.posts, key=lambda x: x.upload_date)
+                data[url] = lastmod.created_at.strftime('%Y-%m-%d')
+            else:
+                url = url_for('pages.page', id=obj.id, _external=True)
+                data[url] = obj.updated_at.strftime('%Y-%m-%d')
+        return data
 
 
 class User(Base, UserMixin, ActionMixin):

@@ -1,8 +1,10 @@
 import os
 import time
-from flask import render_template, request, current_app, abort
+from collections import OrderedDict
+from flask import render_template, request, current_app, abort, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
+from app import cache
 from app.models import Playlist, Post, Page
 
 main = Blueprint('main', __name__)
@@ -47,29 +49,50 @@ def home():
 
 
 @main.route('/sitemap.xml')
+@cache.cached(timeout=86400)
 def sitemap_index():
-    per_page = current_app.config['POSTS_PER_PAGE'] * 2
-    posts = Post.get_sitemap(per_page)
-    sources = Playlist.get_sitemap(per_page)
-    pages = Page.get_sitemap(per_page)
-    return render_template('sitemap_index.xml', posts=posts,
-                           sources=sources, pages=pages)
+    data = OrderedDict()
+
+    data.update(Post.get_index(order_by='upload_date'))
+    data.update(Page.get_index())
+    data.update(Playlist.get_index())
+
+    url = url_for('main.sitemap_page', what='misc', page=1, _external=True)
+    posts = Post.query.order_by(Post.upload_date.desc())
+    sources = Playlist.query.order_by(Playlist.id.desc())
+    lastmod = max(posts.first().created_at, sources.first().created_at)
+    data[url] = lastmod.strftime('%Y-%m-%d')
+
+    if not data:
+        abort(404)
+
+    return render_template('sitemap_index.xml', data=data)
 
 
 @main.route('/<string:what>-sitemap-<int:page>.xml')
+@cache.cached(timeout=86400)
 def sitemap_page(what, page):
-    per_page = current_app.config['POSTS_PER_PAGE'] * 2
-    if what == 'post':
-        posts, tp = Post.get_sitemap(per_page), 'posts'
-    elif what == 'page':
-        posts, tp = Page.get_sitemap(per_page), 'pages'
-    elif what == 'source':
-        posts, tp = Playlist.get_sitemap(per_page), 'sources'
+    data = OrderedDict()
 
-    if not (posts := posts.get(page)):
+    if what == 'post':
+        data.update(Post.get_sitemap_page(page, order_by='upload_date'))
+    elif what == 'page':
+        data.update(Page.get_sitemap_page(page))
+    elif what == 'playlist':
+        data.update(Playlist.get_sitemap_page(page))
+    elif what == 'misc':
+        home_lastmod = Post.query.order_by(
+            Post.upload_date.desc()).first().created_at
+        data[url_for('main.home', _external=True)] = home_lastmod
+
+        sources_lastmod = Playlist.query.order_by(
+            Playlist.id.desc()).first().created_at
+        data[url_for('lists.playlists', _external=True)] = sources_lastmod
+
+    if not data:
         abort(404)
 
-    return render_template('sitemap_page.xml', posts=posts, type=tp)
+    return render_template('sitemap_page.xml', data=data)
 
 
 @main.route('/<path:name>')
