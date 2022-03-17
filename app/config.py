@@ -7,8 +7,12 @@ class Config:
     # load the enviroment variables
     load_dotenv()
 
-    # Flask app secret key
+    # app
+    APP_NAME = os.getenv('APP_NAME')
     SECRET_KEY = os.getenv('SECRET_KEY')
+    DEBUG = True if os.getenv('DEBUG') == 'True' else False
+    ENV = 'development' if DEBUG else 'production'
+    LOG_FILE = os.getenv('LOG_FILE')
 
     # cache
     CACHE_TYPE = 'SimpleCache'  # Flask-Caching related configs
@@ -29,7 +33,6 @@ class Config:
     # Other
     POSTS_PER_PAGE = int(os.getenv('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.getenv('NUM_RELATED_POSTS'))
-    APP_NAME = os.getenv('APP_NAME')
 
     # Facebook authentication
     FB_CLIENT_ID = os.getenv('FB_CLIENT_ID')

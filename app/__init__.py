@@ -1,9 +1,4 @@
-import os
-import sys
 import logging
-import atexit
-import signal
-from pytz import utc
 from flask import Flask
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
@@ -12,7 +7,6 @@ from flask_login import LoginManager
 from flask_minify import Minify
 from app.config import Config
 from elasticsearch import Elasticsearch
-from apscheduler.schedulers.background import BackgroundScheduler
 
 cache = Cache()
 db = SQLAlchemy()
@@ -25,13 +19,6 @@ login_manager.login_view = 'main.home'
 # the class/category of the flash message when the user is not logged in
 login_manager.login_message_category = 'warning'
 
-# config logger
-# logging.basicConfig(filename=os.getenv('LOG_FILE'), level=logging.DEBUG)
-logging.basicConfig(level=logging.INFO)
-logging.getLogger('apscheduler').setLevel(logging.INFO)
-logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
-logging.getLogger('elasticsearch').setLevel(logging.INFO)
-
 
 def create_app(default_config=Config):
     """Create a new app instance."""
@@ -39,6 +26,10 @@ def create_app(default_config=Config):
     # create application object
     app = Flask(__name__)
     app.config.from_object(default_config)
+
+    if not app.debug:
+        # config logger if in production
+        logging.basicConfig(filename=app.config['LOG_FILE'])
 
     # configure elasticsearch
     elastic_url = app.config['ELASTIC_URL']
@@ -74,21 +65,5 @@ def create_app(default_config=Config):
 
     with app.app_context():
         db.create_all()
-
-    # configure scheduler (3 workers)
-    # app.scheduler = BackgroundScheduler(
-    #     timezone=utc,
-    #     executors={'default': {'type': 'threadpool', 'max_workers': 1}}
-    # )
-
-    # def kill_scheduler(signum=None, frame=None):
-    #     try:
-    #         app.scheduler.shutdown(wait=False)
-    #     finally:
-    #         exit(0)
-
-    # signal.signal(signal.SIGTERM, kill_scheduler)
-    # signal.signal(signal.SIGINT, kill_scheduler)
-    # app.scheduler.start()
 
     return app
