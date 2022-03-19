@@ -353,14 +353,11 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .alert {
+  visibility: visible;
   -webkit-animation: fadeOut 2s ease-in forwards;
           animation: fadeOut 2s ease-in forwards;
   -webkit-animation-delay: .5s;
           animation-delay: .5s;
-  position: fixed;
-  bottom: 2rem;
-  right: 3rem;
-  z-index: 100;
   border-radius: 1rem;
   padding: 1rem 2rem;
   color: black;
@@ -689,12 +686,17 @@ button.cancel-button {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: end;
-      -ms-flex-pack: end;
-          justify-content: flex-end;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  gap: .25rem;
   visibility: hidden;
 }
 

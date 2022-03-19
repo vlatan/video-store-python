@@ -291,12 +291,9 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .alert {
+    visibility: visible;
     animation: fadeOut 2s ease-in forwards;
     animation-delay: .5s;
-    position: fixed;
-    bottom: 2rem;
-    right: 3rem;
-    z-index: 100;
     border-radius: 1rem;
     padding: 1rem 2rem;
     color: black;
@@ -554,8 +551,10 @@ button.cancel-button {
     max-width: var(--content-width);
     margin: 0 auto;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: .25rem;
     visibility: hidden;
 }
 

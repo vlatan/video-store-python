@@ -59,6 +59,8 @@ if (loginState) {
     } else if (loginState === 'bummer') {
         alert.innerText = "Sorry, something went wrong!";
     }
+    // insert in footer as first child
+    document.getElementById('footer').prepend(alert);
     // remove alert block after 2s
     sleep(2000).then(() => {
         alert.remove();
