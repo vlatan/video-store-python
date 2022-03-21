@@ -34,8 +34,8 @@ def create_app(default_config=Config):
         logging.basicConfig(filename=app.config['LOG_FILE'])
 
     # initialize search index
-    schema = Schema(id=ID(unique=True, stored=True), title=TEXT,
-                    description=TEXT, tags=TEXT)
+    id_num = ID(unique=True, stored=True)
+    schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
     exists = exists_in('index')
     app.index = open_dir('index') if exists else create_in('index', schema)
 
