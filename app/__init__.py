@@ -36,7 +36,8 @@ def create_app(default_config=Config):
     elastic_name = app.config['ELASTIC_USERNAME']
     elastic_pass = app.config['ELASTIC_PASSWORD']
     http_auth = (elastic_name, elastic_pass)
-    app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth)
+    app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth,
+                                      verify_certs=False, ssl_show_warn=False)
 
     cache.init_app(app)
     db.init_app(app)
