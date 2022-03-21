@@ -1,4 +1,3 @@
-import os.path
 import logging
 from flask import Flask
 from flask_caching import Cache
