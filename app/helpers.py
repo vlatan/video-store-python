@@ -4,7 +4,7 @@ from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user, login_required
-from elasticsearch import ImproperlyConfigured, ElasticsearchException
+from whoosh.qparser import OrGroup, MultifieldParser
 
 
 def admin_required(func):
@@ -33,35 +33,25 @@ def dump_datetime(value):
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
 
 
-def add_to_index(index, model):
-    try:
-        es = current_app.elasticsearch
-        payload = {field: getattr(model, field)
-                   for field in model.__searchable__}
-        es.index(index=index, id=model.id, document=payload)
-    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
-        return
+def add_to_index(obj):
+    payload = {field: getattr(obj, field) for field in obj.__searchable__}
+    writer = current_app.index.writer()
+    writer.update_document(id=str(obj.id), **payload)
+    writer.commit()
 
 
-def remove_from_index(index, model):
-    try:
-        es = current_app.elasticsearch
-        if es.exists(index=index, id=model.id):
-            es.delete(index=index, id=model.id)
-    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
-        return
+def remove_from_index(obj):
+    current_app.index.delete_by_term('id', str(obj.id))
 
 
-def query_index(index, query, page, per_page):
-    try:
-        es = current_app.elasticsearch
-        payload = {'query': {'multi_match': {'query': query, 'fields': ['*']}},
-                   'from': (page - 1) * per_page, 'size': per_page}
-        search = es.search(index=index, body=payload)
-
-        ids = [int(hit['_id']) for hit in search['hits']['hits']]
-        return ids, search['hits']['total']['value']
-
-    except (AttributeError, ImproperlyConfigured, ElasticsearchException):
-        # you may need to log this error
-        return [], 0
+def query_index(fields, keyword, page, per_page):
+    with current_app.index.searcher() as searcher:
+        schema, og = current_app.index.schema, OrGroup.factory(0.9)
+        parser = MultifieldParser(fields, schema, group=og)
+        query = parser.parse(keyword)
+        results = searcher.search(query)
+        exact_len = results.has_exact_length()
+        total = len(results) if exact_len else results.estimated_length()
+        results = searcher.search_page(query, page, pagelen=per_page)
+        ids = [int(result['id']) for result in results]
+        return ids, total

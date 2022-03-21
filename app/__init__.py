@@ -1,3 +1,4 @@
+import os.path
 import logging
 from flask import Flask
 from flask_caching import Cache
@@ -6,7 +7,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_minify import Minify
 from app.config import Config
-from elasticsearch import Elasticsearch
+from whoosh.index import create_in, open_dir, exists_in
+from whoosh.fields import Schema, TEXT, ID
 
 cache = Cache()
 db = SQLAlchemy()
@@ -31,13 +33,11 @@ def create_app(default_config=Config):
         # config logger if in production
         logging.basicConfig(filename=app.config['LOG_FILE'])
 
-    # configure elasticsearch
-    elastic_url = app.config['ELASTIC_URL']
-    elastic_name = app.config['ELASTIC_USERNAME']
-    elastic_pass = app.config['ELASTIC_PASSWORD']
-    http_auth = (elastic_name, elastic_pass)
-    app.elasticsearch = Elasticsearch(elastic_url, http_auth=http_auth,
-                                      verify_certs=False, ssl_show_warn=False)
+    # initialize search index
+    schema = Schema(id=ID(unique=True, stored=True), title=TEXT,
+                    description=TEXT, tags=TEXT)
+    exists = exists_in('index')
+    app.index = open_dir('index') if exists else create_in('index', schema)
 
     cache.init_app(app)
     db.init_app(app)

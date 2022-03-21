@@ -41,7 +41,7 @@ class ActionMixin(object):
 class SearchableMixin(object):
     @classmethod
     def search(cls, keyword, page, per_page):
-        ids, total = query_index(cls.__tablename__, keyword, page, per_page)
+        ids, total = query_index(cls.__searchable__, keyword, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
@@ -68,15 +68,15 @@ class SearchableMixin(object):
     @classmethod
     def after_commit(cls, session):
         for obj in session._changes['add'] + session._changes['update']:
-            add_to_index(obj.__tablename__, obj)
+            add_to_index(obj)
         for obj in session._changes['delete']:
-            remove_from_index(obj.__tablename__, obj)
+            remove_from_index(obj)
         session._changes = None
 
     @classmethod
     def reindex(cls):
         for obj in cls.query:
-            add_to_index(cls.__tablename__, obj)
+            add_to_index(obj)
 
 
 class SitemapMixin(object):
