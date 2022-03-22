@@ -1,5 +1,4 @@
 import os.path
-import logging
 from flask import Flask
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
@@ -27,11 +26,8 @@ def create_app(default_config=Config):
 
     # create application object
     app = Flask(__name__)
+    # load config
     app.config.from_object(default_config)
-
-    if not app.debug:
-        # config logger if in production
-        logging.basicConfig(filename=app.config['LOG_FILE'])
 
     # initialize search index
     os.mkdir('index') if not os.path.exists('index') else None
@@ -40,12 +36,14 @@ def create_app(default_config=Config):
     exists = exists_in('index')
     app.index = open_dir('index') if exists else create_in('index', schema)
 
+    # initialize plugins
     cache.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     minify.init_app(app)
     login_manager.init_app(app)
 
+    # import blueprints
     from app.main.routes import main
     from app.users.routes import users
     from app.posts.routes import posts
@@ -55,6 +53,8 @@ def create_app(default_config=Config):
     from app.auth.routes import auth
     from app.cron.handlers import cron
     from app.errors.handlers import errors
+
+    # register blueprints
     app.register_blueprint(main)
     app.register_blueprint(users)
     app.register_blueprint(posts)
