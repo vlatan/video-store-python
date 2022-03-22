@@ -9,6 +9,7 @@ class Config:
 
     # app
     APP_NAME = os.getenv('APP_NAME')
+    DOMAIN = os.getenv('DOMAIN')
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = True if os.getenv('DEBUG') == 'True' else False
     ENV = 'development' if DEBUG else 'production'
@@ -53,13 +54,15 @@ class Config:
             "client_secret": GOOGLE_CLIENT_SECRET,
             "redirect_uris": [
                 "http://localhost:5000/authorize/google",
-                "https://localhost:5000/authorize/google"
+                "https://localhost:5000/authorize/google",
+                f"https://{DOMAIN}/authorize/google"
             ],
             "javascript_origins": [
                 "http://localhost",
                 "http://localhost:5000",
                 "https://localhost",
-                "https://localhost:5000"
+                "https://localhost:5000",
+                f"https://{DOMAIN}"
             ]
         }
     }
