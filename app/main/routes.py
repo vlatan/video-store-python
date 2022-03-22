@@ -1,5 +1,6 @@
 import os
 import time
+import datetime
 from collections import OrderedDict
 from flask import render_template, request, current_app, abort, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
@@ -58,10 +59,14 @@ def sitemap_index():
     data.update(Playlist.get_index())
 
     url = url_for('main.sitemap_page', what='misc', page=1, _external=True)
-    posts = Post.query.order_by(Post.upload_date.desc())
-    sources = Playlist.query.order_by(Playlist.id.desc())
-    lastmod = max(posts.first().created_at, sources.first().created_at)
-    data[url] = lastmod.strftime('%Y-%m-%d')
+    last_post = Post.query.order_by(Post.upload_date.desc()).first()
+    last_source = Playlist.query.order_by(Playlist.id.desc()).first()
+    default_date = datetime.datetime.min
+    last_post_date = last_post.created_at if last_post else default_date
+    last_source_date = last_source.created_at if last_source else default_date
+    if not (last_post_date == last_source_date == default_date):
+        lastmod = max(last_post_date, last_source_date)
+        data[url] = lastmod.strftime('%Y-%m-%d')
 
     if not data:
         abort(404)

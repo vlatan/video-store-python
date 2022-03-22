@@ -85,6 +85,7 @@ class SitemapMixin(object):
     def get_index(cls, order_by='id'):
         per_page = current_app.config['POSTS_PER_PAGE'] * 2
         data = OrderedDict()
+        def key(x): return x.upload_date
 
         query, i = cls.query.order_by(getattr(cls, order_by).desc()), 1
         while True:
@@ -94,12 +95,14 @@ class SitemapMixin(object):
             if hasattr(cls, 'posts'):
                 lastmods = []
                 for item in pagination.items:
-                    freshest = max(item.posts, key=lambda x: x.upload_date)
-                    lastmods.append(freshest.created_at)
-                data[url] = max(lastmods).strftime('%Y-%m-%d')
+                    if (freshest := max(item.posts, key=key, default=None)):
+                        lastmods.append(freshest.created_at)
+                if lastmods:
+                    data[url] = max(lastmods).strftime('%Y-%m-%d')
             else:
-                lastmod = max([obj.updated_at for obj in pagination.items])
-                data[url] = lastmod.strftime('%Y-%m-%d')
+                dates = [obj.updated_at for obj in pagination.items]
+                if (lastmod := max(dates, default=None)):
+                    data[url] = lastmod.strftime('%Y-%m-%d')
             if not pagination.has_next:
                 break
             i += 1
@@ -121,8 +124,10 @@ class SitemapMixin(object):
             elif hasattr(obj, 'playlist_id'):
                 url = url_for('lists.playlist_videos',
                               playlist_id=obj.playlist_id, _external=True)
-                lastmod = max(obj.posts, key=lambda x: x.upload_date)
-                data[url] = lastmod.created_at.strftime('%Y-%m-%d')
+
+                def key(x): return x.upload_date
+                if (last_post := max(obj.posts, key=key, default=None)):
+                    data[url] = last_post.created_at.strftime('%Y-%m-%d')
             else:
                 url = url_for('pages.page', id=obj.id, _external=True)
                 data[url] = obj.updated_at.strftime('%Y-%m-%d')
