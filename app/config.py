@@ -11,7 +11,7 @@ class Config:
     APP_NAME = os.getenv('APP_NAME')
     DOMAIN = os.getenv('DOMAIN')
     SECRET_KEY = os.getenv('SECRET_KEY')
-    DEBUG = True if os.getenv('DEBUG') == 'True' else False
+    DEBUG = json.loads(os.getenv('DEBUG').lower())
     ENV = 'development' if DEBUG else 'production'
     LOG_FILE = os.getenv('LOG_FILE')
 
