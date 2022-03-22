@@ -2,10 +2,11 @@
 :root {
   --primary-background-color: rgb(24, 24, 24);
   --secondary-background-color: rgb(32, 32, 32);
-  --primary-font-color: #fff;
+  --primary-font-color: white;
+  --secondary-font-color: rgb(213, 215, 216);
   --primary-border-color: hsl(0, 0%, 18.82%);
   --content-width: 1200px;
-  --main-font-family: 'Roboto', sans-serif;
+  --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   --content-padding: 1.5rem;
   --header-hight: 3.5rem;
 }
@@ -21,6 +22,11 @@
 html, button, input, textarea, a {
   font-family: var(--main-font-family);
   color: var(--primary-font-color);
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 html, body {
@@ -245,7 +251,6 @@ button.search-arrow {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  line-height: 1.55;
 }
 
 .dropdown-content .nav-item {

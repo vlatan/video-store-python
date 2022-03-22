@@ -1,7 +1,6 @@
 .page {
     padding: calc(var(--content-padding) * 1.5);
     background: var(--secondary-background-color);
-    line-height: 1.4;
     border-radius: 1rem;
     margin: 0 auto;
     max-width: 800px;
@@ -14,4 +13,5 @@
 
 .page p {
     margin: 1rem 0;
+    color: var(--secondary-font-color)
 }
