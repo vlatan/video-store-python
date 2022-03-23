@@ -36,9 +36,8 @@ def new_playlist():
 def playlist_videos(playlist_id):
     """ Route to return all videos in a playlist """
 
-    if request.method == 'GET':
-        playlist = Playlist.query.filter_by(
-            playlist_id=playlist_id).first_or_404()
+    # check if playlist exists
+    playlist = Playlist.query.filter_by(playlist_id=playlist_id).first_or_404()
 
     # posts per page
     per_page = current_app.config['POSTS_PER_PAGE']
