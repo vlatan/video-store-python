@@ -23,7 +23,7 @@ def new_page():
         db.session.add(page)
         db.session.commit()
         flash('Your page has been created!', 'success')
-        return redirect(url_for('pages.page', id=page.slug))
+        return redirect(url_for('pages.page', slug=page.slug))
     return render_template('form.html', title='Add New Page',
                            form=form, legend='New Page')
 
@@ -38,7 +38,7 @@ def edit_page(slug):
         db.session.commit()
         page.delete_cache()
         flash('Your page has been updated!', 'success')
-        return redirect(url_for('pages.page', id=page.slug))
+        return redirect(url_for('pages.page', slug=page.slug))
     form.title.data, form.content.data = page.title, page.content
     return render_template('form.html', title='Edit This Page',
                            form=form, legend='Edit Page')

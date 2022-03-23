@@ -6,7 +6,7 @@
 {% endblock css %}
 
 {% block meta %}
-{% set page_url = url_for('pages.page', id=page.id, _external=True) %}
+{% set page_url = url_for('pages.page', slug=page.slug, _external=True) %}
 <link rel="canonical" href="{{ page_url }}" />
 <meta property='og:title' content='{{ page.title }}'>
 <meta property='og:type' content='article'>
