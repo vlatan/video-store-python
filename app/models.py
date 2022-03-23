@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from markdown import markdown
+from slugify import slugify
 from sqlalchemy import func, inspect
 from datetime import datetime
 from flask import current_app, escape, url_for
@@ -236,6 +237,13 @@ class Page(Base, SitemapMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text)
+    slug = db.Column(db.String(255))
+
+    def __init__(self, *args, **kwargs):
+        if not 'slug' in kwargs:
+            kwargs['slug'] = slugify(kwargs.get(
+                'title', ''), allow_unicode=True)
+        super().__init__(*args, **kwargs)
 
     @cache.memoize(86400)
     def html_content(self):
