@@ -1,10 +1,10 @@
-import os
 import requests
 from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
 from flask_login import current_user, login_required
 from whoosh.qparser import OrGroup, MultifieldParser
+from whoosh.writing import AsyncWriter
 
 
 def admin_required(func):
@@ -35,7 +35,7 @@ def dump_datetime(value):
 
 def add_to_index(obj):
     payload = {field: getattr(obj, field) for field in obj.__searchable__}
-    writer = current_app.index.writer()
+    writer = AsyncWriter(current_app.index)
     writer.update_document(id=str(obj.id), **payload)
     writer.commit()
 
