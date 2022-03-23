@@ -88,6 +88,7 @@ class SitemapMixin(object):
         def key(x): return x.upload_date
 
         query, i = cls.query.order_by(getattr(cls, order_by).desc()), 1
+
         while True:
             pagination = query.paginate(i, per_page, False)
             url = url_for('main.sitemap_page', what=cls.__tablename__,
@@ -105,7 +106,9 @@ class SitemapMixin(object):
                     data[url] = lastmod.strftime('%Y-%m-%d')
             if not pagination.has_next:
                 break
+
             i += 1
+
         return data
 
     @classmethod
@@ -113,9 +116,11 @@ class SitemapMixin(object):
     def get_sitemap_page(cls, page, order_by='id'):
         per_page = current_app.config['POSTS_PER_PAGE'] * 2
         data = OrderedDict()
+        def key(x): return x.upload_date
 
         objects = cls.query.order_by(getattr(cls, order_by).desc())
         objects = objects.paginate(page, per_page, False).items
+
         for obj in objects:
             if hasattr(obj, 'video_id'):
                 url = url_for(
@@ -124,13 +129,12 @@ class SitemapMixin(object):
             elif hasattr(obj, 'playlist_id'):
                 url = url_for('lists.playlist_videos',
                               playlist_id=obj.playlist_id, _external=True)
-
-                def key(x): return x.upload_date
                 if (last_post := max(obj.posts, key=key, default=None)):
                     data[url] = last_post.created_at.strftime('%Y-%m-%d')
             else:
                 url = url_for('pages.page', id=obj.id, _external=True)
                 data[url] = obj.updated_at.strftime('%Y-%m-%d')
+
         return data
 
 
