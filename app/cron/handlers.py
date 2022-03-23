@@ -119,7 +119,7 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     scheduler.add_job(func=process_videos,
                       args=[current_app._get_current_object()],
-                      trigger='cron', hour=15,
+                      trigger='cron', hour=5,
                       id='post', replace_existing=True)
 
     atexit.register(lambda: scheduler.shutdown(wait=False))
