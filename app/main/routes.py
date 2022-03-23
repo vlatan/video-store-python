@@ -16,7 +16,7 @@ main = Blueprint('main', __name__)
 def autoversion_filter(filename):
     fullpath = os.path.join('app/', filename[1:])
     try:
-        timestamp = os.path.getmtime(fullpath)
+        timestamp = round(os.path.getmtime(fullpath))
     except OSError:
         return filename
     return f'{filename}?v={timestamp}'
