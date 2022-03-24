@@ -71,7 +71,10 @@ def sitemap_index():
     if not data:
         abort(404)
 
-    return render_template('sitemap_index.xml', data=data)
+    template = render_template('sitemap_index.xml', data=data)
+    response = make_response(template)
+    response.headers['content-type'] = 'text/xml; charset=utf-8'
+    return response
 
 
 @main.route('/<string:what>-sitemap-<int:page>.xml')
@@ -97,7 +100,19 @@ def sitemap_page(what, page):
     if not data:
         abort(404)
 
-    return render_template('sitemap_page.xml', data=data)
+    template = render_template('sitemap_page.xml', data=data)
+    response = make_response(template)
+    response.headers['content-type'] = 'text/xml; charset=utf-8'
+    return response
+
+
+@main.route('/sitemap.xsl')
+@cache.cached(timeout=86400)
+def sitemap_style():
+    template = render_template('sitemap.xsl')
+    response = make_response(template)
+    response.headers['content-type'] = 'text/xsl; charset=utf-8'
+    return response
 
 
 @main.route('/<path:name>')
