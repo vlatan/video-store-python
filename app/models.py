@@ -133,7 +133,7 @@ class SitemapMixin(object):
                 if (last_post := max(obj.posts, key=key, default=None)):
                     data[url] = last_post.created_at.strftime('%Y-%m-%d')
             else:
-                url = url_for('pages.page', id=obj.id, _external=True)
+                url = url_for('pages.page', slug=obj.slug, _external=True)
                 data[url] = obj.updated_at.strftime('%Y-%m-%d')
 
         return data
