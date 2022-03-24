@@ -14,6 +14,7 @@ class Config:
     DEBUG = json.loads(os.getenv('DEBUG').lower())
     ENV = 'development' if DEBUG else 'production'
     LOG_FILE = os.getenv('LOG_FILE')
+    GTAG_ID = os.getenv('GTAG_ID')
 
     # cache
     CACHE_TYPE = 'SimpleCache'  # Flask-Caching related configs

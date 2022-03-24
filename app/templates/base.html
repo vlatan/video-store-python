@@ -25,6 +25,10 @@
 		{{ app_name }}
 		{% endblock title_tag %}
 	</title>
+
+	{% if not config['DEBUG'] and not current_user.is_authenticated %}
+	{% include 'analytics.html' %}
+	{% endif %}
 </head>
 
 <body>
