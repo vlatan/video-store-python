@@ -27,11 +27,6 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # Elasticsearch
-    ELASTIC_URL = os.getenv('ELASTIC_URL')
-    ELASTIC_USERNAME = os.getenv('ELASTIC_USERNAME')
-    ELASTIC_PASSWORD = os.getenv('ELASTIC_PASSWORD')
-
     # Other
     POSTS_PER_PAGE = int(os.getenv('POSTS_PER_PAGE'))
     NUM_RELATED_POSTS = int(os.getenv('NUM_RELATED_POSTS'))
