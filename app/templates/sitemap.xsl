@@ -44,7 +44,7 @@
 					<th>URL</th>
 					<th>Priority</th>
 					<th>Change frequency</th>
-					<th>Last modified (GMT)</th>
+					<th>Last modified</th>
 				</tr>
 				<xsl:variable name="lower" select="'abcdefghijklmnopqrstuvwxyz'"/>
 				<xsl:variable name="upper" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
@@ -89,7 +89,7 @@
             <table cellpadding="5">
                 <tr style="border-bottom:1px black solid;">
                     <th>URL of sub-sitemap</th>
-                    <th>Last modified (GMT)</th>
+                    <th>Last modified</th>
                 </tr>
                 <xsl:for-each select="./sitemap:sitemap">
                     <tr>
