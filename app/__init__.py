@@ -12,7 +12,7 @@ from whoosh.fields import Schema, TEXT, ID
 cache = Cache()
 db = SQLAlchemy()
 migrate = Migrate(render_as_batch=True, compare_type=True)
-minify = Minify(html=True, js=True, cssless=True)
+minify = Minify()
 login_manager = LoginManager()
 
 # where the user will be redirected if she's not logged in
