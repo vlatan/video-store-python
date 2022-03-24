@@ -279,7 +279,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .nav-item.support {
-  color: #F4511E;
+  color: #cc7b19;
   font-weight: bold;
 }
 
@@ -320,7 +320,7 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .nav-item.delete-account {
-  color: #F4511E;
+  color: #cc7b19;
   font-weight: bold;
   padding-top: .5rem;
   border-top: 1px solid var(--primary-border-color);
