@@ -41,7 +41,9 @@ def add_to_index(obj):
 
 
 def remove_from_index(obj):
-    current_app.index.delete_by_term('id', str(obj.id))
+    writer = AsyncWriter(current_app.index)
+    writer.delete_by_term('id', str(obj.id))
+    writer.commit()
 
 
 def query_index(fields, keyword, page, per_page):
