@@ -88,7 +88,7 @@ class SitemapMixin(object):
         data = OrderedDict()
         def key(x): return x.upload_date
 
-        query, i = cls.query.order_by(getattr(cls, order_by).desc()), 1
+        query, i = cls.query.order_by(getattr(cls, order_by)), 1
 
         while True:
             pagination = query.paginate(i, per_page, False)
@@ -119,7 +119,7 @@ class SitemapMixin(object):
         data = OrderedDict()
         def key(x): return x.upload_date
 
-        objects = cls.query.order_by(getattr(cls, order_by).desc())
+        objects = cls.query.order_by(getattr(cls, order_by))
         objects = objects.paginate(page, per_page, False).items
 
         for obj in objects:
