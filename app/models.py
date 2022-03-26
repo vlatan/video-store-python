@@ -219,18 +219,24 @@ class Post(Base, SearchableMixin, SitemapMixin):
     @classmethod
     @cache.memoize(86400)
     def get_related_posts(cls, title, per_page):
-        # search for related videos using the post title
-        if not (related_posts := cls.search(title, 1, per_page + 1)[0].all()[1:]):
-            # if no related get random
-            related_posts = cls.query.order_by(
-                func.random()).limit(per_page).all()
-        return [post.serialize for post in related_posts]
+        if not (posts := cls.search(title, 1, per_page + 1)[0].all()[1:]):
+            posts = cls.query.order_by(func.random()).limit(per_page).all()
+        return [post.serialize for post in posts]
 
     @classmethod
     @cache.memoize(86400)
     def get_playlist_posts(cls, playlist_id, page, per_page):
         query = cls.query.filter_by(
             playlist_id=playlist_id).order_by(cls.upload_date.desc())
+        posts = query.paginate(page, per_page, False).items
+        return [post.serialize for post in posts]
+
+    @classmethod
+    @cache.memoize(86400)
+    def get_orphans(cls, page, per_page):
+        src_ids = [pl.playlist_id for pl in Playlist.query.all()]
+        orphans = (cls.playlist_id == None) | (cls.playlist_id.not_in(src_ids))
+        query = cls.query.filter(orphans).order_by(cls.upload_date.desc())
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 

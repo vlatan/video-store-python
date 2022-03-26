@@ -23,15 +23,18 @@
 <div class="playlists-content">
 
     {% for post in posts %}
-
     <a class="playlist-link" href="{{ url_for('lists.playlist_videos', playlist_id=post.playlist_id) }}">
         <img class="channel-img" src="{{ post.channel_thumbnails['medium']['url'] }}"
             width="{{ post.channel_thumbnails['medium']['width'] }}"
             height="{{ post.channel_thumbnails['medium']['height'] }}" alt="{{ post.title }}">
         <h2 class="playlist-title">{{ post.title }}</h2>
     </a>
-
     {% endfor %}
+
+    <a class="playlist-link" href="{{ url_for('lists.orphan_videos') }}">
+        <span class="orphans">Other</span>
+        <h2 class="playlist-title">Non Playlist Videos</h2>
+    </a>
 
 </div>
 

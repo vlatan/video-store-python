@@ -38,3 +38,22 @@ img.channel-img {
 h2.playlist-title {
     font-size: .9rem;
 }
+
+.orphans {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border: 2px solid var(--primary-border-color);
+    background-color: var(--secondary-background-color);
+    color: var(--secondary-font-color);
+    text-transform: uppercase;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.orphans::after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
