@@ -71,7 +71,7 @@ def orphan_videos():
         time.sleep(0.4)
         return make_response(jsonify(posts), 200)
 
-    return render_template('source.html', posts=posts, title='Other')
+    return render_template('source.html', posts=posts, title='Other Uploads')
 
 
 @lists.route('/sources/')
