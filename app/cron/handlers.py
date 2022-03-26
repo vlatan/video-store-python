@@ -4,6 +4,7 @@ from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
 from app import db
 from app.models import Post, Playlist
+from app.helpers import query_index
 from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
@@ -62,6 +63,8 @@ def revalidate_single_video(post, api_key):
 def process_videos(app):
     with app.app_context():
         API_KEY = current_app.config['YOUTUBE_API_KEY']
+        PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+
         # get all VALID videos from our playlists from YouTube
         all_videos, complete = get_youtube_videos(API_KEY)
         all_videos = sorted(all_videos, key=lambda d: d['upload_date'])
@@ -78,6 +81,15 @@ def process_videos(app):
                     posted.playlist = video['playlist']
                     db.session.commit()
                     time.sleep(1)
+
+                # update simlar_ids if there's a change
+                similar = Post.get_related_posts(posted.title, PER_PAGE)
+                similar = [item['id'] for item in similar]
+                if posted.similar != similar:
+                    posted.similar = similar
+                    db.session.commit()
+                    time.sleep(1)
+
             else:
                 # create object from Model
                 post = Post(**video)

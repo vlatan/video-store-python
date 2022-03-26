@@ -178,6 +178,7 @@ class Post(Base, SearchableMixin, SitemapMixin):
     tags = db.Column(db.Text)
     duration = db.Column(db.String(10), nullable=False)
     upload_date = db.Column(db.DateTime, nullable=False)
+    similar = db.Column(db.PickleType, default=[])
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
@@ -191,6 +192,7 @@ class Post(Base, SearchableMixin, SitemapMixin):
     def serialize(self):
         """ Return object data in easily serializable format. """
         return {
+            'id': self.id,
             'video_id': self.video_id,
             'title': escape(self.title),
             'thumbnails': self.thumbnails
