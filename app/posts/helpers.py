@@ -27,6 +27,10 @@ def validate_video(response):
     if audio_language and not audio_language.startswith('en'):
         raise ValidationError('This video\'s audio is not in English.')
 
+    broadcast = response['snippet'].get('liveBroadcastContent')
+    if broadcast and broadcast != 'none':
+        raise ValidationError('This video is not fully broadcasted.')
+
     duration = convertDuration(response['contentDetails']['duration'])
     if duration.seconds < 1800:
         raise ValidationError(
