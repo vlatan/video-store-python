@@ -4,7 +4,6 @@ from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
 from app import db
 from app.models import Post, Playlist
-from app.helpers import query_index
 from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
 from googleapiclient.discovery import build
@@ -131,7 +130,7 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     scheduler.add_job(func=process_videos,
                       args=[current_app._get_current_object()],
-                      trigger='cron', hour=5,
+                      trigger='cron', hour=current_app.config['CRON_HOUR'],
                       id='post', replace_existing=True)
 
     atexit.register(lambda: scheduler.shutdown(wait=False))

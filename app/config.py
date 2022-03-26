@@ -13,8 +13,8 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = json.loads(os.getenv('DEBUG').lower())
     ENV = 'development' if DEBUG else 'production'
-    LOG_FILE = os.getenv('LOG_FILE')
     GTAG_ID = os.getenv('GTAG_ID')
+    CRON_HOUR = int(os.getenv('CRON_HOUR'))
 
     # cache
     CACHE_TYPE = 'SimpleCache'  # Flask-Caching related configs
