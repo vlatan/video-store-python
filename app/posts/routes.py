@@ -16,6 +16,9 @@ def post(video_id):
 
     # get standard size thumb, if doesn't exist get high size
     thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
+    # get maxres thumb for meta tag
+    meta_thumb = post.thumbnails.get('maxres', thumb)
+
     # create video duration object
     duration = convertDuration(post.duration)
 
@@ -28,6 +31,7 @@ def post(video_id):
     related_posts = Post.get_related_posts(post.title, PER_PAGE)
 
     return render_template('post.html', post=post, thumb=thumb['url'],
+                           meta_thumb=meta_thumb['url'],
                            duration=duration.human, likes=likes,
                            title=post.title, related_posts=related_posts)
 
