@@ -89,13 +89,17 @@ def sitemap_page(what, page):
     elif what == 'playlist':
         data.update(Playlist.get_sitemap_page(page))
     elif what == 'misc':
-        home_lastmod = Post.query.order_by(
-            Post.upload_date.desc()).first().created_at
+        home_last = Post.query.order_by(Post.upload_date.desc()).first()
+        home_lastmod = home_last.created_at.strftime('%Y-%m-%d')
         data[url_for('main.home', _external=True)] = home_lastmod
 
-        sources_lastmod = Playlist.query.order_by(
-            Playlist.id.desc()).first().created_at
+        sources_last = Playlist.query.order_by(Playlist.id.desc()).first()
+        sources_lastmod = sources_last.created_at.strftime('%Y-%m-%d')
         data[url_for('lists.playlists', _external=True)] = sources_lastmod
+
+        other_lastmod = Post.get_orphans(1, 1)[0]['created_at']
+        other_lastmod = other_lastmod.strftime('%Y-%m-%d')
+        data[url_for('lists.orphan_videos', _external=True)] = other_lastmod
 
     if not data:
         abort(404)
