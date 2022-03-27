@@ -14,6 +14,10 @@ class PostForm(FlaskForm):
                           render_kw={'placeholder': 'Video URL here...'})
     submit = SubmitField('Submit')
 
+    def __init__(self):
+        super().__init__()
+        self.processed_content = None
+
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
         video_id = parse_video(content.data)
@@ -35,7 +39,7 @@ class PostForm(FlaskForm):
                 res = req.execute()['items'][0]
                 # this will raise exception if unable to fetch
                 if validate_video(res):
-                    video_info = fetch_video_data(res)
+                    self.processed_content = fetch_video_data(res)
             # if video's not valid
             except ValidationError:
                 # re-raise the exception thrown from validate_video()
@@ -43,6 +47,3 @@ class PostForm(FlaskForm):
             # if ['items'] list is empty or unable to connect to YT API
             except (HttpError, IndexError):
                 raise ValidationError('Unable to fetch the video.')
-
-        # transform the form input
-        content.data = video_info

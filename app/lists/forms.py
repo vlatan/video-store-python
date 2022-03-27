@@ -13,6 +13,10 @@ class PlaylistForm(FlaskForm):
                           render_kw={'placeholder': 'Playlist URL here...'})
     submit = SubmitField('Submit')
 
+    def __init__(self):
+        super().__init__()
+        self.processed_content = None
+
     def validate_content(self, content):
         # parse url, it will raise ValidationError if unable
         playlist_id = parse_playlist(content.data)
@@ -27,7 +31,4 @@ class PlaylistForm(FlaskForm):
                    cache_discovery=False) as youtube:
             # get the playlist's metadata
             # this will raise ValidationError if unable to fetch data
-            playlist_info = validate_playlist(playlist_id, youtube)
-
-        # transform the form data
-        content.data = playlist_info
+            self.processed_content = validate_playlist(playlist_id, youtube)

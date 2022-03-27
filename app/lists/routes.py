@@ -19,7 +19,7 @@ def new_playlist():
     if form.validate_on_submit():
         # create object from Model
         # form.content.data is a dict, just unpack to transform into kwargs
-        playlist = Playlist(**form.content.data, author=current_user)
+        playlist = Playlist(**form.processed_content, author=current_user)
 
         # add to db
         db.session.add(playlist)

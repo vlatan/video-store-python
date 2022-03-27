@@ -40,7 +40,7 @@ def new_post():
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
         # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(**form.content.data, author=current_user)
+        post = Post(**form.processed_content, author=current_user)
         # add post to database
         db.session.add(post)
         db.session.commit()
