@@ -195,7 +195,9 @@ class Post(Base, SearchableMixin, SitemapMixin):
             'id': self.id,
             'video_id': self.video_id,
             'title': escape(self.title),
-            'thumbnails': self.thumbnails
+            'thumbnails': self.thumbnails,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
         }
 
     @classmethod
