@@ -243,6 +243,13 @@ class Post(Base, SearchableMixin, SitemapMixin):
         return [post.serialize for post in posts]
 
 
+class DeletedPost(Base):
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    provider = db.Column(db.String(7), default='YouTube')
+    video_id = db.Column(db.String(20), unique=True,
+                         nullable=False, index=True)
+
+
 class Page(Base, SitemapMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)

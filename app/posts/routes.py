@@ -3,7 +3,7 @@ from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
 from app import db
 from app.helpers import admin_required
-from app.models import Post
+from app.models import Post, DeletedPost
 from app.posts.forms import PostForm
 from app.posts.helpers import convertDuration
 
@@ -65,6 +65,10 @@ def perform_action(video_id, action):
         db.session.commit()
         return make_response('Success', 200)
     elif action == 'delete' and current_user.is_admin:
+        # add this post to DeletedPost table
+        deleted_post = DeletedPost(video_id=post.video_id)
+        db.session.add(deleted_post)
+        # delete the post
         db.session.delete(post)
         db.session.commit()
         flash('The video has been deleted', 'success')
