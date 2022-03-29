@@ -19,7 +19,8 @@ document.addEventListener('click', (event) => {
             } else {
                 alert.innerText = "Something went wrong!";
             }
-            document.body.appendChild(alert);
+            // insert in footer as first child
+            document.getElementById('footer').prepend(alert);
             // function sleep is defined in shared.js
             sleep(2000).then(() => {
                 alert.remove();

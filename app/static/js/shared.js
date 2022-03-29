@@ -52,7 +52,6 @@ window.addEventListener('click', function (event) {
 var loginState = localStorage.getItem('LoggedIn');
 if (loginState) {
     var alert = document.createElement('div');
-    document.body.appendChild(alert);
     alert.classList.add('alert');
     if (loginState === 'bingo') {
         alert.innerText = "You've been logged in!";
