@@ -1,6 +1,7 @@
 import os
 import hashlib
 import requests
+from datetime import timedelta
 from urllib.parse import urlencode
 import google_auth_oauthlib.flow
 from google.oauth2 import id_token
@@ -67,7 +68,7 @@ def google():
         # get user ready (create or update their info)
         user = get_user_ready(user_info)
         # begin user session by logging the user in
-        login_user(user, remember=True)
+        login_user(user, remember=True, duration=timedelta(days=30))
         # store revoke token in session in case the user wants to revoke access
         session['revoke_token'] = credentials.token
         # successfully completed the process
@@ -112,7 +113,7 @@ def onetap():
         # get user ready (create or update their info)
         user = get_user_ready(user_info)
         # begin user session by logging the user in
-        login_user(user, remember=True)
+        login_user(user, remember=True, duration=timedelta(days=30))
         # successfully completed the process
         return redirect(request.referrer)
 
@@ -197,7 +198,7 @@ def facebook():
         # get user ready (create or update their info)
         user = get_user_ready(user_info)
         # begin user session by logging the user in
-        login_user(user, remember=True)
+        login_user(user, remember=True, duration=timedelta(days=30))
         # store revoke token in session in case the user wants to revoke access
         session['revoke_token'] = ACCESS_TOKEN
         # successfully completed the process
