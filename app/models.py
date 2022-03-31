@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from itertools import groupby
 from markdown import markdown
 from slugify import slugify
 from sqlalchemy import func, inspect
@@ -50,10 +51,9 @@ class SearchableMixin(object):
             db.case(when, value=cls.id)), total
 
     @classmethod
-    def fields_dirty(cls, obj):
+    def _fields_dirty(cls, obj):
         if isinstance(obj, cls):
-            # https://stackoverflow.com/a/28353846
-            insp = inspect(obj)
+            insp = inspect(obj)  # https://stackoverflow.com/a/28353846
             attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
             return any([attr.history.has_changes() for attr in attrs])
         return False
@@ -62,7 +62,7 @@ class SearchableMixin(object):
     def before_commit(cls, session):
         session._changes = {
             'add': [obj for obj in session.new if isinstance(obj, cls)],
-            'update': [obj for obj in session.dirty if cls.fields_dirty(obj)],
+            'update': [obj for obj in session.dirty if cls._fields_dirty(obj)],
             'delete': [obj for obj in session.deleted if isinstance(obj, cls)]
         }
 
@@ -78,65 +78,6 @@ class SearchableMixin(object):
     def reindex(cls):
         for obj in cls.query:
             add_to_index(obj)
-
-
-class SitemapMixin(object):
-    @classmethod
-    @cache.memoize(86400)
-    def get_index(cls, order_by='id'):
-        per_page = current_app.config['POSTS_PER_PAGE'] * 2
-        data = OrderedDict()
-        def key(x): return x.upload_date
-
-        query, i = cls.query.order_by(getattr(cls, order_by)), 1
-
-        while True:
-            pagination = query.paginate(i, per_page, False)
-            url = url_for('main.sitemap_page', what=cls.__tablename__,
-                          page=i, _external=True)
-            if hasattr(cls, 'posts'):
-                lastmods = []
-                for item in pagination.items:
-                    if (freshest := max(item.posts, key=key, default=None)):
-                        lastmods.append(freshest.created_at)
-                if lastmods:
-                    data[url] = max(lastmods).strftime('%Y-%m-%d')
-            else:
-                dates = [obj.updated_at for obj in pagination.items]
-                if (lastmod := max(dates, default=None)):
-                    data[url] = lastmod.strftime('%Y-%m-%d')
-            if not pagination.has_next:
-                break
-
-            i += 1
-
-        return data
-
-    @classmethod
-    @cache.memoize(86400)
-    def get_sitemap_page(cls, page, order_by='id'):
-        per_page = current_app.config['POSTS_PER_PAGE'] * 2
-        data = OrderedDict()
-        def key(x): return x.upload_date
-
-        objects = cls.query.order_by(getattr(cls, order_by))
-        objects = objects.paginate(page, per_page, False).items
-
-        for obj in objects:
-            if hasattr(obj, 'video_id'):
-                url = url_for(
-                    'posts.post', video_id=obj.video_id, _external=True)
-                data[url] = obj.updated_at.strftime('%Y-%m-%d')
-            elif hasattr(obj, 'playlist_id'):
-                url = url_for('lists.playlist_videos',
-                              playlist_id=obj.playlist_id, _external=True)
-                if (last_post := max(obj.posts, key=key, default=None)):
-                    data[url] = last_post.created_at.strftime('%Y-%m-%d')
-            else:
-                url = url_for('pages.page', slug=obj.slug, _external=True)
-                data[url] = obj.updated_at.strftime('%Y-%m-%d')
-
-        return data
 
 
 class User(Base, UserMixin, ActionMixin):
@@ -165,7 +106,7 @@ class User(Base, UserMixin, ActionMixin):
         return False
 
 
-class Post(Base, SearchableMixin, SitemapMixin):
+class Post(Base, SearchableMixin):
     __searchable__ = ['title', 'description', 'tags']
     id = db.Column(db.Integer, primary_key=True, index=True)
     provider = db.Column(db.String(7), default='YouTube')
@@ -250,7 +191,7 @@ class DeletedPost(Base):
                          nullable=False, index=True)
 
 
-class Page(Base, SitemapMixin):
+class Page(Base):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     content = db.Column(db.Text)
@@ -271,7 +212,7 @@ class Page(Base, SitemapMixin):
         cache.delete_memoized(self.html_content)
 
 
-class Playlist(Base, SitemapMixin):
+class Playlist(Base):
     id = db.Column(db.Integer, primary_key=True)
     playlist_id = db.Column(db.String(50), unique=True, nullable=False)
     channel_id = db.Column(db.String(50), unique=True, nullable=False)
