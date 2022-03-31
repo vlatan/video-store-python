@@ -35,13 +35,13 @@ def sitemap_index():
     posts = Post.query.order_by(Post.upload_date.desc()).all()
     grouped = groupby(posts, lambda x: x.upload_date.strftime('%Y-%m'))
     for key, group in grouped:
-        url = url_for('main.posts_sitemap', date=key, _external=True)
+        url = url_for('sitemap.posts_sitemap', date=key, _external=True)
         lastmod = max([obj.updated_at for obj in group])
         data[url] = lastmod.strftime('%Y-%m-%d')
 
     # pages
     if (latest := Page.query.order_by(Page.updated_at.desc()).first()):
-        url = url_for('main.pages_sitemap', _external=True)
+        url = url_for('sitemap.pages_sitemap', _external=True)
         data[url] = latest.created_at.strftime('%Y-%m-%d')
 
     # sources
@@ -51,7 +51,7 @@ def sitemap_index():
         dates = [post['created_at'] for post in posts]
         lastmods.append(max(dates)) if dates else None
     if lastmods:
-        url = url_for('main.sources_sitemap', _external=True)
+        url = url_for('sitemap.sources_sitemap', _external=True)
         data[url] = max(lastmods).strftime('%Y-%m-%d')
 
     # misc
@@ -61,7 +61,7 @@ def sitemap_index():
     last_post_date = last_post.created_at if last_post else default_date
     last_source_date = last_source.created_at if last_source else default_date
     if not (last_post_date == last_source_date == default_date):
-        url = url_for('main.misc_sitemap', _external=True)
+        url = url_for('sitemap.misc_sitemap', _external=True)
         lastmod = max(last_post_date, last_source_date)
         data[url] = lastmod.strftime('%Y-%m-%d')
 
