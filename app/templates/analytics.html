@@ -4,6 +4,15 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
-
+    // https://developers.google.com/analytics/devguides/collection/gtagjs/ip-anonymization
     gtag('config', '{{ config["GTAG_ID"] }}');
+    // https://developers.google.com/tag-platform/devguides/privacy#gtag.js_1
+    gtag('consent', 'default', { 'ad_storage': 'denied' });
+    gtag('set', {
+        'anonymize_ip': true,
+        'ads_data_redaction': true,
+        'allow_google_signals': false,
+        'allow_ad_personalization_signals': false,
+        'restricted_data_processing': true
+    });
 </script>
