@@ -1,8 +1,10 @@
 import os
 import time
+from datetime import datetime
 from flask import render_template, request, current_app
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
+from app import cache
 from app.models import Post
 
 main = Blueprint('main', __name__)
@@ -10,15 +12,21 @@ main = Blueprint('main', __name__)
 
 @main.app_template_filter('autoversion')
 def autoversion_filter(filename):
-    """Autoversion css/js files based on mtime.
-    To be used in templates.
-    """
+    """Autoversion css/js files based on mtime."""
     fullpath = os.path.join('app/', filename[1:])
     try:
         timestamp = round(os.path.getmtime(fullpath))
     except OSError:
         return filename
     return f'{filename}?v={timestamp}'
+
+
+@main.app_context_processor
+@cache.cached(timeout=86400)
+def template_vars():
+    """Make variables available in templates."""
+    return dict(now=datetime.utcnow(),
+                app_name=current_app.config['APP_NAME'])
 
 
 @main.route('/', methods=['GET', 'POST'])

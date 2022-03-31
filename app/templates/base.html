@@ -14,8 +14,6 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
 	<link rel="manifest" href="/site.webmanifest">
 
-	{% set app_name = config["APP_NAME"] %}
-
 	{% block meta %}
 	<meta property='og:site_name' content='{{ app_name }}'>
 	{% endblock meta %}
@@ -174,7 +172,7 @@
 		{% endwith %}
 
 		<footer class="site-footer">
-			<span class="site-copy">{{ app_name }} &copy; 2022</span>
+			<span class="site-copy">{{ app_name }} &copy; {{ now.year }}</span>
 			<a class="nav-item" href="{{ url_for('lists.playlists') }}">Sources</a>
 			<a class="nav-item" href="{{ url_for('pages.page', slug='about') }}">About</a>
 			<!-- <a class="nav-item" href="{{ url_for('pages.page', slug='privacy') }}">Privacy</a> -->
