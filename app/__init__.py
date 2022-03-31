@@ -52,6 +52,7 @@ def create_app(default_config=Config):
     from app.search.routes import search
     from app.auth.routes import auth
     from app.cron.handlers import cron
+    from app.sitemap.routes import sitemap
     from app.errors.handlers import errors
 
     # register blueprints
@@ -63,6 +64,7 @@ def create_app(default_config=Config):
     app.register_blueprint(search)
     app.register_blueprint(auth)
     app.register_blueprint(cron)
+    app.register_blueprint(sitemap)
     app.register_blueprint(errors)
 
     with app.app_context():

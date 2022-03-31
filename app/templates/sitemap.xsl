@@ -35,7 +35,7 @@
  		<div id="intro">
 			<p>This is a XML Sitemap which is supposed to be processed by search engines which follow the XML Sitemap standard.</p>
 			<p>You can find more information about XML sitemaps at <a rel="nofollow" href="https://www.sitemaps.org/">sitemaps.org</a>.</p>
-			<div><a href="{{ url_for('main.sitemap_index') }}">&#8593; Sitemap Index</a></div>
+			<div><a href="{{ url_for('sitemap.sitemap_index') }}">&#8593; Sitemap Index</a></div>
 		</div>
 
 		<div id="content">
