@@ -1,10 +1,8 @@
-from collections import OrderedDict
-from itertools import groupby
 from markdown import markdown
 from slugify import slugify
 from sqlalchemy import func, inspect
 from datetime import datetime
-from flask import current_app, escape, url_for
+from flask import current_app, escape
 from flask_login import UserMixin
 from app import db, login_manager, cache
 from app.helpers import add_to_index, remove_from_index, query_index
