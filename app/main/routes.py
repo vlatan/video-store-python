@@ -1,11 +1,12 @@
 import os
 import time
+import hashlib
 from datetime import datetime
 from flask import render_template, request, current_app
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
-from app import cache
 from app.models import Post
+from app import db
 
 main = Blueprint('main', __name__)
 
@@ -21,12 +22,24 @@ def autoversion_filter(filename):
     return f'{filename}?v={timestamp}'
 
 
+def get_analytics_id():
+    analytics_id, authenticated = None, current_user.is_authenticated
+    if authenticated and not (analytics_id := current_user.analytics_id):
+        google_id, fb_id = current_user.google_id, current_user.facebook_id
+        open_id = google_id if google_id else fb_id
+        value = str(current_user.id) + str(open_id)
+        analytics_id = hashlib.md5(value.encode()).hexdigest()
+        current_user.analytics_id = analytics_id
+        db.session.commit()
+    return analytics_id
+
+
 @main.app_context_processor
-@cache.cached(timeout=86400)
 def template_vars():
     """Make variables available in templates."""
     return dict(now=datetime.utcnow(),
-                app_name=current_app.config['APP_NAME'])
+                app_name=current_app.config['APP_NAME'],
+                analytics_id=get_analytics_id())
 
 
 @main.route('/', methods=['GET', 'POST'])

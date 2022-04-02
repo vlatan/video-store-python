@@ -85,6 +85,7 @@ class User(Base, UserMixin, ActionMixin):
                           nullable=True, index=True)
     facebook_id = db.Column(db.String(256), unique=True,
                             nullable=True, index=True)
+    analytics_id = db.Column(db.String(512))
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
@@ -95,6 +96,14 @@ class User(Base, UserMixin, ActionMixin):
                             cascade='all,delete-orphan', lazy='dynamic')
     faved = db.relationship('PostFave', backref='user',
                             cascade='all,delete-orphan', lazy='dynamic')
+
+    def __init__(self, *args, **kwargs):
+        if not 'analytics_id' in kwargs:
+            open_id = kwargs.get('google_id', kwargs.get('facebook_id'))
+            value = str(kwargs.get('id')) + str(open_id)
+            value = hashlib.md5(value.encode()).hexdigest()
+            kwargs['analytics_id'] = value
+        super().__init__(*args, **kwargs)
 
     @property
     def is_admin(self):

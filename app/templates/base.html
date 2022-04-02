@@ -24,7 +24,7 @@
 		{% endblock title_tag %}
 	</title>
 
-	{% if not config['DEBUG'] and not current_user.is_authenticated %}
+	{% if not config['DEBUG'] %}
 	{% include 'analytics.html' %}
 	{% endif %}
 </head>
