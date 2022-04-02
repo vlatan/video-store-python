@@ -66,17 +66,17 @@ def favorites():
 @users.route('/account/delete/', methods=['POST'])
 @login_required
 def delete_account():
-    # revoke Doxder app from user's Google/Facebook account
-    revoke_token = session['revoke_token']
-    if current_user.google_id:
-        # https://tinyurl.com/ymadyw2k
-        requests.post('https://oauth2.googleapis.com/revoke',
-                      params={'token': revoke_token},
-                      headers={'content-type': 'application/x-www-form-urlencoded'})
-    elif (facebook_id := current_user.facebook_id):
-        # https://tinyurl.com/bdd23hnt
-        requests.delete(f'https://graph.facebook.com/v12.0/{facebook_id}/permissions',
-                        data={'access_token': revoke_token})
+    # try to revoke Doxder app from user's Google/Facebook account
+    if (revoke_token := session.get('revoke_token')):
+        if current_user.google_id:
+            # https://tinyurl.com/ymadyw2k
+            requests.post('https://oauth2.googleapis.com/revoke',
+                          params={'token': revoke_token},
+                          headers={'content-type': 'application/x-www-form-urlencoded'})
+        elif (facebook_id := current_user.facebook_id):
+            # https://tinyurl.com/bdd23hnt
+            requests.delete(f'https://graph.facebook.com/v12.0/{facebook_id}/permissions',
+                            data={'access_token': revoke_token})
 
     db.session.delete(current_user)
     db.session.commit()
