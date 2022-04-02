@@ -1,3 +1,4 @@
+import hashlib
 from markdown import markdown
 from slugify import slugify
 from sqlalchemy import func, inspect
@@ -98,9 +99,7 @@ class User(Base, UserMixin, ActionMixin):
     @property
     def is_admin(self):
         admin_openid = current_app.config['ADMIN_OPENID']
-        if self.google_id == admin_openid:
-            return True
-        return False
+        return True if self.google_id == admin_openid else False
 
 
 class Post(Base, SearchableMixin):
@@ -196,8 +195,8 @@ class Page(Base):
 
     def __init__(self, *args, **kwargs):
         if not 'slug' in kwargs:
-            kwargs['slug'] = slugify(kwargs.get(
-                'title', ''), allow_unicode=True)
+            slug = slugify(kwargs.get('title', ''), allow_unicode=True)
+            kwargs['slug'] = slug
         super().__init__(*args, **kwargs)
 
     @cache.memoize(86400)
