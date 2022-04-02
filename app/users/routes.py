@@ -66,11 +66,6 @@ def favorites():
 @users.route('/account/delete/', methods=['POST'])
 @login_required
 def delete_account():
-    image_name = f'{current_user.id}.jpg'
-    image_name = os.path.join('app/static/user_images/', image_name)
-    if os.path.exists(image_name):
-        os.remove(image_name)
-
     # revoke Doxder app from user's Google/Facebook account
     revoke_token = session['revoke_token']
     if current_user.google_id:
