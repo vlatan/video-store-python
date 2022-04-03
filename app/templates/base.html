@@ -180,10 +180,10 @@
 	</div>
 
 	{% block scripts %}
+	<script async defer src="{{ url_for('static', filename='js/shared.js') | autoversion }}"></script>
 	{% if not current_user.is_authenticated %}
 	<script async defer src="{{ url_for('static', filename='js/pop.js') | autoversion }}"></script>
 	{% endif %}
-	<script async defer src="{{ url_for('static', filename='js/shared.js') | autoversion }}"></script>
 	{% endblock scripts %}
 </body>
 
