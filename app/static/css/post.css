@@ -90,11 +90,15 @@
 }
 
 h1.video-title {
-  /* font-size: 1.5rem; */
   font-weight: normal;
   line-height: 1.2;
   padding-bottom: var(--metadata-padding);
   border-bottom: 1px solid #303030;
+}
+
+button.edit-title {
+  background-color: var(--secondary-background-color);
+  border: 1px solid var(--primary-border-color);
 }
 
 .other-metadata {

@@ -69,6 +69,7 @@
 					</div>
 					{% if current_user.is_authenticated and current_user.is_admin %}
 					<button data-modal="video" class="modal-button">Delete</button>
+					<button class="modal-button edit-title">Edit Title</button>
 					{% endif %}
 				</div>
 			</div>
@@ -106,11 +107,14 @@
 {% endblock content %}
 
 {% block scripts %}
+{{ super() }}
 {% if current_user.is_authenticated %}
 <script async defer src="{{ url_for('static', filename='js/likes.js') | autoversion }}"></script>
+{% if current_user.is_admin %}
+<script async defer src="{{ url_for('static', filename='js/edit-title.js') | autoversion }}"></script>
+{% endif %}
 {% else %}
 <script async defer src="{{ url_for('static', filename='js/login.js') | autoversion }}"></script>
 {% endif %}
 <script async defer src="{{ url_for('static', filename='js/play.js') | autoversion }}"></script>
-{{ super() }}
 {% endblock scripts %}
