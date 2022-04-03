@@ -97,14 +97,12 @@ h1.video-title {
 }
 
 h1.editing {
-  padding: 1rem;
   font-size: normal;
 }
 
 h1.editing:focus {
   outline: none;
-  border: 1px solid #585896;
-  border-radius: 5px;
+  border-bottom: 1px solid #585896;
 }
 
 button.edit-title {
