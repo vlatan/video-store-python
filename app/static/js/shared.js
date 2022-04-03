@@ -24,7 +24,7 @@ function SetAlert(message) {
     });
 }
 
-window.addEventListener('click', function (event) {
+document.addEventListener('click', function (event) {
 
     // Modals
     document.querySelectorAll('[data-modal]').forEach(function (element) {
