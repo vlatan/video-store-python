@@ -1,24 +1,24 @@
 // Edit Title
 var editTitle = document.querySelector('.edit-title');
 var videoTitle = document.querySelector('.video-title');
-const originalTitle = videoTitle.innerHTML;
+const originalTitle = videoTitle.innerText;
 editTitle.addEventListener('click', () => {
-    if (editTitle.innerHTML === "Edit Title") {
+    if (editTitle.innerText === "Edit Title") {
         videoTitle.contentEditable = true;
         videoTitle.focus();
-        editTitle.innerHTML = "Save Title";
+        editTitle.innerText = "Save Title";
     } else {
         const url = `${window.location.pathname}edit`;
-        PostData(url, { title: videoTitle.innerHTML })
+        PostData(url, { title: videoTitle.innerText })
             .then(response => {
                 if (response.ok) {
                     SetAlert("Title succesfully edited!");
                 } else {
-                    videoTitle.innerHTML = originalTitle;
+                    videoTitle.innerText = originalTitle;
                     SetAlert("Sorry, something went wrong!");
                 }
             });
         videoTitle.contentEditable = false;
-        editTitle.innerHTML = "Edit Title";
+        editTitle.innerText = "Edit Title";
     }
 });
