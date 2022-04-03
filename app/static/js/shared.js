@@ -3,6 +3,27 @@ function sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
 }
 
+// Send/recieve data to/from backend
+async function PostData(url = '', data = {}) {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return response;
+}
+
+// Set alert message
+function SetAlert(message) {
+    var alert = document.createElement('div');
+    alert.classList.add('alert');
+    alert.innerText = message;
+    document.getElementById('footer').prepend(alert);
+    sleep(2000).then(() => {
+        alert.remove();
+    });
+}
+
 window.addEventListener('click', function (event) {
 
     // Modals
