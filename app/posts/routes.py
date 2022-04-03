@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, request
 from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
 from app import db
@@ -73,4 +73,10 @@ def perform_action(video_id, action):
         db.session.commit()
         flash('The video has been deleted', 'success')
         return redirect(url_for('main.home'))
+    elif action == 'edit' and current_user.is_admin:
+        frontend_data = request.get_json()
+        if (title := frontend_data.get('title')):
+            post.title = title
+            db.session.commit()
+            return make_response('Success', 200)
     return make_response('Sorry, can\'t resolve the request', 400)
