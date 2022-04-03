@@ -11,20 +11,12 @@ document.addEventListener('click', (event) => {
         }
         var url = `/video/${remove.dataset.id}/${action}`;
         fetch(url, { method: 'POST' }).then(response => {
-            var alert = document.createElement('div');
-            alert.classList.add('alert');
             if (response.ok) {
                 remove.parentElement.remove();
-                alert.innerText = messageText;
+                SetAlert(messageText);
             } else {
-                alert.innerText = "Something went wrong!";
+                SetAlert("Something went wrong!");
             }
-            // insert in footer as first child
-            document.getElementById('footer').prepend(alert);
-            // function sleep is defined in shared.js
-            sleep(2000).then(() => {
-                alert.remove();
-            });
         });
     }
 });

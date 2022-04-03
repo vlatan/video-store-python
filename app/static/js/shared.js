@@ -72,20 +72,11 @@ window.addEventListener('click', function (event) {
 // save login state for parent window
 var loginState = localStorage.getItem('LoggedIn');
 if (loginState) {
-    var alert = document.createElement('div');
-    alert.classList.add('alert');
     if (loginState === 'bingo') {
-        alert.innerText = "You've been logged in!";
+        SetAlert("You've been logged in!");
     } else if (loginState === 'bummer') {
-        alert.innerText = "Sorry, something went wrong!";
+        SetAlert("Sorry, something went wrong!");
     }
-    // insert in footer as first child
-    document.getElementById('footer').prepend(alert);
-    // remove alert block after 2s
-    sleep(2000).then(() => {
-        alert.remove();
-    });
 }
-
 // remove login state
 localStorage.removeItem('LoggedIn');
