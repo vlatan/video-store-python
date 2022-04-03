@@ -81,6 +81,17 @@ h1.video-title {
     border-bottom: 1px solid hsl(0, 0%, 18.82%);
 }
 
+h1.editing {
+    padding: 1rem;
+    font-size: normal;
+}
+
+h1.editing:focus {
+    outline: none;
+    border: 1px solid rgb(88, 88, 150);
+    border-radius: 5px;
+}
+
 button.edit-title {
     background-color: var(--secondary-background-color);
     border: 1px solid var(--primary-border-color);
