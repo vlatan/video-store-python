@@ -11,14 +11,9 @@ var page = 2;
 var the_end = false;
 
 // Function to request new items and render to the dom
-async function loadItems(url = '', data = {}) {
+function loadItems(url = '', data = {}) {
 
-    // Use fetch to request data by passing the page number via POST method
-    await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    }).then((response) => {
+    PostData(url, data).then((response) => {
 
         if (!response.ok) {
             the_end = true;
