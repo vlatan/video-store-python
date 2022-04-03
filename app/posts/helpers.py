@@ -54,6 +54,9 @@ def normalize_title(title):
     # split title into words
     words = title.split()
 
+    if words[-1].lower() == 'documentary':
+        del words[-1]
+
     if (length := len(words)) > 1:
         norm_title = words[0].capitalize()
         for i in range(1, length - 1):
