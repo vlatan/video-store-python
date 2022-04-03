@@ -5,7 +5,7 @@
     --secondary-background-color: rgb(32, 32, 32);
     --primary-font-color: white;
     --secondary-font-color: rgb(213, 215, 216);
-    --primary-border-color: hsl(0, 0%, 18.82%);;
+    --primary-border-color: hsl(0, 0%, 18.82%);
     --content-width: 1200px;
     --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     --content-padding: 1.5rem;
@@ -15,13 +15,19 @@
 
 /* ################# Reset ################# */
 
-*, *:after, *:before {
+*,
+*:after,
+*:before {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-html, button, input, textarea, a {
+html,
+button,
+input,
+textarea,
+a {
     font-family: var(--main-font-family);
     color: var(--primary-font-color);
 }
@@ -31,7 +37,8 @@ html {
     line-height: 1.5;
 }
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
@@ -39,7 +46,8 @@ body {
     background-color: var(--primary-background-color);
 }
 
-ul, li {
+ul,
+li {
     list-style: none;
 }
 
@@ -59,7 +67,8 @@ a {
     width: 100%;
 }
 
-.site-header, .content-wrap {
+.site-header,
+.content-wrap {
     max-width: var(--content-width);
     margin: 0 auto;
 }
@@ -121,7 +130,7 @@ input.search-form-input:focus {
     border-color: rgb(88, 88, 150);
 }
 
-button.search-button  {
+button.search-button {
     display: flex;
     width: 3.5rem;
     height: 2.5rem;
@@ -186,8 +195,13 @@ button.search-arrow {
 }
 
 @keyframes growOut {
-    80% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+    80% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .nav-item {
@@ -214,7 +228,8 @@ a.nav-item::after {
     transition: transform .2s ease-in-out;
 }
 
-a.nav-item:focus::after, a.nav-item:hover::after {
+a.nav-item:focus::after,
+a.nav-item:hover::after {
     transform: scaleX(1);
 }
 
@@ -232,17 +247,17 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .nav-item.username::after {
-	content: "";
+    content: "";
     position: absolute;
     right: 0;
     top: 60%;
     width: 0;
-	height: 0;
-	border: 6px solid transparent;
-	border-top-color: var(--primary-font-color);
-	border-bottom: 0;
-	margin-left: -6px;
-	margin-top: -6px;
+    height: 0;
+    border: 6px solid transparent;
+    border-top-color: var(--primary-font-color);
+    border-bottom: 0;
+    margin-left: -6px;
+    margin-top: -6px;
 }
 
 .nav-item img.username-image {
@@ -258,7 +273,8 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 .nav-item.delete-account {
     color: #cc7b19;
     font-weight: bold;
-    padding-top: .5rem;;
+    padding-top: .5rem;
+    ;
     border-top: 1px solid var(--primary-border-color);
 }
 
@@ -282,17 +298,17 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 }
 
 .need-login::after {
-	content: "";
-	position: absolute;
-	top: 0;
-	right: 10%;
-	width: 0;
-	height: 0;
-	border: 10px solid transparent;
-	border-bottom-color: white;
-	border-top: 0;
-	margin-left: -10px;
-	margin-top: -10px;
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 10%;
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-bottom-color: white;
+    border-top: 0;
+    margin-left: -10px;
+    margin-top: -10px;
 }
 
 .alert {
@@ -330,23 +346,32 @@ a.nav-item:focus::after, a.nav-item:hover::after {
 
 /* The Modal (background) */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
     justify-content: center;
     align-items: center;
-    z-index: 102; /* Sit on top */
+    z-index: 102;
+    /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0); /* Fallback color */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
     background-color: rgba(0, 0, 0, 0.8);
     animation: fadeIn 300ms ease-in forwards;
 }
 
 @keyframes fadeIn {
-    from {opacity: 0;}
+    from {
+        opacity: 0;
+    }
 }
 
 /* Modal Content/Box */
@@ -405,7 +430,8 @@ button.modal-button:hover {
 }
 
 /* Float cancel and delete buttons and add an equal width */
-button.cancel-button, button.delete-button {
+button.cancel-button,
+button.delete-button {
     width: 50%;
     padding: .8rem 2rem;
 }
@@ -434,7 +460,9 @@ button.cancel-button {
 
 /* Change styles for cancel button and delete button on extra small screens */
 @media screen and (max-width: 300px) {
-    .cancelbtn, .deletebtn {
+
+    .cancelbtn,
+    .deletebtn {
         width: 100%;
     }
 }
@@ -443,8 +471,8 @@ button.cancel-button {
 /* ############# Specific to Login Modal ############# */
 
 .login-modal-content {
-        max-width: calc(286px + 2 * var(--content-padding));
-        box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.3);
+    max-width: calc(286px + 2 * var(--content-padding));
+    box-shadow: 2px 2px 10px 0 rgba(0, 0, 0, 0.3);
 }
 
 .login-text {
@@ -534,7 +562,7 @@ button.cancel-button {
 }
 
 /* Handle */
-  ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background-color: #a8a8a8;
     border: 4px solid transparent;
     border-radius: .5rem;
@@ -576,7 +604,7 @@ button.cancel-button {
     visibility: visible;
 }
 
-.site-footer > * {
+.site-footer>* {
     display: block;
 }
 
@@ -584,10 +612,13 @@ button.cancel-button {
     color: rgb(120, 120, 120);
 }
 
+
 /* ############# Media Queries ############# */
 
 @media screen and (max-width: 1260px) {
-    .site-header, .content-wrap {
+
+    .site-header,
+    .content-wrap {
         margin: 0 var(--content-padding);
     }
 }
@@ -619,7 +650,7 @@ button.cancel-button {
         content: none;
     }
 
-    .dropdown-content::after{
+    .dropdown-content::after {
         right: 5%;
     }
 }
@@ -637,7 +668,9 @@ button.cancel-button {
     }
 
     @keyframes expandSearch {
-        to {transform: translateY(-50%) scaleX(1);}
+        to {
+            transform: translateY(-50%) scaleX(1);
+        }
     }
 
     button.search-button-mobile {

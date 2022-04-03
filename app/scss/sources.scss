@@ -12,7 +12,7 @@
 }
 
 @media screen and (max-width: 700px) {
-    .playlists-content{
+    .playlists-content {
         grid-template-columns: repeat(3, minmax(88px, 240px));
     }
 }

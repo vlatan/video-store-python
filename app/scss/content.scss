@@ -63,17 +63,22 @@ h2.video-title {
     width: 80px;
     height: 80px;
     animation: spin 2s linear infinite;
-  }
+}
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
 
 
-  /* ################# Specific to User Library ################# */
+/* ################# Specific to User Library ################# */
 
-  .remove-option {
+.remove-option {
     position: absolute;
     display: flex;
     align-items: center;
@@ -96,9 +101,9 @@ h2.video-title {
     background-color: white;
 }
 
-  .content-title {
-      font-size: 1rem;
-      line-height: normal;
-      font-weight: normal;
-      margin-bottom: var(--content-padding);
-  }
+.content-title {
+    font-size: 1rem;
+    line-height: normal;
+    font-weight: normal;
+    margin-bottom: var(--content-padding);
+}

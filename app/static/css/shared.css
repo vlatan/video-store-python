@@ -12,14 +12,20 @@
 }
 
 /* ################# Reset ################# */
-*, *:after, *:before {
+*,
+*:after,
+*:before {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, button, input, textarea, a {
+html,
+button,
+input,
+textarea,
+a {
   font-family: var(--main-font-family);
   color: var(--primary-font-color);
 }
@@ -29,7 +35,8 @@ html {
   line-height: 1.5;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -37,7 +44,8 @@ body {
   background-color: var(--primary-background-color);
 }
 
-ul, li {
+ul,
+li {
   list-style: none;
 }
 
@@ -56,7 +64,8 @@ a {
   width: 100%;
 }
 
-.site-header, .content-wrap {
+.site-header,
+.content-wrap {
   max-width: var(--content-width);
   margin: 0 auto;
 }
@@ -273,7 +282,8 @@ a.nav-item::after {
   transition: transform .2s ease-in-out, -webkit-transform .2s ease-in-out;
 }
 
-a.nav-item:focus::after, a.nav-item:hover::after {
+a.nav-item:focus::after,
+a.nav-item:hover::after {
   -webkit-transform: scaleX(1);
           transform: scaleX(1);
 }
@@ -515,7 +525,8 @@ button.modal-button:hover {
 }
 
 /* Float cancel and delete buttons and add an equal width */
-button.cancel-button, button.delete-button {
+button.cancel-button,
+button.delete-button {
   width: 50%;
   padding: .8rem 2rem;
 }
@@ -544,7 +555,8 @@ button.cancel-button {
 
 /* Change styles for cancel button and delete button on extra small screens */
 @media screen and (max-width: 300px) {
-  .cancelbtn, .deletebtn {
+  .cancelbtn,
+  .deletebtn {
     width: 100%;
   }
 }
@@ -734,7 +746,8 @@ button.cancel-button {
 
 /* ############# Media Queries ############# */
 @media screen and (max-width: 1260px) {
-  .site-header, .content-wrap {
+  .site-header,
+  .content-wrap {
     margin: 0 var(--content-padding);
   }
 }
