@@ -27,7 +27,6 @@
 .player {
   position: relative;
   padding-bottom: 56.25%;
-  /* 16:9 */
   height: 0;
   overflow: hidden;
   max-width: 100%;
@@ -156,7 +155,8 @@ h1.video-title {
   gap: .5rem;
 }
 
-.like, .fave {
+.like,
+.fave {
   cursor: pointer;
   border: 1px solid var(--primary-border-color);
   border-radius: 1rem;
@@ -175,7 +175,8 @@ h1.video-title {
   min-width: 5.5rem;
 }
 
-.like:hover, .fave:hover {
+.like:hover,
+.fave:hover {
   background: var(--primary-background-color);
 }
 
