@@ -1,19 +1,19 @@
 // Edit Title
-var editTitle = document.querySelector('.edit-title');
+var editTitleButton = document.querySelector('.edit-title');
 var videoTitle = document.querySelector('.video-title');
 const originalTitle = videoTitle.innerText;
-editTitle.addEventListener('click', () => {
+
+editTitleButton.addEventListener('click', () => {
     videoTitle.classList.toggle('editing');
-    if (editTitle.innerText === "Edit Title") {
+    if (editTitleButton.innerText === "Edit Title") {
         videoTitle.contentEditable = true;
         videoTitle.focus();
-        editTitle.innerText = "Save Title";
+        editTitleButton.innerText = "Save Title";
     } else {
         const url = `${window.location.pathname}edit`;
         PostData(url, { title: videoTitle.innerText })
             .then(response => {
                 if (response.ok) {
-                    videoTitle.classList.add('edited');
                     SetAlert("Title succesfully edited!");
                 } else {
                     videoTitle.innerText = originalTitle;
@@ -21,6 +21,25 @@ editTitle.addEventListener('click', () => {
                 }
             });
         videoTitle.contentEditable = false;
-        editTitle.innerText = "Edit Title";
+        editTitleButton.innerText = "Edit Title";
+    }
+});
+
+videoTitle.addEventListener('keydown', (e) => {
+    if (e.code === 'Escape') {
+        videoTitle.contentEditable = false;
+        editTitleButton.innerText = "Edit Title";
+        videoTitle.classList.remove('editing');
+        videoTitle.innerText = originalTitle;
+    }
+});
+
+document.addEventListener('click', (e) => {
+    var editingTitle = document.querySelector('.editing');
+    if (e.target !== editTitleButton && e.target !== editingTitle) {
+        videoTitle.contentEditable = false;
+        editTitleButton.innerText = "Edit Title";
+        videoTitle.classList.remove('editing');
+        videoTitle.innerText = originalTitle;
     }
 });
