@@ -5,7 +5,7 @@ editTitle.addEventListener('click', () => {
     if (editTitle.innerHTML === "Edit Title") {
         videoTitle.contentEditable = true;
         videoTitle.focus();
-        editTitle.innerHTML = "Save";
+        editTitle.innerHTML = "Save Title";
     } else {
         const url = `${window.location.pathname}edit`;
         PostData(url, { title: videoTitle.innerHTML })
