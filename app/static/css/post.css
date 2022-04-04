@@ -96,11 +96,8 @@ h1.video-title {
   border-bottom: 1px solid #303030;
 }
 
-h1.editing {
-  font-size: normal;
-}
-
 h1.editing:focus {
+  font-size: normal;
   outline: none;
   border-bottom: 1px solid #585896;
 }
