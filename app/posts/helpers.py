@@ -36,6 +36,8 @@ def validate_video(response):
 
 
 def normalize_title(title):
+    # specific to SLICE source
+    title = title.split(' I SLICE ')[0]
     # remove content after pipe symbol
     title = title.split(' | ')[0]
     # remove bracketed content
