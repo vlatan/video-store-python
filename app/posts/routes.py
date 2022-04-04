@@ -43,6 +43,12 @@ def new_post():
     # the form will not validate if the video is already in the database,
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
+        # check if this video was already deleted
+        # and if true remove it from DeletedPost table
+        video_id = form.processed_content['video_id']
+        if (was_deleted := DeletedPost.query.filter_by(video_id=video_id).first()):
+            db.session.delete(was_deleted)
+
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.processed_content, author=current_user)
         # add post to database

@@ -2,13 +2,9 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
-from app.models import DeletedPost
 
 
 def validate_video(response):
-    if DeletedPost.query.filter_by(video_id=response['id']).first():
-        raise ValidationError('This video is banned.')
-
     if response['status']['privacyStatus'] != 'public':
         raise ValidationError('This video is not public.')
 
