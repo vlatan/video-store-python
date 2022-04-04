@@ -7,7 +7,7 @@ from app.models import DeletedPost
 def is_deleted(response):
     if DeletedPost.query.filter_by(video_id=response['id']).first():
         raise ValidationError('This video is banned.')
-    return True
+    return False
 
 
 def get_playlist_videos(playlist_id, youtube):
