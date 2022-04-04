@@ -51,9 +51,7 @@ def query_index(fields, keyword, page, per_page):
         schema, og = current_app.index.schema, OrGroup.factory(0.9)
         parser = MultifieldParser(fields, schema, group=og)
         query = parser.parse(keyword)
-        results = searcher.search(query)
-        exact_len = results.has_exact_length()
-        total = len(results) if exact_len else results.estimated_length()
+        total = len(searcher.search(query))
         results = searcher.search_page(query, page, pagelen=per_page)
         ids = [int(result['id']) for result in results]
         return ids, total
