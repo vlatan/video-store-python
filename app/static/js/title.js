@@ -22,6 +22,7 @@ editTitleButton.addEventListener('click', () => {
                 }
             });
         videoTitle.removeAttribute('contenteditable');
+        videoTitle.blur();
         editTitleButton.innerText = "Edit Title";
     }
 });
