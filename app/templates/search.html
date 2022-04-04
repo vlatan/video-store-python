@@ -19,7 +19,9 @@
 {% endblock title_tag %}
 
 {% block content %}
-<h1 class="content-title">Found <strong>{{ total }}</strong> results for this query.</h1>
+<h1 class="content-title">
+    About <strong>{{ total }}</strong> results <small>({{ time_took }} seconds)</small>
+</h1>
 {% include 'content.html' %}
 {% endblock content %}
 

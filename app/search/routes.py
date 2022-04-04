@@ -24,6 +24,8 @@ def search_results():
 
     # if it's the first page
     if request.method == 'GET':
+        # note the time now
+        start_time = time.time()
         # validate the form from which the request is comming
         if not g.search_form.validate():
             return redirect(url_for('main.home'))
@@ -32,9 +34,12 @@ def search_results():
         posts, total = Post.search(keyword, 1, per_page)
         # save keyword and the total number of posts in session
         session['keyword'], session['total'] = keyword, total
+        # calculate the time took to get the search results
+        time_took = round(time.time() - start_time, 2)
         # render the template
         return render_template('search.html', posts=posts,
-                               total=total, title='Search')
+                               total=total, time_took=time_took,
+                               title='Search')
 
     keyword, total = session['keyword'], session['total']
     # if we got the frontend data (POST), the keyword and the total number of posts
