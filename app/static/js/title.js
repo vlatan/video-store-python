@@ -1,7 +1,7 @@
 // Edit Title
 var editTitleButton = document.querySelector('.edit-title');
 var videoTitle = document.querySelector('.video-title');
-const originalTitle = videoTitle.innerText;
+var originalTitle = videoTitle.innerText;
 
 
 editTitleButton.addEventListener('click', () => {
@@ -16,6 +16,7 @@ editTitleButton.addEventListener('click', () => {
             .then(response => {
                 if (response.ok) {
                     SetAlert("Title succesfully edited!");
+                    originalTitle = videoTitle.innerText;
                 } else {
                     videoTitle.innerText = originalTitle;
                     SetAlert("Sorry, something went wrong!");
