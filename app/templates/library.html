@@ -48,9 +48,9 @@
 {% endblock content %}
 
 {% block scripts %}
+{{ super() }}
 <script async defer src="{{ url_for('static', filename='js/list.js') | autoversion }}"></script>
 {% if total > config['POSTS_PER_PAGE'] %}
 <script async defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endif %}
-{{ super() }}
 {% endblock scripts %}
