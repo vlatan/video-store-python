@@ -67,7 +67,4 @@ def create_app(default_config=Config):
     app.register_blueprint(sitemap)
     app.register_blueprint(errors)
 
-    with app.app_context():
-        db.create_all()
-
     return app
