@@ -45,7 +45,9 @@ videoTitle.addEventListener('keydown', (e) => {
 
 
 document.addEventListener('click', (e) => {
-    if (e.target !== editTitleButton && e.target !== videoTitle) {
+    if (e.target !== editTitleButton &&
+        e.target !== videoTitle &&
+        videoTitle.classList.contains('editing')) {
         resetTitle(videoTitle, editTitleButton);
     }
 });
