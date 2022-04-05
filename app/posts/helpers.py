@@ -2,6 +2,11 @@ import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
+from app.models import DeletedPost
+
+
+def video_banned(video_id):
+    return DeletedPost.query.filter_by(video_id=video_id).first()
 
 
 def validate_video(response):

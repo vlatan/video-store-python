@@ -1,13 +1,6 @@
-from app.posts.helpers import validate_video, fetch_video_data
+from app.posts.helpers import video_banned, validate_video, fetch_video_data
 from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
-from app.models import DeletedPost
-
-
-def is_deleted(response):
-    if DeletedPost.query.filter_by(video_id=response['id']).first():
-        raise ValidationError('This video is banned.')
-    return False
 
 
 def get_playlist_videos(playlist_id, youtube):
@@ -39,8 +32,8 @@ def get_playlist_videos(playlist_id, youtube):
         # if there are no videos res['items'] will be empty list
         for item in res['items']:
             try:
-                # this will raise ValidationError if video's invalid or deleted
-                if validate_video(item) and not is_deleted(item):
+                # this will raise ValidationError if video's invalid
+                if validate_video(item) and not video_banned(item['id']):
                     video_info = fetch_video_data(
                         item, playlist_id=playlist_id)
                     videos.append(video_info)

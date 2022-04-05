@@ -5,7 +5,7 @@ from app import db
 from app.helpers import admin_required
 from app.models import Post, DeletedPost
 from app.posts.forms import PostForm
-from app.posts.helpers import convertDuration
+from app.posts.helpers import convertDuration, video_banned
 
 posts = Blueprint('posts', __name__)
 
@@ -45,9 +45,8 @@ def new_post():
     if form.validate_on_submit():
         # check if this video was already deleted
         # and if true remove it from DeletedPost table
-        video_id = form.processed_content['video_id']
-        if (was_deleted := DeletedPost.query.filter_by(video_id=video_id).first()):
-            db.session.delete(was_deleted)
+        if (banned := video_banned(form.processed_content['video_id'])):
+            db.session.delete(banned)
 
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.processed_content, author=current_user)
