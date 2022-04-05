@@ -11,6 +11,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
+from sqlalchemy.exc import IntegrityError
 
 cron = Blueprint('cron', __name__)
 
@@ -100,7 +101,10 @@ def process_videos(app):
                 post = Post(**video)
                 # add post to database
                 db.session.add(post)
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
                 time.sleep(1)
 
         # get sources ids
