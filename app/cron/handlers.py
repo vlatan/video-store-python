@@ -1,5 +1,6 @@
 import time
 import atexit
+import logging
 from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
 from app import db
@@ -105,6 +106,7 @@ def process_videos(app):
                     db.session.commit()
                 except IntegrityError:
                     db.session.rollback()
+                    logging.exception('Database integrity error')
                 time.sleep(1)
 
         # get sources ids
