@@ -43,6 +43,8 @@ def validate_video(response):
 def normalize_title(title):
     # specific to SLICE source
     title = title.split(' I SLICE ')[0]
+    # remove content after //
+    title = title.split(' // ')[0]
     # remove content after pipe symbol
     title = title.split(' | ')[0]
     # remove bracketed content
@@ -53,7 +55,7 @@ def normalize_title(title):
     prep = ['at', 'by', 'for', 'in', 'of', 'off', 'the', 'and', 'or',
             'nor', 'a', 'an', 'on', 'out', 'to', 'up', 'as', 'but', 'per', 'via']
     # punctuation
-    punct = [':', '.', '!', '?', '-', '—', '–', '|']
+    punct = [':', '.', '!', '?', '-', '—', '–', '//', '--', '|']
     # split title into words
     words = title.split()
 
