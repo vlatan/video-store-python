@@ -62,7 +62,7 @@ a {
     background-color: var(--secondary-background-color);
     margin-bottom: var(--content-padding);
     z-index: 101;
-    position: sticky;
+    position: fixed;
     top: 0;
     width: 100%;
 }
@@ -75,6 +75,7 @@ a {
 
 .content-wrap {
     min-height: 100%;
+    padding-top: calc(var(--content-padding) + var(--header-hight));
 }
 
 .site-header {
@@ -82,7 +83,7 @@ a {
     justify-content: space-between;
     align-items: center;
     column-gap: calc(var(--content-padding) * 7);
-    min-height: var(--header-hight);
+    height: var(--header-hight);
     position: relative;
 }
 
