@@ -9,6 +9,7 @@ class Config:
 
     # app
     APP_NAME = os.getenv('APP_NAME')
+    APP_DESCRIPTION = os.getenv('APP_DESCRIPTION')
     DOMAIN = os.getenv('DOMAIN')
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = json.loads(os.getenv('DEBUG').lower())
