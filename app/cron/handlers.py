@@ -12,7 +12,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, StatementError
 
 cron = Blueprint('cron', __name__)
 
@@ -60,7 +60,11 @@ def revalidate_single_video(post, api_key):
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
             db.session.delete(post)
-            db.session.commit()
+            try:
+                db.session.commit()
+            except StatementError as e:
+                db.session.rollback()
+                logging.error(e)
         except HttpError:
             # we couldn't connect to YouTube API,
             # so we can't evaluate the video
@@ -104,9 +108,9 @@ def process_videos(app):
                 db.session.add(post)
                 try:
                     db.session.commit()
-                except IntegrityError:
+                except IntegrityError as e:
                     db.session.rollback()
-                    logging.exception('Database integrity error')
+                    logging.error(e)
                 time.sleep(1)
 
         # get sources ids
@@ -121,7 +125,11 @@ def process_videos(app):
                 Post.video_id.in_(posted_ids - fetched_ids)).all()
             for post in to_delete:
                 db.session.delete(post)
-                db.session.commit()
+                try:
+                    db.session.commit()
+                except StatementError as e:
+                    db.session.rollback()
+                    logging.error(e)
                 time.sleep(1)
 
         # revalidate orphan videos (not attached to any source/playlist)
