@@ -505,7 +505,7 @@ button.modal-button {
   color: white;
   border-radius: 5px;
   padding: 5px 20px;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   opacity: 0.9;
 }
