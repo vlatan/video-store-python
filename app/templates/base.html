@@ -40,7 +40,7 @@
 			<nav class="navbar">
 				{% if g.search_form %}
 				<form id="searchForm" class="search-form" method="get" action="{{ url_for('search.search_results') }}">
-					<button type="button" class="search-arrow">
+					<button type="button" aria-label="Collapse Search Field" class="search-arrow">
 						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
 							clip-rule="evenodd">
 							<path fill="white"
@@ -49,7 +49,7 @@
 					</button>
 					{{ g.search_form.q(size=20, class='search-form-input',
 					placeholder=g.search_form.q.label.text) }}
-					<button class="search-button">
+					<button aria-label="Search" class="search-button">
 						<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
 							clip-rule="evenodd">
 							<path fill="white"
@@ -57,7 +57,7 @@
 						</svg>
 					</button>
 				</form>
-				<button class="search-button-mobile">
+				<button aria-label="Show Search Field" class="search-button-mobile">
 					<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd">
 						<path fill="white"
 							d="M15.853 16.56c-1.683 1.517-3.911 2.44-6.353 2.44-5.243 0-9.5-4.257-9.5-9.5s4.257-9.5 9.5-9.5 9.5 4.257 9.5 9.5c0 2.442-.923 4.67-2.44 6.353l7.44 7.44-.707.707-7.44-7.44zm-6.353-15.56c4.691 0 8.5 3.809 8.5 8.5s-3.809 8.5-8.5 8.5-8.5-3.809-8.5-8.5 3.809-8.5 8.5-8.5z" />
@@ -67,7 +67,7 @@
 				{% endif %}
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
-					<button class="nav-item username">
+					<button aria-label="Drop User Menu" class="nav-item username">
 						<img src="{{ current_user.picture }}" class="username-image" width="20" height="20" alt="">
 						<span class="username-text">{{ current_user.name }}</span>
 					</button>
@@ -91,9 +91,10 @@
 						<h2 class="modal-title">Delete Account</h2>
 						<p>Are you sure you want to delete your account?</p>
 						<div class="modal-buttons-wrap">
-							<button data-close="account" type="button"
+							<button aria-label="Cancel Delete Account" data-close="account" type="button"
 								class="modal-button cancel-button">Cancel</button>
-							<button type="submit" class="modal-button delete-button">Delete</button>
+							<button aria-label="Delete Account" type="submit"
+								class="modal-button delete-button">Delete</button>
 						</div>
 					</form>
 				</div>
@@ -112,7 +113,8 @@
 							documentaries.
 						</p>
 						<div class="login-buttons">
-							<button data-close="login" class="brand-login-button google-login"
+							<button aria-label="Login via Google" data-close="login"
+								class="brand-login-button google-login"
 								onclick="popupWindow(`{{ url_for('auth.google') }}`, 'Google')">
 								<div class="brand-logo google-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 533.5 544.3"
@@ -133,7 +135,8 @@
 								</div>
 								<div class="brand-text">Sign In with Google</div>
 							</button>
-							<button data-close="login" class="brand-login-button facebook-login"
+							<button aria-label="Login via Facebook" data-close="login"
+								class="brand-login-button facebook-login"
 								onclick="popupWindow(`{{ url_for('auth.facebook') }}`)">
 								<div class="brand-logo">
 									<svg xmlns="http://www.w3.org/2000/svg" viewBox="50 67 400 368"
