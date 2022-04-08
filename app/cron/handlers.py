@@ -1,6 +1,5 @@
 import time
 import atexit
-import logging
 from flask import current_app, Blueprint
 from wtforms.validators import ValidationError
 from app import db
@@ -62,9 +61,8 @@ def revalidate_single_video(post, api_key):
             db.session.delete(post)
             try:
                 db.session.commit()
-            except StatementError as e:
+            except StatementError:
                 db.session.rollback()
-                logging.error(e)
         except HttpError:
             # we couldn't connect to YouTube API,
             # so we can't evaluate the video
@@ -108,9 +106,8 @@ def process_videos(app):
                 db.session.add(post)
                 try:
                     db.session.commit()
-                except IntegrityError as e:
+                except IntegrityError:
                     db.session.rollback()
-                    logging.error(e)
                 time.sleep(1)
 
         # get sources ids
@@ -127,9 +124,8 @@ def process_videos(app):
                 db.session.delete(post)
                 try:
                     db.session.commit()
-                except StatementError as e:
+                except StatementError:
                     db.session.rollback()
-                    logging.error(e)
                 time.sleep(1)
 
         # revalidate orphan videos (not attached to any source/playlist)
