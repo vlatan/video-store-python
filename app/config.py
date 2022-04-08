@@ -38,28 +38,21 @@ class Config:
 
     # Google/Youtube authentication
     YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
+    GOOGLE_PROJECT_ID = os.getenv('GOOGLE_PROJECT_ID')
     GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
     GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
     GOOGLE_SCOPES = json.loads(os.getenv('GOOGLE_SCOPES'))
+    GOOGLE_REDIRECT_URIS = json.loads(os.getenv('GOOGLE_REDIRECT_URIS'))
+    GOOGLE_JS_ORIGINS = json.loads(os.getenv('GOOGLE_JAVASCRIPT_ORIGINS'))
     GOOGLE_CLIENT_CONFIG = {
         "web": {
             "client_id": GOOGLE_CLIENT_ID,
-            "project_id": "doxder",
+            "project_id": GOOGLE_PROJECT_ID,
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": GOOGLE_CLIENT_SECRET,
-            "redirect_uris": [
-                "http://localhost:5000/authorize/google",
-                "https://localhost:5000/authorize/google",
-                f"https://{DOMAIN}/authorize/google"
-            ],
-            "javascript_origins": [
-                "http://localhost",
-                "http://localhost:5000",
-                "https://localhost",
-                "https://localhost:5000",
-                f"https://{DOMAIN}"
-            ]
+            "redirect_uris": GOOGLE_REDIRECT_URIS,
+            "javascript_origins": GOOGLE_JS_ORIGINS
         }
     }
