@@ -2,7 +2,7 @@
 
 {% block css %}
 {{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/content.css') | autoversion }}">
+{% include 'content_css.html' %}
 {% endblock css %}
 
 {% block title_tag %}

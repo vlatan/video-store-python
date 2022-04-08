@@ -2,7 +2,9 @@
 
 {% block css %}
 {{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/page.css') | autoversion }}">
+{% set page_css_url = url_for('static', filename='css/page.css') | autoversion %}
+<link rel="preload" href="{{ page_css_url }}" as="style">
+<link rel="stylesheet" type="text/css" href="{{ page_css_url }}">
 {% endblock css %}
 
 {% block meta %}

@@ -2,7 +2,9 @@
 
 {% block css %}
 {{ super() }}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/error.css') | autoversion }}">
+{% set error_css_url = url_for('static', filename='css/error.css') | autoversion %}
+<link rel="preload" href="{{ error_css_url }}" as="style">
+<link rel="stylesheet" type="text/css" href="{{ error_css_url }}">
 {% endblock css %}
 
 {% block title_tag %}
