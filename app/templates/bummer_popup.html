@@ -14,7 +14,7 @@
     <script>
         if (window.opener && window.opener !== window) {
             window.opener.location.reload();
-            localStorage.setItem('LoggedIn', 'bummer');
+            localStorage.setItem('LoggedIn', false);
             window.close();
         }
         else {

@@ -14,7 +14,7 @@
     <script>
         if (window.opener && window.opener !== window) {
             window.opener.location.reload();
-            localStorage.setItem('LoggedIn', 'bingo');
+            localStorage.setItem('LoggedIn', true);
             window.close();
         }
         else {

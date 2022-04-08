@@ -72,11 +72,11 @@ document.addEventListener('click', function (event) {
 // save login state for parent window
 var loginState = localStorage.getItem('LoggedIn');
 if (loginState) {
-    if (loginState === 'bingo') {
+    if (loginState === 'true') {
         SetAlert("You've been logged in!");
-    } else if (loginState === 'bummer') {
+    } else if (loginState === 'false') {
         SetAlert("Sorry, something went wrong!");
     }
+    // remove login state
+    localStorage.removeItem('LoggedIn');
 }
-// remove login state
-localStorage.removeItem('LoggedIn');
