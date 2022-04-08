@@ -41,6 +41,12 @@ def get_youtube_videos(api_key):
                 video['playlist'] = playlist
             # add this batch of videos to the total list of videos
             all_videos += playlist_videos
+
+    # remove duplicates if any
+    all_videos = list({v['video_id']: v for v in all_videos}.values())
+    # sort by upload date
+    all_videos = sorted(all_videos, key=lambda d: d['upload_date'])
+
     return all_videos, complete
 
 
@@ -76,7 +82,6 @@ def process_videos(app):
 
         # get all VALID videos from our playlists from YouTube
         all_videos, complete = get_youtube_videos(API_KEY)
-        all_videos = sorted(all_videos, key=lambda d: d['upload_date'])
 
         # loop through total number of videos
         for video in all_videos:
