@@ -123,8 +123,8 @@ def process_videos(app):
             fetched_ids = {video['video_id'] for video in all_videos}
             posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
             posted_ids = {post.video_id for post in posted}
-            to_delete = Post.query.filter(
-                Post.video_id.in_(posted_ids - fetched_ids)).all()
+            to_delete = posted_ids - fetched_ids
+            to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
             for post in to_delete:
                 db.session.delete(post)
                 try:
