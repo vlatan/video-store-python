@@ -12,6 +12,7 @@ from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import utc
 from sqlalchemy.exc import IntegrityError, StatementError
+from sqlalchemy.orm.exc import ObjectDeletedError
 
 cron = Blueprint('cron', __name__)
 
@@ -67,7 +68,7 @@ def revalidate_single_video(post, api_key):
             db.session.delete(post)
             try:
                 db.session.commit()
-            except StatementError:
+            except (ObjectDeletedError, StatementError):
                 db.session.rollback()
         except HttpError:
             # we couldn't connect to YouTube API,
@@ -129,7 +130,7 @@ def process_videos(app):
                 db.session.delete(post)
                 try:
                     db.session.commit()
-                except StatementError:
+                except (ObjectDeletedError, StatementError):
                     db.session.rollback()
                 time.sleep(1)
 
