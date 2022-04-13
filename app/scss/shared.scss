@@ -215,7 +215,6 @@ button.search-arrow {
 
 .dropdown-content .nav-item {
     white-space: nowrap;
-    /* margin: auto; */
 }
 
 a.nav-item::after {
@@ -275,7 +274,6 @@ a.nav-item:hover::after {
     color: #cc7b19;
     font-weight: bold;
     padding-top: .5rem;
-    ;
     border-top: 1px solid var(--primary-border-color);
 }
 
@@ -329,18 +327,6 @@ a.nav-item:hover::after {
         visibility: hidden;
     }
 }
-
-/* .alert-info {
-    background: blue;
-}
-
-.alert-success {
-    background: green;
-}
-
-.alert-warning {
-    background: red;
-} */
 
 
 /* ############# Generic Modal ############# */
@@ -423,7 +409,7 @@ button.modal-button:hover {
     gap: .5rem;
 }
 
-/* Float cancel and delete buttons and add an equal width */
+/* Float cancel and delete buttons - add an equal width */
 button.cancel-button,
 button.delete-button {
     width: 50%;
@@ -529,7 +515,6 @@ button.cancel-button {
     background-color: #fff;
 }
 
-
 .google-svg {
     width: 24px;
 }
@@ -607,7 +592,7 @@ button.cancel-button {
 }
 
 
-/* ############# Cookies ############# */
+/* ############# Cookies Disclaimer Message Box ############# */
 
 .snackbar {
     position: fixed;
@@ -682,6 +667,7 @@ button.cancel-button {
     background-color: rgb(58, 59, 64);
     transition: box-shadow 200ms linear, background-color 400ms ease;
 }
+
 
 /* ############# Media Queries ############# */
 

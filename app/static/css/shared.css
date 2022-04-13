@@ -264,7 +264,6 @@ button.search-arrow {
 
 .dropdown-content .nav-item {
   white-space: nowrap;
-  /* margin: auto; */
 }
 
 a.nav-item::after {
@@ -394,17 +393,6 @@ a.nav-item:hover::after {
   }
 }
 
-/* .alert-info {
-    background: blue;
-}
-
-.alert-success {
-    background: green;
-}
-
-.alert-warning {
-    background: red;
-} */
 /* ############# Generic Modal ############# */
 /* The Modal (background) */
 .modal {
@@ -517,7 +505,7 @@ button.modal-button:hover {
   gap: .5rem;
 }
 
-/* Float cancel and delete buttons and add an equal width */
+/* Float cancel and delete buttons - add an equal width */
 button.cancel-button,
 button.delete-button {
   width: 50%;
@@ -737,7 +725,7 @@ button.cancel-button {
   color: #a2a2a2;
 }
 
-/* ############# Cookies ############# */
+/* ############# Cookies Disclaimer Message Box ############# */
 .snackbar {
   position: fixed;
   z-index: 101;
