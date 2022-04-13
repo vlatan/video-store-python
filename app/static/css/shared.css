@@ -717,12 +717,13 @@ button.cancel-button {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   gap: 1rem;
   background-color: var(--primary-background-color);
-  padding: .3rem .6rem;
-  width: -webkit-max-content;
-  width: -moz-max-content;
-  width: max-content;
+  padding: .5rem .7rem;
+  line-height: 1;
   border: 1px solid var(--primary-border-color);
   border-bottom: none;
   font-size: .75rem;
@@ -841,7 +842,8 @@ button.cancel-button {
 /* ############# Media Queries ############# */
 @media screen and (max-width: 1260px) {
   .site-header,
-  .content-wrap {
+  .content-wrap,
+  .site-footer-wrap {
     margin: 0 var(--content-padding);
   }
 }
@@ -904,5 +906,9 @@ button.cancel-button {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+  }
+  .site-footer {
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
   }
 }
