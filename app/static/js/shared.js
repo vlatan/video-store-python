@@ -80,3 +80,40 @@ if (loginState) {
     // remove login state
     localStorage.removeItem('LoggedIn');
 }
+
+
+// Cookies disclaimer
+var acceptCookies = localStorage.getItem('acceptCookies');
+var privacyPath = "/page/privacy/";
+var currentPath = window.location.pathname;
+if (currentPath !== privacyPath && acceptCookies !== 'true') {
+    var snackbar = document.createElement('div');
+    snackbar.classList.add('snackbar');
+    document.getElementById('footer').after(snackbar);
+
+    var snackbarLabel = document.createElement('div');
+    snackbarLabel.classList.add('snackbar-label');
+    snackbarLabel.innerText = "We serve cookies on this site to analyze traffic, \
+    remember your preferences, and optimize your experience.";
+    snackbar.appendChild(snackbarLabel);
+
+    var snackbarActions = document.createElement('div');
+    snackbarActions.classList.add('snackbar-actions');
+    snackbar.appendChild(snackbarActions);
+
+    var detailsLink = document.createElement('a');
+    detailsLink.classList.add('cookies-button');
+    detailsLink.href = privacyPath;
+    detailsLink.innerText = "More details";
+    snackbarActions.appendChild(detailsLink);
+
+    var buttonOK = document.createElement('button');
+    buttonOK.classList.add('cookies-button');
+    buttonOK.innerText = "OK";
+    snackbarActions.appendChild(buttonOK);
+
+    buttonOK.addEventListener('click', () => {
+        localStorage.setItem('acceptCookies', true);
+        snackbar.remove();
+    });
+}

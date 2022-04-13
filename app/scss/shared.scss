@@ -348,23 +348,16 @@ a.nav-item:hover::after {
 /* The Modal (background) */
 .modal {
     display: none;
-    /* Hidden by default */
     position: fixed;
-    /* Stay in place */
     justify-content: center;
     align-items: center;
     z-index: 102;
-    /* Sit on top */
     left: 0;
     top: 0;
     width: 100%;
-    /* Full width */
     height: 100%;
-    /* Full height */
     overflow: auto;
-    /* Enable scroll if needed */
     background-color: rgb(0, 0, 0);
-    /* Fallback color */
     background-color: rgba(0, 0, 0, 0.8);
     animation: fadeIn 300ms ease-in forwards;
 }
@@ -613,6 +606,82 @@ button.cancel-button {
     color: rgb(162, 162, 162);
 }
 
+
+/* ############# Cookies ############# */
+
+.snackbar {
+    position: fixed;
+    z-index: 101;
+    inset: auto auto 1vw 1.5vw;
+    border-radius: 10px;
+    max-width: 30rem;
+    width: 100%;
+    background-color: var(--secondary-background-color);
+    outline: 1px solid rgb(210, 211, 215);
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--content-padding) * 1.25);
+    gap: calc(var(--content-padding) * 1.25);
+    box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2),
+        0 6px 10px 0 rgba(0, 0, 0, 0.14),
+        0 1px 18px 0 rgba(0, 0, 0, 0.12);
+}
+
+@media screen and (max-width: 510px) {
+    .snackbar {
+        outline: unset;
+        inset: auto auto 0 auto;
+        border-radius: unset;
+        max-width: none;
+    }
+}
+
+.snackbar-label {
+    line-height: 1.6;
+}
+
+.snackbar-actions {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: calc(var(--content-padding) * 0.5);
+}
+
+@media screen and (max-width: 310px) {
+    .snackbar-actions {
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+    }
+}
+
+.snackbar-actions .cookies-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    cursor: pointer;
+    padding: 0.8rem 1rem;
+    background-color: rgb(48, 49, 54);
+    color: #9da2ff;
+    min-width: 6rem;
+    text-transform: uppercase;
+    letter-spacing: .03ch;
+    border-radius: 3px;
+    overflow: hidden;
+    line-height: 1;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: background-color .8s;
+}
+
+.snackbar-actions .cookies-button:hover {
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.1),
+        0px 8px 8px 1px rgba(0, 0, 0, 0.07),
+        0px 3px 8px 2px rgba(0, 0, 0, 0.08);
+    background-color: rgb(58, 59, 64);
+    transition: box-shadow 200ms linear, background-color 400ms ease;
+}
 
 /* ############# Media Queries ############# */
 
