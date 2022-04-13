@@ -10,7 +10,7 @@ def video_banned(video_id):
 
 
 def validate_video(response):
-    if response['status']['privacyStatus'] != 'public':
+    if response['status']['privacyStatus'] == 'private':
         raise ValidationError('This video is not public.')
 
     rating = response['contentDetails'].get('contentRating')
