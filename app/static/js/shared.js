@@ -104,6 +104,7 @@ if (currentPath !== privacyPath && acceptCookies !== 'true') {
     var detailsLink = document.createElement('a');
     detailsLink.classList.add('cookies-button');
     detailsLink.href = privacyPath;
+    detailsLink.target = '_blank';
     detailsLink.innerText = "More details";
     snackbarActions.appendChild(detailsLink);
 
