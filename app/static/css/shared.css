@@ -676,7 +676,7 @@ button.cancel-button {
 .site-footer-wrap {
   position: -webkit-sticky;
   position: sticky;
-  z-index: 101;
+  z-index: 100;
   bottom: 0;
   max-width: var(--content-width);
   margin: 0 auto;
@@ -727,7 +727,7 @@ button.cancel-button {
 /* ############# Cookies Disclaimer Message Box ############# */
 .snackbar {
   position: fixed;
-  z-index: 101;
+  z-index: 100;
   inset: auto auto 1vw 1.5vw;
   border-radius: 10px;
   max-width: 30rem;
