@@ -56,9 +56,8 @@ a {
 /* ################# Header / Content ################# */
 .site-header-wrap {
   background-color: var(--secondary-background-color);
-  margin-bottom: var(--content-padding);
-  z-index: 101;
   position: fixed;
+  z-index: 101;
   top: 0;
   width: 100%;
 }
@@ -200,12 +199,12 @@ button.search-arrow {
 .dropdown-content {
   display: none;
   position: absolute;
+  z-index: 1;
   top: 154%;
   right: 0;
   padding: var(--content-padding) calc(var(--content-padding) + .5rem);
   background-color: var(--secondary-background-color);
   border-top: none;
-  z-index: 1;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -398,13 +397,13 @@ a.nav-item:hover::after {
 .modal {
   display: none;
   position: fixed;
+  z-index: 102;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  z-index: 102;
   left: 0;
   top: 0;
   width: 100%;
