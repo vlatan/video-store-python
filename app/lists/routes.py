@@ -29,7 +29,7 @@ def new_playlist():
         return redirect(url_for('lists.playlists'))
 
     return render_template('form.html', title='Suggest YouTube Playlist',
-                           form=form, legend='Playlist')
+                           form=form, legend='New Playlist')
 
 
 @lists.route('/source/<string:playlist_id>/', methods=['GET', 'POST'])

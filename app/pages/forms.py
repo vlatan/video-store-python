@@ -8,5 +8,5 @@ class PageForm(FlaskForm):
                         render_kw={'placeholder': 'Your title...'})
     content = TextAreaField(label='Content', validators=[DataRequired()],
                             render_kw={'placeholder': 'You can use markdown...',
-                                       'rows': 12})
+                                       'rows': 15})
     submit = SubmitField(label='Submit')

@@ -58,7 +58,7 @@ def new_post():
         return redirect(url_for('posts.post', video_id=post.video_id))
 
     return render_template('form.html', title='Suggest YouTube Documentary',
-                           form=form, legend='Documentary')
+                           form=form, legend='New Video')
 
 
 @posts.route('/video/<string:video_id>/<string:action>', methods=['POST'])

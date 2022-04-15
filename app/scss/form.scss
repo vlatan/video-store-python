@@ -26,7 +26,6 @@
 
 .form-legend {
     font-weight: bold;
-    font-size: 1.2rem;
     padding: .3rem 1rem;
     border: 1px solid var(--primary-border-color);
     border-radius: 5px;
@@ -35,12 +34,12 @@
 
 .form-label {
     display: block;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .form-input {
     padding: .5rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
     width: 100%;
     background-color: var(--primary-background-color);
     border: 1px solid var(--primary-border-color);
