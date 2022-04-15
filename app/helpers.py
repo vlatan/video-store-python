@@ -55,3 +55,12 @@ def query_index(fields, keyword, page, per_page):
         results = searcher.search_page(query, page, pagelen=per_page)
         ids = [int(result['id']) for result in results]
         return ids, total
+
+
+def query_index_all(fields, keyword):
+    with current_app.index.searcher() as searcher:
+        schema, og = current_app.index.schema, OrGroup.factory(0.9)
+        parser = MultifieldParser(fields, schema, group=og)
+        query = parser.parse(keyword)
+        results = searcher.search(query, limit=None)
+        return [int(result['id']) for result in results]

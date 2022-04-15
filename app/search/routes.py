@@ -1,8 +1,10 @@
 import time
 from flask import render_template, request, redirect, current_app, g
 from flask import url_for, Blueprint, jsonify, make_response, session
+from app.helpers import query_index_all
 from app.search.forms import SearchForm
 from app.models import Post
+from app import db
 
 
 search = Blueprint('search', __name__)
@@ -31,25 +33,37 @@ def search_results():
             return redirect(url_for('main.home'))
         keyword = g.search_form.q.data
         # get the search results
-        posts, total = Post.search(keyword, 1, per_page)
-        # save keyword and the total number of posts in session
-        session['keyword'], session['total'] = keyword, total
-        # calculate the time took to get the search results
+        ids = query_index_all(Post.__searchable__, keyword)
+        # save ids and the total number of posts in session
+        session['ids'], session['total'] = ids, len(ids)
+
+        # get the first page results
+        posts = []
+        if (ids := ids[:per_page]):
+            when = [(ids[i], i) for i in range(len(ids))]
+            posts = Post.query.filter(Post.id.in_(ids)).order_by(
+                db.case(when, value=Post.id))
+
+        # calculate the time it took to get the search results
         time_took = round(time.time() - start_time, 2)
         # render the template
         return render_template('search.html', posts=posts,
-                               total=total, time_took=time_took,
+                               total=session['total'],
+                               time_took=time_took,
                                title='Search')
 
-    keyword, total = session['keyword'], session['total']
-    # if we got the frontend data (POST), the keyword and the total number of posts
-    if (frontend_data := request.get_json()) and keyword and total:
+    # load the next page (POST request)
+    ids, total = session.get('ids'), session.get('total')
+    if (frontend_data := request.get_json()) and ids and total:
         # get the page number
         page = frontend_data.get('page')
         # if there are subsequent posts send content to frontend
-        if total > (page - 1) * per_page:
-            # get the search results
-            posts, _ = Post.search(keyword, page, per_page)
+        if total > (start := (page - 1) * per_page):
+            # get posts from this page
+            ids = ids[start:start + per_page]
+            when = [(ids[i], i) for i in range(len(ids))]
+            posts = Post.query.filter(Post.id.in_(ids)).order_by(
+                db.case(when, value=Post.id))
             # posts as JSON object
             posts = jsonify([post.serialize for post in posts])
             # Simulate delay
