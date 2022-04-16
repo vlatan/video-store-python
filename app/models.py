@@ -157,8 +157,8 @@ class Post(Base, SearchableMixin):
     @cache.memoize(86400)
     def get_posts_by_likes(cls, page, per_page):
         """ query posts by likes (outerjoin)
-            https://stackoverflow.com/q/63889938 """
-
+            https://stackoverflow.com/q/63889938
+        """
         query = cls.query.outerjoin(PostLike).group_by(
             cls.id).order_by(func.count().desc())
         posts = query.paginate(page, per_page, False).items
@@ -186,6 +186,16 @@ class Post(Base, SearchableMixin):
         orphans = (cls.playlist_id == None) | (cls.playlist_id.not_in(src_ids))
         query = cls.query.filter(orphans).order_by(cls.upload_date.desc())
         posts = query.paginate(page, per_page, False).items
+        return [post.serialize for post in posts]
+
+    @classmethod
+    @cache.memoize(86400)
+    def get_posts_by_id(cls, ids):
+        if not ids:
+            return ids
+        when = [(ids[i], i) for i in range(len(ids))]
+        posts = cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id))
         return [post.serialize for post in posts]
 
 

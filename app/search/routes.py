@@ -38,11 +38,7 @@ def search_results():
         session['ids'], session['total'] = ids, len(ids)
 
         # get the first page results
-        posts = []
-        if (ids := ids[:per_page]):
-            when = [(ids[i], i) for i in range(len(ids))]
-            posts = Post.query.filter(Post.id.in_(ids)).order_by(
-                db.case(when, value=Post.id))
+        posts = Post.get_posts_by_id(ids[:per_page])
 
         # calculate the time it took to get the search results
         time_took = round(time.time() - start_time, 2)
@@ -60,15 +56,9 @@ def search_results():
         # if there are subsequent posts send content to frontend
         if total > (start := (page - 1) * per_page):
             # get posts from this page
-            ids = ids[start:start + per_page]
-            when = [(ids[i], i) for i in range(len(ids))]
-            posts = Post.query.filter(Post.id.in_(ids)).order_by(
-                db.case(when, value=Post.id))
-            # posts as JSON object
-            posts = jsonify([post.serialize for post in posts])
-            # Simulate delay
+            posts = Post.get_posts_by_id(ids[start:start + per_page])
             time.sleep(0.4)
-            return make_response(posts, 200)
+            return make_response(jsonify(posts), 200)
 
     # if there are no more pages
     return make_response(jsonify([]), 200)
