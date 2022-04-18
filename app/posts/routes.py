@@ -84,4 +84,8 @@ def perform_action(video_id, action):
             post.title = title
             db.session.commit()
             return make_response('Success', 200)
+        elif (desc := frontend_data.get('description')):
+            post.short_description = desc
+            db.session.commit()
+            return make_response('Success', 200)
     return make_response('Sorry, can\'t resolve the request', 400)

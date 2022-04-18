@@ -15,6 +15,9 @@
 <meta property='og:url' content='{{ post_url }}'>
 <meta property='og:image' content='{{ meta_thumb }}'>
 <meta name='thumbnail' content='{{ meta_thumb }}'>
+{% if post.short_description %}
+<meta name='description' content='{{ post.short_description }}'>
+{% endif %}
 {{ super() }}
 {% endblock meta %}
 
@@ -76,6 +79,25 @@
 				</div>
 			</div>
 		</header>
+
+		{% if post.short_description %}
+
+		<div class="video-description">
+			{{ post.short_description }}
+		</div>
+
+		{% if current_user.is_authenticated and current_user.is_admin %}
+		<button class="modal-button edit-description">Edit Desc</button>
+		{% endif %}
+
+		{% elif current_user.is_authenticated and current_user.is_admin %}
+		<div class="video-description">
+			{{ post.description }}
+		</div>
+		<button class="modal-button edit-description">Edit Desc</button>
+
+		{% endif %}
+
 	</div>
 
 	<div class="related_videos">
@@ -114,6 +136,7 @@
 <script defer src="{{ url_for('static', filename='js/likes.js') | autoversion }}"></script>
 {% if current_user.is_admin %}
 <script defer src="{{ url_for('static', filename='js/title.js') | autoversion }}"></script>
+<script defer src="{{ url_for('static', filename='js/description.js') | autoversion }}"></script>
 {% endif %}
 {% else %}
 <script defer src="{{ url_for('static', filename='js/login.js') | autoversion }}"></script>
