@@ -106,9 +106,12 @@ button.edit-description {
     gap: var(--content-padding);
 }
 
+.video-description {
+    padding-bottom: calc(var(--content-padding) / 2);
+}
+
 @media screen and (max-width: 900px) {
     .video-description {
-        padding-bottom: calc(var(--content-padding) / 2);
         border-bottom: 1px solid var(--primary-border-color);
     }
 }
