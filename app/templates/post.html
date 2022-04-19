@@ -91,8 +91,11 @@
 		{% endif %}
 
 		{% elif current_user.is_authenticated and current_user.is_admin %}
-		<div style="color:rgb(183, 187, 233);" class="video-description">
-			{{ post.description }}
+		<div class="unpublished">
+			<p>UNPUBLISHED DESCRIPTION:</p>
+			<div class="video-description">
+				{{ post.description }}
+			</div>
 		</div>
 		<button class="modal-button edit-description">Edit Desc</button>
 

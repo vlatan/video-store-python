@@ -136,6 +136,21 @@ button.edit-description {
   padding-bottom: calc(var(--content-padding) / 2);
 }
 
+.unpublished {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: calc(var(--content-padding) / 2);
+}
+
+.unpublished .video-description {
+  color: #b7bbe9;
+}
+
 @media screen and (max-width: 900px) {
   .video-description {
     border-bottom: 1px solid var(--primary-border-color);
@@ -143,12 +158,11 @@ button.edit-description {
 }
 
 @media screen and (max-width: 700px) {
-  .metadata {
+  .metadata,
+  .unpublished {
     gap: var(--content-padding);
   }
-  h1.video-title {
-    padding-bottom: var(--content-padding);
-  }
+  h1.video-title,
   .video-description {
     padding-bottom: var(--content-padding);
   }

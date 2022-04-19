@@ -110,6 +110,16 @@ button.edit-description {
     padding-bottom: calc(var(--content-padding) / 2);
 }
 
+.unpublished {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--content-padding) / 2);
+}
+
+.unpublished .video-description {
+    color: rgb(183, 187, 233);
+}
+
 @media screen and (max-width: 900px) {
     .video-description {
         border-bottom: 1px solid var(--primary-border-color);
@@ -117,14 +127,13 @@ button.edit-description {
 }
 
 @media screen and (max-width: 700px) {
-    .metadata {
+
+    .metadata,
+    .unpublished {
         gap: var(--content-padding);
     }
 
-    h1.video-title {
-        padding-bottom: var(--content-padding);
-    }
-
+    h1.video-title,
     .video-description {
         padding-bottom: var(--content-padding);
     }

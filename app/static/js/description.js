@@ -1,5 +1,6 @@
 // Edit Description
 var editDescriptionButton = document.querySelector('.edit-description');
+var unpublishedWrap = document.querySelector('.unpublished');
 var videoDescription = document.querySelector('.video-description');
 var originalDescription = videoDescription.innerText;
 
@@ -15,8 +16,9 @@ editDescriptionButton.addEventListener('click', () => {
         PostData(url, { description: videoDescription.innerText })
             .then(response => {
                 if (response.ok) {
-                    SetAlert("Description succesfully edited!");
+                    SetAlert("Description succesfully published!");
                     originalDescription = videoDescription.innerText;
+                    unpublishedWrap.replaceWith(videoDescription);
                 } else {
                     videoDescription.innerText = originalDescription;
                     SetAlert("Sorry, something went wrong!");
