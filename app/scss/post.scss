@@ -68,17 +68,16 @@
 }
 
 .metadata {
-    --metadata-padding: calc(var(--content-padding) / 2);
     display: flex;
     flex-direction: column;
-    gap: var(--metadata-padding);
+    gap: calc(var(--content-padding) / 2);
 }
 
 h1.video-title {
     font-weight: normal;
     line-height: 1.2;
-    padding-bottom: var(--metadata-padding);
-    border-bottom: 1px solid hsl(0, 0%, 18.82%);
+    padding-bottom: calc(var(--content-padding) / 2);
+    border-bottom: 1px solid var(--primary-border-color);
 }
 
 .editing:focus {
@@ -105,6 +104,13 @@ button.edit-description {
     justify-content: space-between;
     align-items: center;
     gap: var(--content-padding);
+}
+
+@media screen and (max-width: 900px) {
+    .video-description {
+        padding-bottom: calc(var(--content-padding) / 2);
+        border-bottom: 1px solid var(--primary-border-color);
+    }
 }
 
 @media screen and (max-width: 700px) {

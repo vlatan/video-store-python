@@ -78,7 +78,6 @@
 }
 
 .metadata {
-  --metadata-padding: calc(var(--content-padding) / 2);
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -86,14 +85,14 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  gap: var(--metadata-padding);
+  gap: calc(var(--content-padding) / 2);
 }
 
 h1.video-title {
   font-weight: normal;
   line-height: 1.2;
-  padding-bottom: var(--metadata-padding);
-  border-bottom: 1px solid #303030;
+  padding-bottom: calc(var(--content-padding) / 2);
+  border-bottom: 1px solid var(--primary-border-color);
 }
 
 .editing:focus {
@@ -131,6 +130,13 @@ button.edit-description {
       -ms-flex-align: center;
           align-items: center;
   gap: var(--content-padding);
+}
+
+@media screen and (max-width: 900px) {
+  .video-description {
+    padding-bottom: calc(var(--content-padding) / 2);
+    border-bottom: 1px solid var(--primary-border-color);
+  }
 }
 
 @media screen and (max-width: 700px) {
