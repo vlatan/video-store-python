@@ -121,6 +121,10 @@ button.edit-description {
     h1.video-title {
         padding-bottom: var(--content-padding);
     }
+
+    .video-description {
+        padding-bottom: var(--content-padding);
+    }
 }
 
 @media screen and (max-width: 600px) {
