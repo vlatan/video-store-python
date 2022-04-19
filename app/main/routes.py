@@ -53,10 +53,16 @@ def home():
     page = frontend_data.get('page') if frontend_data else 1
 
     if current_user.is_authenticated and current_user.is_admin:
-        # https://flask-caching.readthedocs.io/en/latest/api.html#flask_caching.Cache.memoize
-        uncached_posts = Post.get_posts.uncached
-        posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
-            'order_by') == 'likes' else uncached_posts(Post, page, per_page)
+        if request.args.get('order_by') == 'likes':
+            posts = Post.get_posts_by_likes(page, per_page)
+        elif request.args.get('short_desc') == 'no':
+            query = Post.query.filter_by(
+                short_description=None).order_by(Post.upload_date.desc())
+            posts = query.paginate(page, per_page, False).items
+            posts = [post.serialize for post in posts]
+        else:
+            uncached_posts = Post.get_posts.uncached
+            posts = uncached_posts(Post, page, per_page)
     else:
         posts = Post.get_posts_by_likes(page, per_page) if request.args.get(
             'order_by') == 'likes' else Post.get_posts(page, per_page)
