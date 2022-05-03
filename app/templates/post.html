@@ -13,8 +13,8 @@
 <meta property='og:title' content='{{ post.title }}'>
 <meta property='og:type' content='video.movie'>
 <meta property='og:url' content='{{ post_url }}'>
-<meta property='og:image' content='{{ meta_thumb }}'>
-<meta name='thumbnail' content='{{ meta_thumb }}'>
+<meta property='og:image' content='{{ thumb }}'>
+<meta name='thumbnail' content='{{ thumb }}'>
 {% if post.short_description %}
 <meta name='description' content='{{ post.short_description }}'>
 {% endif %}
@@ -30,7 +30,7 @@
 	<div class="video-content">
 		<div class="player">
 			<div class="player-content" id="{{ post.video_id }}">
-				<img alt="{{ post.title }}" src="{{ thumb }}">
+				<img alt="{{ post.title }}" srcset="{{ srcset }}" src="{{ thumb }}">
 				<div class="play"></div>
 			</div>
 		</div>

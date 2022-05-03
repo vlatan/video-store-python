@@ -14,10 +14,11 @@ posts = Blueprint('posts', __name__)
 def post(video_id):
     post = Post.query.filter_by(video_id=video_id).first_or_404()
 
-    # get standard size thumb, if doesn't exist get high size
-    thumb = post.thumbnails.get('standard', post.thumbnails.get('high'))
-    # get maxres thumb for meta tag
-    meta_thumb = post.thumbnails.get('maxres', thumb)
+    # thumbs
+    thumbs = sorted(post.thumbnails.values(), key=lambda x: x['width'])
+    thumb = thumbs[-1]['url']
+    srcset = [f"{item['url']} {item['width']}w" for item in thumbs]
+    srcset = ", ".join(srcset)
 
     # create video duration object
     duration = convertDuration(post.duration)
@@ -30,8 +31,8 @@ def post(video_id):
     PER_PAGE = current_app.config['NUM_RELATED_POSTS']
     related_posts = Post.get_related_posts(post.title, PER_PAGE)
 
-    return render_template('post.html', post=post, thumb=thumb['url'],
-                           meta_thumb=meta_thumb['url'],
+    return render_template('post.html', post=post,
+                           thumb=thumb, srcset=srcset,
                            duration=duration.human, likes=likes,
                            title=post.title, related_posts=related_posts)
 
