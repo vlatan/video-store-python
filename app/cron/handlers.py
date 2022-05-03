@@ -65,8 +65,8 @@ def revalidate_single_video(post, api_key):
             validate_video(res)
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
-            db.session.delete(post)
             try:
+                db.session.delete(post)
                 db.session.commit()
             except (ObjectDeletedError, StatementError):
                 db.session.rollback()
@@ -108,9 +108,8 @@ def process_videos(app):
             else:
                 # create object from Model
                 post = Post(**video)
-                # add post to database
-                db.session.add(post)
                 try:
+                    db.session.add(post)
                     db.session.commit()
                 except IntegrityError:
                     db.session.rollback()
@@ -127,8 +126,8 @@ def process_videos(app):
             to_delete = posted_ids - fetched_ids
             to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
             for post in to_delete:
-                db.session.delete(post)
                 try:
+                    db.session.delete(post)
                     db.session.commit()
                 except (ObjectDeletedError, StatementError):
                     db.session.rollback()
