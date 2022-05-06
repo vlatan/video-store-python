@@ -729,6 +729,7 @@ button.cancel-button {
   position: fixed;
   z-index: 100;
   inset: auto auto 1vw 1.5vw;
+  left: calc(((100vw - 1rem) - var(--content-width)) / 2);
   border-radius: 10px;
   max-width: 30rem;
   width: 100%;
@@ -747,15 +748,6 @@ button.cancel-button {
           box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.2), 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12);
 }
 
-@media screen and (max-width: 510px) {
-  .snackbar {
-    outline: unset;
-    inset: auto auto 0 auto;
-    border-radius: unset;
-    max-width: none;
-  }
-}
-
 .snackbar-label {
   line-height: 1.6;
 }
@@ -771,21 +763,6 @@ button.cancel-button {
       -ms-flex-align: center;
           align-items: center;
   gap: calc(var(--content-padding) * 0.5);
-}
-
-@media screen and (max-width: 310px) {
-  .snackbar-actions {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
-    -webkit-box-align: start;
-        -ms-flex-align: start;
-            align-items: flex-start;
-  }
 }
 
 .snackbar-actions .cookies-button {
@@ -832,6 +809,9 @@ button.cancel-button {
   .site-footer-wrap {
     margin: 0 var(--content-padding);
   }
+  .snackbar {
+    left: var(--content-padding);
+  }
 }
 
 @media screen and (max-width: 1024px) {
@@ -860,6 +840,15 @@ button.cancel-button {
   }
   .dropdown-content::after {
     right: 5%;
+  }
+}
+
+@media screen and (max-width: 510px) {
+  .snackbar {
+    outline: unset;
+    inset: auto auto 0 auto;
+    border-radius: unset;
+    max-width: none;
   }
 }
 
@@ -897,5 +886,20 @@ button.cancel-button {
     width: 100%;
     -ms-flex-wrap: wrap;
         flex-wrap: wrap;
+  }
+}
+
+@media screen and (max-width: 310px) {
+  .snackbar-actions {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: start;
+        -ms-flex-align: start;
+            align-items: flex-start;
   }
 }

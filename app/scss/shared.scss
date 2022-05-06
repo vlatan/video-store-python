@@ -597,6 +597,8 @@ button.cancel-button {
     position: fixed;
     z-index: 100;
     inset: auto auto 1vw 1.5vw;
+    // 1rem below is the width of the custom scrollbar
+    left: calc(((100vw - 1rem) - var(--content-width)) / 2);
     border-radius: 10px;
     max-width: 30rem;
     width: 100%;
@@ -611,15 +613,6 @@ button.cancel-button {
         0 1px 18px 0 rgba(0, 0, 0, 0.12);
 }
 
-@media screen and (max-width: 510px) {
-    .snackbar {
-        outline: unset;
-        inset: auto auto 0 auto;
-        border-radius: unset;
-        max-width: none;
-    }
-}
-
 .snackbar-label {
     line-height: 1.6;
 }
@@ -629,14 +622,6 @@ button.cancel-button {
     justify-content: flex-start;
     align-items: center;
     gap: calc(var(--content-padding) * 0.5);
-}
-
-@media screen and (max-width: 310px) {
-    .snackbar-actions {
-        flex-direction: column;
-        justify-content: center;
-        align-items: flex-start;
-    }
 }
 
 .snackbar-actions .cookies-button {
@@ -677,6 +662,10 @@ button.cancel-button {
     .site-footer-wrap {
         margin: 0 var(--content-padding);
     }
+
+    .snackbar {
+        left: var(--content-padding);
+    }
 }
 
 @media screen and (max-width: 1024px) {
@@ -711,6 +700,15 @@ button.cancel-button {
     }
 }
 
+@media screen and (max-width: 510px) {
+    .snackbar {
+        outline: unset;
+        inset: auto auto 0 auto;
+        border-radius: unset;
+        max-width: none;
+    }
+}
+
 @media screen and (max-width: 450px) {
     .search-form {
         display: none;
@@ -736,5 +734,13 @@ button.cancel-button {
     .site-footer {
         width: 100%;
         flex-wrap: wrap;
+    }
+}
+
+@media screen and (max-width: 310px) {
+    .snackbar-actions {
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
     }
 }
