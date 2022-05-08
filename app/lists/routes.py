@@ -6,6 +6,8 @@ from app import db
 from app.models import Post, Playlist
 from app.helpers import admin_required
 from app.lists.forms import PlaylistForm
+from app.lists.helpers import validate_playlist
+from googleapiclient.discovery import build
 
 lists = Blueprint('lists', __name__)
 
@@ -79,4 +81,13 @@ def playlists():
     """ Route to return the channels """
     # Query the Playlist table
     playlists = Playlist.query.order_by(Playlist.id.desc())
+    api_key = current_app.config['YOUTUBE_API_KEY']
+    with build('youtube', 'v3', developerKey=api_key,
+               cache_discovery=False) as youtube:
+        for pl in playlists:
+            pl_info = validate_playlist(pl.playlist_id, youtube)
+            pl.channel_title = pl_info['channel_title']
+            pl.channel_description = pl_info['channel_description']
+        db.session.commit()
+
     return render_template('sources.html', posts=playlists, title='Sources')
