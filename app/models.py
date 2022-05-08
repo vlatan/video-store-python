@@ -233,9 +233,11 @@ class Playlist(Base):
     playlist_id = db.Column(db.String(50), unique=True, nullable=False)
     channel_id = db.Column(db.String(50), unique=True, nullable=False)
     title = db.Column(db.String(256), nullable=False)
+    channel_title = db.Column(db.String(256))
     thumbnails = db.Column(db.PickleType, nullable=False)
     channel_thumbnails = db.Column(db.PickleType, nullable=False)
     description = db.Column(db.Text)
+    channel_description = db.Column(db.Text)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     posts = db.relationship('Post', backref='playlist', lazy=True)

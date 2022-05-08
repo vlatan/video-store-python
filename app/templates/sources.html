@@ -29,7 +29,12 @@
         <img class="channel-img" src="{{ post.channel_thumbnails['medium']['url'] }}"
             width="{{ post.channel_thumbnails['medium']['width'] }}"
             height="{{ post.channel_thumbnails['medium']['height'] }}" alt="{{ post.title }}">
+        {% if post.channel_title %}
+        <h2 class="playlist-title">{{ post.channel_title }}</h2>
+        {% else %}
         <h2 class="playlist-title">{{ post.title }}</h2>
+        {% endif %}
+
     </a>
     {% endfor %}
 

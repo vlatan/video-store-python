@@ -24,9 +24,11 @@ def validate_playlist(playlist_id, youtube):
         return {'playlist_id': playlist_id,
                 'channel_id': channel_id,
                 'title': res['snippet']['title'],
+                'channel_title': ch['snippet']['title'],
                 'thumbnails': res['snippet']['thumbnails'],
                 'channel_thumbnails': ch['snippet']['thumbnails'],
-                'description': res['snippet'].get('description')}
+                'description': res['snippet'].get('description'),
+                'channel_description': ch['snippet'].get('description')}
 
     # could not connect to YT API (HttpError)
     # or the playlist doesn't exist (IndexError)
