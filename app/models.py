@@ -52,11 +52,11 @@ class SearchableMixin(object):
 
     @classmethod
     def _fields_dirty(cls, obj):
-        if isinstance(obj, cls):
-            insp = inspect(obj)  # https://stackoverflow.com/a/28353846
-            attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
-            return any([attr.history.has_changes() for attr in attrs])
-        return False
+        if not isinstance(obj, cls):
+            return False
+        insp = inspect(obj)  # https://stackoverflow.com/a/28353846
+        attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
+        return any([attr.history.has_changes() for attr in attrs])
 
     @classmethod
     def before_commit(cls, session):
