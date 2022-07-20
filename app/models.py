@@ -178,9 +178,8 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_playlist_posts(cls, playlist_id, page, per_page):
-        query = cls.query.filter_by(playlist_id=playlist_id).order_by(
-            cls.upload_date.desc()
-        )
+        query = cls.query.filter_by(playlist_id=playlist_id)
+        query = query.order_by(cls.upload_date.desc())
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
