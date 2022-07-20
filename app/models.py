@@ -163,9 +163,8 @@ class Post(Base, SearchableMixin):
         Query posts by likes (outerjoin)
         https://stackoverflow.com/q/63889938
         """
-        query = (
-            cls.query.outerjoin(PostLike).group_by(cls.id).order_by(func.count().desc())
-        )
+        query = cls.query.outerjoin(PostLike).group_by(cls.id)
+        query = query.order_by(func.count().desc())
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
