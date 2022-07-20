@@ -29,9 +29,8 @@ def google():
             return redirect(request.referrer)
 
         # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-        flow = google_auth_oauthlib.flow.Flow.from_client_config(
-            CLIENT_CONFIG, scopes=SCOPES
-        )
+        flow = google_auth_oauthlib.flow.Flow
+        flow = flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES)
         flow.redirect_uri = REDIRECT_URL
 
         authorization_url, state = flow.authorization_url(
@@ -47,9 +46,8 @@ def google():
 
         return redirect(authorization_url)
 
-    flow = google_auth_oauthlib.flow.Flow.from_client_config(
-        CLIENT_CONFIG, scopes=SCOPES, state=session["state"]
-    )
+    flow = google_auth_oauthlib.flow.Flow
+    flow = flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES, state=session["state"])
     flow.redirect_uri = REDIRECT_URL
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
@@ -60,9 +58,8 @@ def google():
     try:
         # verify the integrity of the ID token and return the user info
         # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
-        data = id_token.verify_oauth2_token(
-            credentials.id_token, google_requests.Request(), CLIENT_ID
-        )
+        token, google_request = credentials.id_token, google_requests.Request()
+        data = id_token.verify_oauth2_token(token, google_request, CLIENT_ID)
 
         # process user data for login
         user_info = {
@@ -107,9 +104,10 @@ def onetap():
     try:
         # verify the integrity of the ID token and get the user info
         token = request.form.get("credential")
+        google_request = google_requests.Request()
         CLIENT_ID = current_app.config["GOOGLE_OAUTH_CLIENT_ID"]
         # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
-        data = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
+        data = id_token.verify_oauth2_token(token, google_request, CLIENT_ID)
 
         # process user data for login
         user_info = {
@@ -185,9 +183,8 @@ def facebook():
         }
 
         # get access token from the access token endpoint (json response)
-        ACCESS_TOKEN = requests.get(access_token_endpoint, params=payload).json()[
-            "access_token"
-        ]
+        ACCESS_TOKEN = requests.get(access_token_endpoint, params=payload)
+        ACCESS_TOKEN = ACCESS_TOKEN.json()["access_token"]
 
         # verify the access token we got
         inspect_token_endpoint = "https://graph.facebook.com/debug_token"
