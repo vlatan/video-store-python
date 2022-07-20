@@ -36,9 +36,8 @@ class ActionMixin(object):
 
     def has_casted(self, post, action):
         obj = PostLike if action in ["like", "unlike"] else PostFave
-        return (
-            obj.query.filter(obj.user_id == self.id, obj.post_id == post.id).count() > 0
-        )
+        query = obj.query.filter(obj.user_id == self.id, obj.post_id == post.id)
+        return query.count() > 0
 
 
 class SearchableMixin(object):
@@ -48,10 +47,8 @@ class SearchableMixin(object):
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
-        return (
-            cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id)),
-            total,
-        )
+        query = cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id))
+        return query, total
 
     @classmethod
     def _fields_dirty(cls, obj):
