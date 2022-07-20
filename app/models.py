@@ -17,13 +17,14 @@ def load_user(user_id):
 class Base(db.Model):
     __abstract__ = True
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow,
-                           onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
 
 class ActionMixin(object):
     def cast(self, post, action):
-        obj = PostLike if action in ['like', 'unlike'] else PostFave
+        obj = PostLike if action in ["like", "unlike"] else PostFave
         # if user hasn't liked/faved the post record her like/fave
         if not self.has_casted(post, action):
             cast = obj(user_id=self.id, post_id=post.id)
@@ -34,9 +35,10 @@ class ActionMixin(object):
             cast.delete()
 
     def has_casted(self, post, action):
-        obj = PostLike if action in ['like', 'unlike'] else PostFave
-        return obj.query.filter(obj.user_id == self.id,
-                                obj.post_id == post.id).count() > 0
+        obj = PostLike if action in ["like", "unlike"] else PostFave
+        return (
+            obj.query.filter(obj.user_id == self.id, obj.post_id == post.id).count() > 0
+        )
 
 
 class SearchableMixin(object):
@@ -46,8 +48,10 @@ class SearchableMixin(object):
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
-        return cls.query.filter(cls.id.in_(ids)).order_by(
-            db.case(when, value=cls.id)), total
+        return (
+            cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id)),
+            total,
+        )
 
     @classmethod
     def _fields_dirty(cls, obj):
@@ -60,16 +64,16 @@ class SearchableMixin(object):
     @classmethod
     def before_commit(cls, session):
         session._changes = {
-            'add': [obj for obj in session.new if isinstance(obj, cls)],
-            'update': [obj for obj in session.dirty if cls._fields_dirty(obj)],
-            'delete': [obj for obj in session.deleted if isinstance(obj, cls)]
+            "add": [obj for obj in session.new if isinstance(obj, cls)],
+            "update": [obj for obj in session.dirty if cls._fields_dirty(obj)],
+            "delete": [obj for obj in session.deleted if isinstance(obj, cls)],
         }
 
     @classmethod
     def after_commit(cls, session):
-        for obj in session._changes['add'] + session._changes['update']:
+        for obj in session._changes["add"] + session._changes["update"]:
             add_to_index(obj)
-        for obj in session._changes['delete']:
+        for obj in session._changes["delete"]:
             remove_from_index(obj)
         session._changes = None
 
@@ -81,42 +85,41 @@ class SearchableMixin(object):
 
 class User(Base, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
-    google_id = db.Column(db.String(256), unique=True,
-                          nullable=True, index=True)
-    facebook_id = db.Column(db.String(256), unique=True,
-                            nullable=True, index=True)
+    google_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
+    facebook_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
     analytics_id = db.Column(db.String(512))
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
 
-    posts = db.relationship('Post', backref='author', lazy=True)
-    playlists = db.relationship('Playlist', backref='author', lazy=True)
-    liked = db.relationship('PostLike', backref='user',
-                            cascade='all,delete-orphan', lazy='dynamic')
-    faved = db.relationship('PostFave', backref='user',
-                            cascade='all,delete-orphan', lazy='dynamic')
+    posts = db.relationship("Post", backref="author", lazy=True)
+    playlists = db.relationship("Playlist", backref="author", lazy=True)
+    liked = db.relationship(
+        "PostLike", backref="user", cascade="all,delete-orphan", lazy="dynamic"
+    )
+    faved = db.relationship(
+        "PostFave", backref="user", cascade="all,delete-orphan", lazy="dynamic"
+    )
 
     def __init__(self, *args, **kwargs):
-        if not 'analytics_id' in kwargs:
-            open_id = kwargs.get('google_id', kwargs.get('facebook_id'))
-            value = str(kwargs.get('id')) + str(open_id)
+        if not "analytics_id" in kwargs:
+            open_id = kwargs.get("google_id", kwargs.get("facebook_id"))
+            value = str(kwargs.get("id")) + str(open_id)
             value = hashlib.md5(value.encode()).hexdigest()
-            kwargs['analytics_id'] = value
+            kwargs["analytics_id"] = value
         super().__init__(*args, **kwargs)
 
     @property
     def is_admin(self):
-        admin_openid = current_app.config['ADMIN_OPENID']
+        admin_openid = current_app.config["ADMIN_OPENID"]
         return True if self.google_id == admin_openid else False
 
 
 class Post(Base, SearchableMixin):
-    __searchable__ = ['title', 'description', 'tags']
+    __searchable__ = ["title", "description", "tags"]
     id = db.Column(db.Integer, primary_key=True, index=True)
-    provider = db.Column(db.String(7), default='YouTube')
-    video_id = db.Column(db.String(20), unique=True,
-                         nullable=False, index=True)
+    provider = db.Column(db.String(7), default="YouTube")
+    video_id = db.Column(db.String(20), unique=True, nullable=False, index=True)
     playlist_id = db.Column(db.String(50))
     title = db.Column(db.String(256), nullable=False)
     thumbnails = db.Column(db.PickleType, nullable=False)
@@ -127,24 +130,26 @@ class Post(Base, SearchableMixin):
     upload_date = db.Column(db.DateTime, nullable=False)
     similar = db.Column(db.PickleType, default=[])
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    playlist_db_id = db.Column(db.Integer, db.ForeignKey('playlist.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    playlist_db_id = db.Column(db.Integer, db.ForeignKey("playlist.id"))
 
-    likes = db.relationship('PostLike', backref='post',
-                            cascade='all,delete-orphan', lazy='dynamic')
-    faves = db.relationship('PostFave', backref='post',
-                            cascade='all,delete-orphan', lazy='dynamic')
+    likes = db.relationship(
+        "PostLike", backref="post", cascade="all,delete-orphan", lazy="dynamic"
+    )
+    faves = db.relationship(
+        "PostFave", backref="post", cascade="all,delete-orphan", lazy="dynamic"
+    )
 
     @property
     def serialize(self):
-        """ Return object data in easily serializable format. """
+        """Return object data in easily serializable format."""
         return {
-            'id': self.id,
-            'video_id': self.video_id,
-            'title': escape(self.title),
-            'thumbnails': self.thumbnails,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            "id": self.id,
+            "video_id": self.video_id,
+            "title": escape(self.title),
+            "thumbnails": self.thumbnails,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
         }
 
     @classmethod
@@ -157,11 +162,13 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_posts_by_likes(cls, page, per_page):
-        """ query posts by likes (outerjoin)
-            https://stackoverflow.com/q/63889938
         """
-        query = cls.query.outerjoin(PostLike).group_by(
-            cls.id).order_by(func.count().desc())
+        Query posts by likes (outerjoin)
+        https://stackoverflow.com/q/63889938
+        """
+        query = (
+            cls.query.outerjoin(PostLike).group_by(cls.id).order_by(func.count().desc())
+        )
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
@@ -175,8 +182,9 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_playlist_posts(cls, playlist_id, page, per_page):
-        query = cls.query.filter_by(
-            playlist_id=playlist_id).order_by(cls.upload_date.desc())
+        query = cls.query.filter_by(playlist_id=playlist_id).order_by(
+            cls.upload_date.desc()
+        )
         posts = query.paginate(page, per_page, False).items
         return [post.serialize for post in posts]
 
@@ -195,16 +203,14 @@ class Post(Base, SearchableMixin):
         if not ids:
             return ids
         when = [(ids[i], i) for i in range(len(ids))]
-        posts = cls.query.filter(cls.id.in_(ids)).order_by(
-            db.case(when, value=cls.id))
+        posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id))
         return [post.serialize for post in posts]
 
 
 class DeletedPost(Base):
     id = db.Column(db.Integer, primary_key=True, index=True)
-    provider = db.Column(db.String(7), default='YouTube')
-    video_id = db.Column(db.String(20), unique=True,
-                         nullable=False, index=True)
+    provider = db.Column(db.String(7), default="YouTube")
+    video_id = db.Column(db.String(20), unique=True, nullable=False, index=True)
 
 
 class Page(Base):
@@ -214,9 +220,9 @@ class Page(Base):
     slug = db.Column(db.String(255))
 
     def __init__(self, *args, **kwargs):
-        if not 'slug' in kwargs:
-            slug = slugify(kwargs.get('title', ''), allow_unicode=True)
-            kwargs['slug'] = slug
+        if not "slug" in kwargs:
+            slug = slugify(kwargs.get("title", ""), allow_unicode=True)
+            kwargs["slug"] = slug
         super().__init__(*args, **kwargs)
 
     @cache.memoize(86400)
@@ -239,22 +245,22 @@ class Playlist(Base):
     description = db.Column(db.Text)
     channel_description = db.Column(db.Text)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    posts = db.relationship('Post', backref='playlist', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    posts = db.relationship("Post", backref="playlist", lazy=True)
 
 
 class PostLike(Base):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"))
 
 
 class PostFave(Base):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    post_id = db.Column(db.Integer, db.ForeignKey("post.id"))
 
 
 # listen for commit and make changes to search index
-db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+db.event.listen(db.session, "before_commit", SearchableMixin.before_commit)
+db.event.listen(db.session, "after_commit", SearchableMixin.after_commit)
