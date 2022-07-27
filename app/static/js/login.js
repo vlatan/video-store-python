@@ -1,6 +1,6 @@
-var needLogin = document.querySelector('.need-login');
+const needLogin = document.querySelector('.need-login');
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', event => {
     if (event.target.closest('[data-auth]')) {
         needLogin.style.display = 'block';
     }
