@@ -1,52 +1,51 @@
 // Get references to the dom elements
-var scroller = document.querySelector("#scroller");
-var template = document.querySelector('#post_template');
-var sentinel = document.querySelector('#sentinel');
-var spinner = document.querySelector('#spinner');
+const scroller = document.querySelector("#scroller");
+const template = document.querySelector('#post_template');
+const sentinel = document.querySelector('#sentinel');
+const spinner = document.querySelector('#spinner');
 // apply spinner
 spinner.classList.add('spinner');
 // Use infinite scroll from the second page onwards
-var page = 2;
-// There are still posts to be fetched
-var the_end = false;
+let page = 2;
 
 // Function to request new items and render to the dom
-function loadItems(url = '', data = {}) {
+const loadItems = (url = '', data = {}) => {
 
-    postData(url, data).then((response) => {
+    postData(url, data).then(response => {
 
         if (!response.ok) {
-            the_end = true;
+            // Replace the spinner with "No more posts"
+            sentinel.innerHTML = "No more posts";
+            // We got to the end, no more posts
             return
         }
 
         // Convert the response data to JSON
-        response.json().then((data) => {
+        response.json().then(data => {
 
             // If empty JSON, exit the function
             if (!data.length) {
                 // Replace the spinner with "No more posts"
                 sentinel.innerHTML = "No more posts";
                 // We got to the end, no more posts
-                the_end = true;
                 return;
             }
 
             // Iterate over the items in the response
-            for (var i = 0; i < data.length; i++) {
+            for (const item of data) {
 
                 // Clone the HTML template
-                let template_clone = template.content.cloneNode(true);
+                const template_clone = template.content.cloneNode(true);
 
                 // Query & update the template content
-                template_clone.querySelector('.video-link').href = `/video/${data[i]['video_id']}/`;
-                let thumb = template_clone.querySelector('.video-img');
-                thumb.src = data[i]['thumbnails']['medium']['url'];
-                thumb.alt = data[i]['title'];
-                template_clone.querySelector('.video-title').innerHTML = data[i]['title'];
-                let remove = template_clone.querySelector('.remove-option');
+                template_clone.querySelector('.video-link').href = `/video/${item.video_id}/`;
+                const thumb = template_clone.querySelector('.video-img');
+                thumb.src = item.thumbnails.medium.url;
+                thumb.alt = item.title;
+                template_clone.querySelector('.video-title').innerHTML = item.title;
+                const remove = template_clone.querySelector('.remove-option');
                 if (remove) {
-                    remove.setAttribute('data-id', `${data[i]['id']}`)
+                    remove.setAttribute('data-id', `${item.id}`)
                 }
 
                 // Append template to dom
@@ -63,7 +62,7 @@ if ('IntersectionObserver' in window) {
     // Create a new IntersectionObserver instance
     let intersectionObserver = new IntersectionObserver(([entry]) => {
         // If there are still posts and the entry is intersecting
-        if (the_end === false && entry.isIntersecting) {
+        if (entry.isIntersecting) {
             // Call the loadItems function
             loadItems(`${window.location.href}`, { page: page });
             // Unobserve the entry
