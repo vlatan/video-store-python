@@ -1,8 +1,8 @@
 // Edit Description
-var editDescriptionButton = document.querySelector('.edit-description');
-var unpublishedWrap = document.querySelector('.unpublished');
-var videoDescription = document.querySelector('.video-description');
-var originalDescription = videoDescription.innerText;
+const editDescriptionButton = document.querySelector('.edit-description');
+const unpublishedWrap = document.querySelector('.unpublished');
+const videoDescription = document.querySelector('.video-description');
+let originalDescription = videoDescription.innerText;
 
 
 editDescriptionButton.addEventListener('click', () => {
@@ -31,7 +31,7 @@ editDescriptionButton.addEventListener('click', () => {
 });
 
 
-function resetDescription(description, button) {
+const resetDescription = (description, button) => {
     description.removeAttribute('contenteditable');
     button.innerText = "Edit Desc";
     description.classList.remove('editing');
