@@ -24,6 +24,6 @@
 {% endblock content %}
 
 {% block scripts %}
-<script defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {{ super() }}
+<script defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
 {% endblock scripts %}
