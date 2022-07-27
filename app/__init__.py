@@ -16,9 +16,9 @@ minify = Minify()
 login_manager = LoginManager()
 
 # where the user will be redirected if she's not logged in
-login_manager.login_view = 'main.home'
+login_manager.login_view = "main.home"
 # the class/category of the flash message when the user is not logged in
-login_manager.login_message_category = 'warning'
+login_manager.login_message_category = "warning"
 
 
 def create_app(default_config=Config):
@@ -30,11 +30,11 @@ def create_app(default_config=Config):
     app.config.from_object(default_config)
 
     # initialize search index
-    os.mkdir('index') if not os.path.exists('index') else None
+    os.mkdir("index") if not os.path.exists("index") else None
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    exists = exists_in('index')
-    app.index = open_dir('index') if exists else create_in('index', schema)
+    exists = exists_in("index")
+    app.index = open_dir("index") if exists else create_in("index", schema)
 
     # initialize plugins
     cache.init_app(app)
