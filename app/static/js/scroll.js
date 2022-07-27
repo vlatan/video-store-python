@@ -13,7 +13,7 @@ var the_end = false;
 // Function to request new items and render to the dom
 function loadItems(url = '', data = {}) {
 
-    PostData(url, data).then((response) => {
+    postData(url, data).then((response) => {
 
         if (!response.ok) {
             the_end = true;

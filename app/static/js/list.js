@@ -13,9 +13,9 @@ document.addEventListener('click', (event) => {
         fetch(url, { method: 'POST' }).then(response => {
             if (response.ok) {
                 remove.parentElement.remove();
-                SetAlert(messageText);
+                setAlert(messageText);
             } else {
-                SetAlert("Something went wrong!");
+                setAlert("Something went wrong!");
             }
         });
     }

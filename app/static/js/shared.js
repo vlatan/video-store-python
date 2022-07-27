@@ -4,7 +4,7 @@ function sleep(time) {
 }
 
 // Send/recieve data to/from backend
-async function PostData(url = '', data = {}) {
+async function postData(url = '', data = {}) {
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -14,7 +14,7 @@ async function PostData(url = '', data = {}) {
 }
 
 // Set alert message
-function SetAlert(message) {
+function setAlert(message) {
     var alert = document.createElement('div');
     alert.classList.add('alert');
     alert.innerText = message;
@@ -73,9 +73,9 @@ document.addEventListener('click', function (event) {
 var loginState = localStorage.getItem('LoggedIn');
 if (loginState) {
     if (loginState === 'true') {
-        SetAlert("You've been logged in!");
+        setAlert("You've been logged in!");
     } else if (loginState === 'false') {
-        SetAlert("Sorry, something went wrong!");
+        setAlert("Sorry, something went wrong!");
     }
     // remove login state
     localStorage.removeItem('LoggedIn');

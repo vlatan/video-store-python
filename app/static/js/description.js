@@ -13,15 +13,15 @@ editDescriptionButton.addEventListener('click', () => {
         editDescriptionButton.innerText = "Save Desc";
     } else {
         const url = `${window.location.pathname}edit`;
-        PostData(url, { description: videoDescription.innerText })
+        postData(url, { description: videoDescription.innerText })
             .then(response => {
                 if (response.ok) {
-                    SetAlert("Description succesfully published!");
+                    setAlert("Description succesfully published!");
                     originalDescription = videoDescription.innerText;
                     unpublishedWrap.replaceWith(videoDescription);
                 } else {
                     videoDescription.innerText = originalDescription;
-                    SetAlert("Sorry, something went wrong!");
+                    setAlert("Sorry, something went wrong!");
                 }
             });
         videoDescription.removeAttribute('contenteditable');

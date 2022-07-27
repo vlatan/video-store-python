@@ -12,14 +12,14 @@ editTitleButton.addEventListener('click', () => {
         editTitleButton.innerText = "Save Title";
     } else {
         const url = `${window.location.pathname}edit`;
-        PostData(url, { title: videoTitle.innerText })
+        postData(url, { title: videoTitle.innerText })
             .then(response => {
                 if (response.ok) {
-                    SetAlert("Title succesfully edited!");
+                    setAlert("Title succesfully edited!");
                     originalTitle = videoTitle.innerText;
                 } else {
                     videoTitle.innerText = originalTitle;
-                    SetAlert("Sorry, something went wrong!");
+                    setAlert("Sorry, something went wrong!");
                 }
             });
         videoTitle.removeAttribute('contenteditable');
