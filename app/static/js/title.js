@@ -1,7 +1,7 @@
 // Edit Title
-var editTitleButton = document.querySelector('.edit-title');
-var videoTitle = document.querySelector('.video-title');
-var originalTitle = videoTitle.innerText;
+const editTitleButton = document.querySelector('.edit-title');
+const videoTitle = document.querySelector('.video-title');
+let originalTitle = videoTitle.innerText;
 
 
 editTitleButton.addEventListener('click', () => {
@@ -29,24 +29,24 @@ editTitleButton.addEventListener('click', () => {
 });
 
 
-function resetTitle(title, button) {
+const resetTitle = (title, button) => {
     title.removeAttribute('contenteditable');
     button.innerText = "Edit Title";
     title.classList.remove('editing');
     title.innerText = originalTitle;
-}
+};
 
 
-videoTitle.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape') {
+videoTitle.addEventListener('keydown', (event) => {
+    if (event.code === 'Escape') {
         resetTitle(videoTitle, editTitleButton);
     }
 });
 
 
-document.addEventListener('click', (e) => {
-    if (e.target !== editTitleButton &&
-        e.target !== videoTitle &&
+document.addEventListener('click', (event) => {
+    if (event.target !== editTitleButton &&
+        event.target !== videoTitle &&
         videoTitle.classList.contains('editing')) {
         resetTitle(videoTitle, editTitleButton);
     }
