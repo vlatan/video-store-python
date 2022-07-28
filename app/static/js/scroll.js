@@ -12,7 +12,7 @@ const noMoreScroll = () => {
     sentinel.innerHTML = "No more videos";
     nextPage = false;
     return
-}
+};
 
 // Function to request new items and render to the dom
 const loadItems = (url = '', data = {}) => {
@@ -57,7 +57,7 @@ const loadItems = (url = '', data = {}) => {
             page += 1;
         })
     })
-}
+};
 
 if ('IntersectionObserver' in window) {
     // Create a new IntersectionObserver instance
