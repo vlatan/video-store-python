@@ -1,23 +1,27 @@
 // Get references to the dom elements
-const scroller = document.querySelector("#scroller");
-const template = document.querySelector('#post_template');
-const sentinel = document.querySelector('#sentinel');
-const spinner = document.querySelector('#spinner');
-// apply spinner
-spinner.classList.add('spinner');
-// Use infinite scroll from the second page onwards
-let page = 2;
+const scroller = document.getElementById("scroller");
+const template = document.getElementById("post_template");
+const sentinel = document.getElementById("sentinel");
+const spinner = document.getElementById("spinner");
+let page = 2; // Use infinite scroll from the second page onwards
+let nextPage = true; // Assume there is next page to load
+
+
+const noMoreScroll = () => {
+    // Replace the spinner with "No more videos"
+    sentinel.innerHTML = "No more videos";
+    nextPage = false;
+    return
+}
 
 // Function to request new items and render to the dom
 const loadItems = (url = '', data = {}) => {
 
     postData(url, data).then(response => {
 
+        // If bad response exit the function
         if (!response.ok) {
-            // Replace the spinner with "No more posts"
-            sentinel.innerHTML = "No more posts";
-            // We got to the end, no more posts
-            return
+            return noMoreScroll();
         }
 
         // Convert the response data to JSON
@@ -25,10 +29,7 @@ const loadItems = (url = '', data = {}) => {
 
             // If empty JSON, exit the function
             if (!data.length) {
-                // Replace the spinner with "No more posts"
-                sentinel.innerHTML = "No more posts";
-                // We got to the end, no more posts
-                return;
+                return noMoreScroll();
             }
 
             // Iterate over the items in the response
@@ -61,8 +62,8 @@ const loadItems = (url = '', data = {}) => {
 if ('IntersectionObserver' in window) {
     // Create a new IntersectionObserver instance
     let intersectionObserver = new IntersectionObserver(([entry]) => {
-        // If there are still posts and the entry is intersecting
-        if (entry.isIntersecting) {
+        // If there are still videos and the entry is intersecting
+        if (nextPage && entry.isIntersecting) {
             // Call the loadItems function
             loadItems(`${window.location.href}`, { page: page });
             // Unobserve the entry
