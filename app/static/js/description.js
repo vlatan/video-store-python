@@ -36,19 +36,19 @@ const resetDescription = (description, button) => {
     button.innerText = "Edit Desc";
     description.classList.remove('editing');
     description.innerText = originalDescription;
-}
+};
 
 
-videoDescription.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape') {
+videoDescription.addEventListener('keydown', event => {
+    if (event.code === 'Escape') {
         resetDescription(videoDescription, editDescriptionButton);
     }
 });
 
 
-document.addEventListener('click', (e) => {
-    if (e.target !== editDescriptionButton &&
-        e.target !== videoDescription &&
+document.addEventListener('click', event => {
+    if (event.target !== editDescriptionButton &&
+        event.target !== videoDescription &&
         videoDescription.classList.contains('editing')) {
         resetDescription(videoDescription, editDescriptionButton);
     }

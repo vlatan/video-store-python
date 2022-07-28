@@ -4,7 +4,7 @@ const setFaveStatus = action => {
         text = '&#10003; Saved';
     }
     document.querySelector('[data-status]').innerHTML = text;
-}
+};
 
 const setLikeCounter = action => {
     let likes = document.querySelector('[data-likes]');
@@ -31,12 +31,12 @@ const setLikeCounter = action => {
         text = `${counter} Likes`;
     }
     document.querySelector('[data-likes]').textContent = text;
-}
+};
 
 const performAction = async action => {
     const url = `${window.location.pathname}${action}`;
     return await fetch(url, { method: 'POST' });
-}
+};
 
 const listenForAction = (event, action) => {
     const actionElement = event.target.closest(`.${action}`);
@@ -58,9 +58,9 @@ const listenForAction = (event, action) => {
                 }
             });
     }
-}
+};
 
-document.addEventListener('click', (event) => {
+document.addEventListener('click', event => {
     listenForAction(event, 'like');
     listenForAction(event, 'fave');
 });
