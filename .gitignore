@@ -131,6 +131,7 @@ dmypy.json
 # Custom
 *.db
 .vscode
+todo.txt
 testing/
 logs/
 migrations/
