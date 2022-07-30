@@ -3,7 +3,7 @@ import hashlib
 import requests
 from datetime import timedelta
 from urllib.parse import urlencode
-import google_auth_oauthlib.flow
+from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from flask import request, redirect, session, current_app
@@ -29,8 +29,7 @@ def google():
             return redirect(request.referrer)
 
         # Create flow instance to manage the OAuth 2.0 Authorization Grant Flow steps.
-        flow = google_auth_oauthlib.flow.Flow
-        flow = flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES)
+        flow = Flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES)
         flow.redirect_uri = REDIRECT_URL
 
         authorization_url, state = flow.authorization_url(
@@ -46,8 +45,8 @@ def google():
 
         return redirect(authorization_url)
 
-    flow = google_auth_oauthlib.flow.Flow
-    flow = flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES, state=session["state"])
+    # Create flow instance
+    flow = Flow.from_client_config(CLIENT_CONFIG, scopes=SCOPES, state=session["state"])
     flow.redirect_uri = REDIRECT_URL
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
