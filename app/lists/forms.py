@@ -8,10 +8,12 @@ from googleapiclient.discovery import build
 
 
 class PlaylistForm(FlaskForm):
-    content = StringField('Post YouTube Playlist URL',
-                          validators=[DataRequired(), URL(message='')],
-                          render_kw={'placeholder': 'Playlist URL here...'})
-    submit = SubmitField('Submit')
+    content = StringField(
+        "Post YouTube Playlist URL",
+        validators=[DataRequired(), URL(message="")],
+        render_kw={"placeholder": "Playlist URL here..."},
+    )
+    submit = SubmitField("Submit")
 
     def __init__(self):
         super().__init__()
@@ -23,12 +25,13 @@ class PlaylistForm(FlaskForm):
 
         # check if the playlits is already posted
         if Playlist.query.filter_by(playlist_id=playlist_id).first():
-            raise ValidationError('Playlist already in the database.')
+            raise ValidationError("Playlist already in the database.")
 
         # construct youtube API service
-        api_key = current_app.config['YOUTUBE_API_KEY']
-        with build('youtube', 'v3', developerKey=api_key,
-                   cache_discovery=False) as youtube:
+        api_key = current_app.config["YOUTUBE_API_KEY"]
+        with build(
+            "youtube", "v3", developerKey=api_key, cache_discovery=False
+        ) as youtube:
             # get the playlist's metadata
             # this will raise ValidationError if unable to fetch data
             self.processed_content = validate_playlist(playlist_id, youtube)

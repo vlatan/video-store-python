@@ -7,16 +7,16 @@ from app.models import Post, DeletedPost
 from app.posts.forms import PostForm
 from app.posts.helpers import convertDuration, video_banned
 
-posts = Blueprint('posts', __name__)
+posts = Blueprint("posts", __name__)
 
 
-@posts.route('/video/<string:video_id>/')
+@posts.route("/video/<string:video_id>/")
 def post(video_id):
     post = Post.query.filter_by(video_id=video_id).first_or_404()
 
     # thumbs
-    thumbs = sorted(post.thumbnails.values(), key=lambda x: x['width'])
-    thumb = thumbs[-1]['url']
+    thumbs = sorted(post.thumbnails.values(), key=lambda x: x["width"])
+    thumb = thumbs[-1]["url"]
     srcset = [f"{item['url']} {item['width']}w" for item in thumbs]
     srcset = ", ".join(srcset)
 
@@ -24,20 +24,26 @@ def post(video_id):
     duration = convertDuration(post.duration)
 
     num_likes = post.likes.count()
-    likes = '1 Like' if num_likes == 1 else f'{num_likes} Likes'
+    likes = "1 Like" if num_likes == 1 else f"{num_likes} Likes"
     if not num_likes:
-        likes = 'Like'
+        likes = "Like"
 
-    PER_PAGE = current_app.config['NUM_RELATED_POSTS']
+    PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
     related_posts = Post.get_related_posts(post.title, PER_PAGE)
 
-    return render_template('post.html', post=post,
-                           thumb=thumb, srcset=srcset,
-                           duration=duration.human, likes=likes,
-                           title=post.title, related_posts=related_posts)
+    return render_template(
+        "post.html",
+        post=post,
+        thumb=thumb,
+        srcset=srcset,
+        duration=duration.human,
+        likes=likes,
+        title=post.title,
+        related_posts=related_posts,
+    )
 
 
-@posts.route('/video/new', methods=['GET', 'POST'])
+@posts.route("/video/new", methods=["GET", "POST"])
 @admin_required
 def new_post():
     form = PostForm()
@@ -46,7 +52,7 @@ def new_post():
     if form.validate_on_submit():
         # check if this video was already deleted
         # and if true remove it from DeletedPost table
-        if (banned := video_banned(form.processed_content['video_id'])):
+        if banned := video_banned(form.processed_content["video_id"]):
             db.session.delete(banned)
 
         # form.content.data is a dict, just unpack to transform into kwargs
@@ -55,38 +61,39 @@ def new_post():
         db.session.add(post)
         db.session.commit()
 
-        flash('Your post has been created!', 'success')
-        return redirect(url_for('posts.post', video_id=post.video_id))
+        flash("Your post has been created!", "success")
+        return redirect(url_for("posts.post", video_id=post.video_id))
 
-    return render_template('form.html', title='Suggest YouTube Documentary',
-                           form=form, legend='New Video')
+    return render_template(
+        "form.html", title="Suggest YouTube Documentary", form=form, legend="New Video"
+    )
 
 
-@posts.route('/video/<string:video_id>/<string:action>', methods=['POST'])
+@posts.route("/video/<string:video_id>/<string:action>", methods=["POST"])
 @login_required
 def perform_action(video_id, action):
     post = Post.query.filter_by(video_id=video_id).first_or_404()
-    if action in ['like', 'unlike', 'fave', 'unfave']:
+    if action in ["like", "unlike", "fave", "unfave"]:
         current_user.cast(post, action)
         db.session.commit()
-        return make_response('Success', 200)
-    elif action == 'delete' and current_user.is_admin:
+        return make_response("Success", 200)
+    elif action == "delete" and current_user.is_admin:
         # add this post to DeletedPost table
         deleted_post = DeletedPost(video_id=post.video_id)
         db.session.add(deleted_post)
         # delete the post
         db.session.delete(post)
         db.session.commit()
-        flash('The video has been deleted', 'success')
-        return redirect(url_for('main.home'))
-    elif action == 'edit' and current_user.is_admin:
+        flash("The video has been deleted", "success")
+        return redirect(url_for("main.home"))
+    elif action == "edit" and current_user.is_admin:
         frontend_data = request.get_json()
-        if (title := frontend_data.get('title')):
+        if title := frontend_data.get("title"):
             post.title = title
             db.session.commit()
-            return make_response('Success', 200)
-        elif (desc := frontend_data.get('description')):
+            return make_response("Success", 200)
+        elif desc := frontend_data.get("description"):
             post.short_description = desc
             db.session.commit()
-            return make_response('Success', 200)
-    return make_response('Sorry, can\'t resolve the request', 400)
+            return make_response("Success", 200)
+    return make_response("Sorry, can't resolve the request", 400)

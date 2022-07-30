@@ -8,42 +8,42 @@ class Config:
     load_dotenv()
 
     # app
-    APP_NAME = os.getenv('APP_NAME')
-    APP_DESCRIPTION = os.getenv('APP_DESCRIPTION')
-    DOMAIN = os.getenv('DOMAIN')
-    SECRET_KEY = os.getenv('SECRET_KEY')
-    DEBUG = json.loads(os.getenv('DEBUG').lower())
-    ENV = 'development' if DEBUG else 'production'
-    GTAG_ID = os.getenv('GTAG_ID')
-    CRON_HOUR = int(os.getenv('CRON_HOUR'))
+    APP_NAME = os.getenv("APP_NAME")
+    APP_DESCRIPTION = os.getenv("APP_DESCRIPTION")
+    DOMAIN = os.getenv("DOMAIN")
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    DEBUG = json.loads(os.getenv("DEBUG").lower())
+    ENV = "development" if DEBUG else "production"
+    GTAG_ID = os.getenv("GTAG_ID")
+    CRON_HOUR = int(os.getenv("CRON_HOUR"))
 
     # cache
-    CACHE_TYPE = 'SimpleCache'  # Flask-Caching related configs
+    CACHE_TYPE = "SimpleCache"  # Flask-Caching related configs
     CACHE_DEFAULT_TIMEOUT = 300
 
     # Admin Google openid
-    ADMIN_OPENID = os.getenv('ADMIN_OPENID')
+    ADMIN_OPENID = os.getenv("ADMIN_OPENID")
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
-    POSTS_PER_PAGE = int(os.getenv('POSTS_PER_PAGE'))
-    NUM_RELATED_POSTS = int(os.getenv('NUM_RELATED_POSTS'))
+    POSTS_PER_PAGE = int(os.getenv("POSTS_PER_PAGE"))
+    NUM_RELATED_POSTS = int(os.getenv("NUM_RELATED_POSTS"))
 
     # Facebook authentication
-    FB_CLIENT_ID = os.getenv('FB_CLIENT_ID')
-    FB_CLIENT_SECRET = os.getenv('FB_CLIENT_SECRET')
+    FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
+    FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
 
     # Google/Youtube authentication
-    YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-    GOOGLE_PROJECT_ID = os.getenv('GOOGLE_PROJECT_ID')
-    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-    GOOGLE_SCOPES = json.loads(os.getenv('GOOGLE_SCOPES'))
-    GOOGLE_REDIRECT_URIS = json.loads(os.getenv('GOOGLE_REDIRECT_URIS'))
-    GOOGLE_JS_ORIGINS = json.loads(os.getenv('GOOGLE_JAVASCRIPT_ORIGINS'))
+    YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+    GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    GOOGLE_SCOPES = json.loads(os.getenv("GOOGLE_SCOPES"))
+    GOOGLE_REDIRECT_URIS = json.loads(os.getenv("GOOGLE_REDIRECT_URIS"))
+    GOOGLE_JS_ORIGINS = json.loads(os.getenv("GOOGLE_JAVASCRIPT_ORIGINS"))
     GOOGLE_CLIENT_CONFIG = {
         "web": {
             "client_id": GOOGLE_CLIENT_ID,
@@ -53,6 +53,6 @@ class Config:
             "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
             "client_secret": GOOGLE_CLIENT_SECRET,
             "redirect_uris": GOOGLE_REDIRECT_URIS,
-            "javascript_origins": GOOGLE_JS_ORIGINS
+            "javascript_origins": GOOGLE_JS_ORIGINS,
         }
     }

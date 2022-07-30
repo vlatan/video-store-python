@@ -9,10 +9,12 @@ from googleapiclient.discovery import build
 
 
 class PostForm(FlaskForm):
-    content = StringField('Post YouTube Video URL',
-                          validators=[DataRequired(), URL(message='')],
-                          render_kw={'placeholder': 'Video URL here...'})
-    submit = SubmitField('Submit')
+    content = StringField(
+        "Post YouTube Video URL",
+        validators=[DataRequired(), URL(message="")],
+        render_kw={"placeholder": "Video URL here..."},
+    )
+    submit = SubmitField("Submit")
 
     def __init__(self):
         super().__init__()
@@ -24,19 +26,20 @@ class PostForm(FlaskForm):
 
         # check if the video is already posted
         if Post.query.filter_by(video_id=video_id).first():
-            raise ValidationError('Video already posted.')
+            raise ValidationError("Video already posted.")
 
         # construct youtube API service
-        api_key = current_app.config['YOUTUBE_API_KEY']
-        with build('youtube', 'v3', developerKey=api_key,
-                   cache_discovery=False) as youtube:
+        api_key = current_app.config["YOUTUBE_API_KEY"]
+        with build(
+            "youtube", "v3", developerKey=api_key, cache_discovery=False
+        ) as youtube:
             try:
                 # the scope for YouTube API
-                part = ['status', 'snippet', 'contentDetails']
+                part = ["status", "snippet", "contentDetails"]
                 # construct the request for YouTube
                 req = youtube.videos().list(id=video_id, part=part)
                 # call YouTube API, get response (execute request)
-                res = req.execute()['items'][0]
+                res = req.execute()["items"][0]
                 # this will raise exception if unable to fetch
                 if validate_video(res):
                     self.processed_content = fetch_video_data(res)
@@ -46,4 +49,4 @@ class PostForm(FlaskForm):
                 raise
             # if ['items'] list is empty or unable to connect to YT API
             except (HttpError, IndexError):
-                raise ValidationError('Unable to fetch the video.')
+                raise ValidationError("Unable to fetch the video.")
