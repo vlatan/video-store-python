@@ -1,7 +1,7 @@
 import hashlib
 
 
-def test_new_google_user_with_fixture(new_google_user):
+def test_new_google_user(new_google_user):
     """
     GIVEN a User model
     WHEN a new User is created
@@ -18,7 +18,7 @@ def test_new_google_user_with_fixture(new_google_user):
     assert new_google_user.analytics_id == analytics_id
 
 
-def test_new_facebook_user_with_fixture(new_facebook_user):
+def test_new_facebook_user(new_facebook_user):
     """
     GIVEN a User model
     WHEN a new User is created
