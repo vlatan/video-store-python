@@ -16,7 +16,11 @@ auth = Blueprint("auth", __name__)
 
 @auth.route("/authorize/google")
 def google():
-    # https://tinyurl.com/ymadyw2k
+    """
+    Use Google to authenticate the user.
+    https://developers.google.com/identity/protocols/oauth2/web-server/
+    """
+
     CLIENT_CONFIG = current_app.config["GOOGLE_CLIENT_CONFIG"]
     CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
     REDIRECT_URL = url_for("auth.google", _external=True)
@@ -85,6 +89,11 @@ def google():
 
 @auth.route("/authorize/onetap", methods=["POST"])
 def onetap():
+    """
+    Use Google's One Tap to authenticate the user.
+    https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+    """
+
     if current_user.is_authenticated:
         return redirect(request.referrer)
 
@@ -130,7 +139,10 @@ def onetap():
 
 @auth.route("/authorize/facebook")
 def facebook():
-    # https://tinyurl.com/yzexjyru
+    """
+    Use Facebook to authenticate the user.
+    https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow
+    """
 
     CLIENT_ID = current_app.config["FB_CLIENT_ID"]
     REDIRECT_URI = url_for("auth.facebook", _external=True)
@@ -238,6 +250,8 @@ def facebook():
 @auth.route("/logout")
 @login_required
 def logout():
+    """Logout the user and redirect."""
+
     logout_user()
     login_needed = [
         url_for("users.liked", _external=True),
