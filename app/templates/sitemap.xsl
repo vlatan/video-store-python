@@ -12,11 +12,10 @@
 				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 				<meta name="robots" content="noindex,follow" />
 				<style type="text/css">
-					body { font-family:"Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; font-size:11px; margin:20px;}
+					body { font-family:"Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; margin:20px;}
 					h1 { margin: 5px; }
 					#intro { margin: 20px 0 20px 5px; color: gray; }
 					#intro p { display: block; line-height: 6px; }
-					td { font-size:11px; }
 					th { text-align:left; padding-right:30px; }
 					tr.high { background-color:whitesmoke; }
 					#footer { margin: 10px 0 0 5px; color:gray; }
