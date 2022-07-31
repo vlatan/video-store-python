@@ -1,11 +1,32 @@
 from app import db
 from app.models import User
-from flask import flash, redirect, request
+from flask import flash, redirect, request, current_app
+from flask_login import login_user
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from datetime import timedelta
 
 
 def failed_login():
     flash("Sorry, there was a problem signing in to your account.", "info")
     return redirect(request.referrer)
+
+
+def verify_google_token(token):
+    """
+    Verify the integrity of the Google's ID token and return the user info
+    https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
+    """
+
+    CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
+    data = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
+    # return user info
+    return {
+        "google_id": data["sub"],
+        "email": data.get("email"),
+        "name": data.get("given_name", "Guest"),
+        "picture": data.get("picture"),
+    }
 
 
 def get_user_ready(user_info):
@@ -31,3 +52,21 @@ def get_user_ready(user_info):
 
     db.session.commit()
     return user
+
+
+def finalize_google_login(token):
+    """Verify token, get user info, log user in."""
+
+    # verify the integrity of the ID token and get the user info
+    user_info = verify_google_token(token)
+    # get user ready (create or update their info)
+    user = get_user_ready(user_info)
+    # begin user session by logging the user in
+    login_user(user, remember=True, duration=timedelta(days=30))
+
+
+def finalize_fb_login(user_info):
+    # get user ready (create or update their info)
+    user = get_user_ready(user_info)
+    # begin user session by logging the user in
+    login_user(user, remember=True, duration=timedelta(days=30))

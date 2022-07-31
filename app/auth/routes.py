@@ -1,15 +1,12 @@
 import os
 import hashlib
 import requests
-from datetime import timedelta
 from urllib.parse import urlencode
 from google_auth_oauthlib.flow import Flow
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
 from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
-from flask_login import current_user, login_user, logout_user, login_required
-from app.auth.helpers import failed_login, get_user_ready
+from flask_login import current_user, logout_user, login_required
+from app.auth.helpers import failed_login, finalize_google_login, finalize_fb_login
 
 auth = Blueprint("auth", __name__)
 
@@ -22,13 +19,13 @@ def google():
     """
 
     CLIENT_CONFIG = current_app.config["GOOGLE_CLIENT_CONFIG"]
-    CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
     REDIRECT_URL = url_for("auth.google", _external=True)
     SCOPES = current_app.config["GOOGLE_SCOPES"]
 
     # if the request DOESN'T have 'code' argument in the URL
     if "code" not in request.args:
 
+        # do not proceed if user is already logged in
         if current_user.is_authenticated:
             return redirect(request.referrer)
 
@@ -47,6 +44,7 @@ def google():
         # Store the state so the callback can verify the auth server response.
         session["state"] = state
 
+        # redirect user to the callback url which is in fact this exact same view
         return redirect(authorization_url)
 
     # Create flow instance
@@ -59,31 +57,15 @@ def google():
     credentials = flow.credentials
 
     try:
-        # verify the integrity of the ID token and return the user info
-        # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
-        token, google_request = credentials.id_token, google_requests.Request()
-        data = id_token.verify_oauth2_token(token, google_request, CLIENT_ID)
-
-        # process user data for login
-        user_info = {
-            "google_id": data["sub"],
-            "email": data.get("email"),
-            "name": data.get("given_name", "Guest"),
-            "picture": data.get("picture"),
-        }
-
-        # get user ready (create or update their info)
-        user = get_user_ready(user_info)
-        # begin user session by logging the user in
-        login_user(user, remember=True, duration=timedelta(days=30))
+        # verify ID token, log in user
+        finalize_google_login(credentials.id_token)
         # store revoke token in session in case the user wants to revoke access
         session["revoke_token"] = credentials.token
         # successfully completed the process
         return render_template("bingo_popup.html")
 
     except Exception:
-        # Invalid token
-        # Failed to complete the process, signal to the parent window
+        # Invalid token, failed to complete the process, signal to the parent window
         return render_template("bummer_popup.html")
 
 
@@ -110,30 +92,15 @@ def onetap():
         return failed_login()
 
     try:
-        # verify the integrity of the ID token and get the user info
+        # get the ID token
         token = request.form.get("credential")
-        google_request = google_requests.Request()
-        CLIENT_ID = current_app.config["GOOGLE_OAUTH_CLIENT_ID"]
-        # https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
-        data = id_token.verify_oauth2_token(token, google_request, CLIENT_ID)
-
-        # process user data for login
-        user_info = {
-            "google_id": data["sub"],
-            "email": data.get("email"),
-            "name": data.get("given_name", "Guest"),
-            "picture": data.get("picture"),
-        }
-
-        # get user ready (create or update their info)
-        user = get_user_ready(user_info)
-        # begin user session by logging the user in
-        login_user(user, remember=True, duration=timedelta(days=30))
+        # verify ID token, get user info, log user in
+        finalize_google_login(token)
         # successfully completed the process
         return redirect(request.referrer)
 
     except Exception:
-        # Invalid token
+        # invalid token
         return failed_login()
 
 
@@ -159,9 +126,9 @@ def facebook():
         # put it in a session
         session["state"] = STATE
 
-        # prepare the dialog uri
+        # oauth dialog endpoint
         dialog_endpoint = "https://www.facebook.com/v12.0/dialog/oauth"
-        # parameters to the dialog endpoint
+        # parameters to add to the the dialog endpoint
         payload = {
             "response_type": "code",
             "client_id": CLIENT_ID,
@@ -170,10 +137,9 @@ def facebook():
             "auth_type": "rerequest",
             "scope": "email",
         }
-
-        dialog_uri = f"{dialog_endpoint}?{urlencode(payload)}"
-
-        # redirect to the dialog endpoint
+        # construct the final dialog uri
+        dialog_uri = os.path.join(dialog_endpoint, "?", urlencode(payload))
+        # redirect to the dialog uri
         return redirect(dialog_uri)
 
     try:
@@ -233,10 +199,8 @@ def facebook():
             "picture": pic,
         }
 
-        # get user ready (create or update their info)
-        user = get_user_ready(user_info)
-        # begin user session by logging the user in
-        login_user(user, remember=True, duration=timedelta(days=30))
+        # get user ready, log user in
+        finalize_fb_login(user_info)
         # store revoke token in session in case the user wants to revoke access
         session["revoke_token"] = ACCESS_TOKEN
         # successfully completed the process
