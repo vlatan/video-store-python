@@ -35,6 +35,10 @@ class Config:
     # Facebook authentication
     FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
     FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
+    FB_GRAPH_ENDPOINT = "https://graph.facebook.com/v12.0"
+    FB_DIALOG_ENDPOINT = "https://www.facebook.com/v12.0/dialog/oauth"
+    FB_ACCESS_TOKEN_ENDPOINT = f"{FB_GRAPH_ENDPOINT}/oauth/access_token"
+    FB_INSPECT_TOKEN_ENDPOINT = "https://graph.facebook.com/debug_token"
 
     # Google/Youtube authentication
     YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")

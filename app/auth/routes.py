@@ -127,7 +127,7 @@ def facebook():
         session["state"] = STATE
 
         # oauth dialog endpoint
-        dialog_endpoint = "https://www.facebook.com/v12.0/dialog/oauth"
+        dialog_endpoint = current_app.config["FB_DIALOG_ENDPOINT"]
         # parameters to add to the the dialog endpoint
         payload = {
             "response_type": "code",
@@ -150,7 +150,7 @@ def facebook():
 
         # exchange the code for access token
         CLIENT_SECRET = current_app.config["FB_CLIENT_SECRET"]
-        access_token_endpoint = "https://graph.facebook.com/v12.0/oauth/access_token"
+        access_token_endpoint = current_app.config["FB_ACCESS_TOKEN_ENDPOINT"]
         # parameters for the access token endpoint
         payload = {
             "client_id": CLIENT_ID,
@@ -164,7 +164,7 @@ def facebook():
         ACCESS_TOKEN = ACCESS_TOKEN.json()["access_token"]
 
         # verify the access token we got
-        inspect_token_endpoint = "https://graph.facebook.com/debug_token"
+        inspect_token_endpoint = current_app.config["FB_INSPECT_TOKEN_ENDPOINT"]
         # parameters for the inspect token endpoint
         payload = {
             "input_token": ACCESS_TOKEN,
@@ -180,7 +180,8 @@ def facebook():
 
         # get user info
         USER_ID = data["user_id"]
-        graph_endpoint = f"https://graph.facebook.com/v12.0/{USER_ID}"
+        GRAPH_ENDPOINT = current_app.config["FB_GRAPH_ENDPOINT"]
+        user_graph_endpoint = f"{GRAPH_ENDPOINT}/{USER_ID}"
         # parameters for the graph endpoint
         payload = {
             "access_token": ACCESS_TOKEN,
@@ -188,7 +189,7 @@ def facebook():
         }
 
         # get response from the graph endpoint (json response)
-        data = requests.get(graph_endpoint, params=payload).json()
+        data = requests.get(user_graph_endpoint, params=payload).json()
 
         # process user data for login
         pic = data.get("picture", {}).get("data", {}).get("url")
