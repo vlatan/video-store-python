@@ -1,47 +1,32 @@
 .scroll-content {
-  display: -ms-grid;
   display: grid;
-  -ms-grid-columns: (minmax(50px, 320px))[4];
-      grid-template-columns: repeat(4, minmax(50px, 320px));
-  -webkit-box-pack: stretch;
-      -ms-flex-pack: stretch;
-          justify-content: stretch;
+  grid-template-columns: repeat(4, minmax(50px, 320px));
+  justify-content: stretch;
   gap: var(--content-padding);
 }
 
 @media screen and (max-width: 1024px) {
   .scroll-content {
-    -ms-grid-columns: (minmax(50px, 320px))[3];
-        grid-template-columns: repeat(3, minmax(50px, 320px));
+    grid-template-columns: repeat(3, minmax(50px, 320px));
   }
 }
-
 @media screen and (max-width: 700px) {
   .scroll-content {
-    -ms-grid-columns: (minmax(50px, 320px))[2];
-        grid-template-columns: repeat(2, minmax(50px, 320px));
+    grid-template-columns: repeat(2, minmax(50px, 320px));
   }
 }
-
 @media screen and (max-width: 360px) {
   .scroll-content {
-    -ms-grid-columns: minmax(50px, 320px);
-        grid-template-columns: minmax(50px, 320px);
+    grid-template-columns: minmax(50px, 320px);
   }
 }
-
 .video-block {
   position: relative;
 }
 
 a.video-link {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   gap: calc(var(--content-padding) / 2);
   text-decoration: none;
 }
@@ -57,18 +42,14 @@ img.video-img {
 
 h2.video-title {
   font-weight: normal;
-  font-size: .9rem;
+  font-size: 0.9rem;
 }
 
 .sentinel {
   margin: 4rem auto;
   font-weight: 700;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  justify-content: center;
 }
 
 #spinner {
@@ -84,38 +65,27 @@ h2.video-title {
 
 @-webkit-keyframes spin {
   0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 
 @keyframes spin {
   0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
-
 /* ################# Specific to User Library ################# */
 .remove-option {
   position: absolute;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  align-items: center;
+  justify-content: center;
   background-color: var(--secondary-background-color);
   font-size: 1.2rem;
   line-height: 1;

@@ -1,13 +1,7 @@
 .form-content {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: center;
+  align-items: center;
   min-height: 500px;
   max-width: 700px;
   margin: 0 auto;
@@ -15,24 +9,14 @@
 
 .form-content form {
   width: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   gap: var(--content-padding);
 }
 
 .form-content fieldset {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   gap: var(--content-padding);
   border: 1px solid var(--primary-border-color);
   border-radius: 5px;
@@ -42,7 +26,7 @@
 
 .form-legend {
   font-weight: bold;
-  padding: .3rem 1rem;
+  padding: 0.3rem 1rem;
   border: 1px solid var(--primary-border-color);
   border-radius: 5px;
   background-color: var(--secondary-background-color);
@@ -54,7 +38,7 @@
 }
 
 .form-input {
-  padding: .5rem;
+  padding: 0.5rem;
   font-size: 0.9rem;
   width: 100%;
   background-color: var(--primary-background-color);
@@ -63,21 +47,17 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #585896;
+  border-color: rgb(88, 88, 150);
 }
 
 .button-group {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   gap: 1rem;
 }
 
 .form-button {
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
   border: 1px solid var(--primary-border-color);
   border-radius: 5px;
@@ -90,12 +70,8 @@
 }
 
 .form-invalid-feedback {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   color: white;
   padding-left: 8px;
   font-size: 0.9rem;
