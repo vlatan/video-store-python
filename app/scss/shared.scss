@@ -1,3 +1,24 @@
+// Breakpoints
+$bp-small: 48em; // 768px
+$bp-medium: 64em; // 1024px
+$bp-large: 85.375em; // 1366px
+$bp-xlarge: 120em; // 1920px
+$bp-xxlarge: 160em; // 2560px
+
+// Media Queries
+$mq-small: "(min-width: #{$bp-small})";
+$mq-medium: "(min-width: #{$bp-medium})";
+$mq-large: "(min-width: #{$bp-large})";
+$mq-xlarge: "(min-width: #{$bp-xlarge})";
+$mq-xxlarge: "(min-width: #{$bp-xxlarge})";
+$mq-retina: "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)";
+
+// Font-Size
+$base-font-size: 16px;
+
+// Line-Height
+$base-line-height: 1.5;
+
 /* ################# Variables ################# */
 
 :root {
@@ -6,7 +27,7 @@
     --primary-font-color: white;
     --secondary-font-color: rgb(213, 215, 216);
     --primary-border-color: hsl(0, 0%, 18.82%);
-    --content-width: 1200px;
+    --content-width: min(90vw, 1600px);
     --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     --content-padding: 1.5rem;
     --header-hight: 3.5rem;
@@ -33,8 +54,24 @@ a {
 }
 
 html {
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: $base-font-size;
+    line-height: $base-line-height;
+
+    // @media #{$mq-medium} {
+    //     font-size: $base-font-size * 1.2;
+    // }
+
+    @media #{$mq-large} {
+        font-size: $base-font-size * 1.3;
+    }
+
+    @media #{$mq-xlarge} {
+        font-size: $base-font-size * 1.4;
+    }
+
+    @media #{$mq-xxlarge} {
+        font-size: $base-font-size * 1.6;
+    }
 }
 
 html,
@@ -536,7 +573,7 @@ button.cancel-button {
 
 /* width */
 ::-webkit-scrollbar {
-    width: 1rem;
+    width: 16px;
 }
 
 /* Handle */
@@ -654,19 +691,6 @@ button.cancel-button {
 
 
 /* ############# Media Queries ############# */
-
-@media screen and (max-width: 1260px) {
-
-    .site-header,
-    .content-wrap,
-    .site-footer-wrap {
-        margin: 0 var(--content-padding);
-    }
-
-    .snackbar {
-        left: var(--content-padding);
-    }
-}
 
 @media screen and (max-width: 1024px) {
     .site-header {

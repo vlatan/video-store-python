@@ -5,7 +5,7 @@
   --primary-font-color: white;
   --secondary-font-color: rgb(213, 215, 216);
   --primary-border-color: hsl(0, 0%, 18.82%);
-  --content-width: 1200px;
+  --content-width: min(90vw, 1600px);
   --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   --content-padding: 1.5rem;
   --header-hight: 3.5rem;
@@ -32,6 +32,21 @@ a {
 html {
   font-size: 16px;
   line-height: 1.5;
+}
+@media (min-width: 85.375em) {
+  html {
+    font-size: 20.8px;
+  }
+}
+@media (min-width: 120em) {
+  html {
+    font-size: 22.4px;
+  }
+}
+@media (min-width: 160em) {
+  html {
+    font-size: 25.6px;
+  }
 }
 
 html,
@@ -545,7 +560,7 @@ button.cancel-button {
 /* ############# Custom Scrollbar ############# */
 /* width */
 ::-webkit-scrollbar {
-  width: 1rem;
+  width: 16px;
 }
 
 /* Handle */
@@ -654,16 +669,6 @@ button.cancel-button {
 }
 
 /* ############# Media Queries ############# */
-@media screen and (max-width: 1260px) {
-  .site-header,
-.content-wrap,
-.site-footer-wrap {
-    margin: 0 var(--content-padding);
-  }
-  .snackbar {
-    left: var(--content-padding);
-  }
-}
 @media screen and (max-width: 1024px) {
   .site-header {
     -moz-column-gap: calc(var(--content-padding) * 3);
