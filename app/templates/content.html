@@ -3,9 +3,7 @@
     {% for post in posts %}
 
     <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
-        <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
-            width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-            alt="{{ post.title }}">
+        <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}" alt="{{ post.title }}">
         <h2 class="video-title">{{ post.title }}</h2>
     </a>
 
