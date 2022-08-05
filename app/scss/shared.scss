@@ -325,7 +325,7 @@ a.nav-item:hover::after {
     padding: .7rem 1.4rem;
     top: 2.2rem;
     right: 0;
-    min-width: 160px;
+    white-space: nowrap;
     text-align: center;
     color: black;
     background: white;
