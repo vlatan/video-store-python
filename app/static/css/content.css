@@ -1,6 +1,6 @@
 .scroll-content {
   display: grid;
-  grid-template-columns: repeat(4, minmax(50px, 320px));
+  grid-template-columns: repeat(4, minmax(50px, auto));
   justify-content: stretch;
   gap: var(--content-padding);
 }
