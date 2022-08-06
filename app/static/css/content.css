@@ -77,8 +77,8 @@ h2.video-title {
   border-top: 7px solid var(--primary-font-color);
   border-bottom: 7px solid var(--primary-font-color);
   border-radius: 50%;
-  width: 80px;
-  height: 80px;
+  width: 3.5rem;
+  height: 3.5rem;
   -webkit-animation: spin 2s linear infinite;
           animation: spin 2s linear infinite;
 }
