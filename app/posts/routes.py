@@ -12,34 +12,30 @@ posts = Blueprint("posts", __name__)
 
 @posts.route("/video/<string:video_id>/")
 def post(video_id):
+    # query the post
     post = Post.query.filter_by(video_id=video_id).first_or_404()
-
-    # thumbs
-    thumbs = sorted(post.thumbnails.values(), key=lambda x: x["width"])
-    thumb = thumbs[-1]["url"]
-    srcset = [f"{item['url']} {item['width']}w" for item in thumbs]
-    srcset = ", ".join(srcset)
-
-    # create video duration object
-    duration = convertDuration(post.duration)
-
+    # widest thumb
+    thumb = max(post.thumbnails.values(), key=lambda x: x["width"])["url"]
+    # get likes text
     num_likes = post.likes.count()
     likes = "1 Like" if num_likes == 1 else f"{num_likes} Likes"
     if not num_likes:
         likes = "Like"
-
+    # how many related posts should we fetch
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
-    related_posts = Post.get_related_posts(post.title, PER_PAGE)
+
+    print(post.thumbnails.values())
+    # print(max(post.thumbnails.values(), key=lambda x: x["width"]))
 
     return render_template(
         "post.html",
         post=post,
         thumb=thumb,
-        srcset=srcset,
-        duration=duration.human,
+        srcset=post.srcset,
+        duration=convertDuration(post.duration).human,
         likes=likes,
         title=post.title,
-        related_posts=related_posts,
+        related_posts=Post.get_related_posts(post.title, PER_PAGE),
     )
 
 

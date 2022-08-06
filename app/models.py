@@ -138,6 +138,13 @@ class Post(Base, SearchableMixin):
     )
 
     @property
+    def srcset(self):
+        """Return string of srcset images for a post."""
+        thumbs = sorted(self.thumbnails.values(), key=lambda x: x["width"])
+        srcset = [f"{item['url']} {item['width']}w" for item in thumbs]
+        return ", ".join(srcset)
+
+    @property
     def serialize(self):
         """Return object data in easily serializable format."""
         return {
@@ -147,6 +154,7 @@ class Post(Base, SearchableMixin):
             "thumbnails": self.thumbnails,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
+            "srcset": self.srcset,
         }
 
     @classmethod

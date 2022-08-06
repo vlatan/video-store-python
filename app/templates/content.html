@@ -3,7 +3,10 @@
     {% for post in posts %}
 
     <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
-        <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}" alt="{{ post.title }}">
+        <span class="video-img-wrap">
+            <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}" alt="{{ post.title }}"
+                srcset="{{post.srcset}}">
+        </span>
         <h2 class="video-title">{{ post.title }}</h2>
     </a>
 
@@ -11,7 +14,9 @@
 
     <template id="post_template">
         <a class="video-link" href="#">
-            <img class="video-img" src="#">
+            <span class="video-img-wrap">
+                <img class="video-img" src="#">
+            </span>
             <h2 class="video-title"></h2>
         </a>
     </template>

@@ -151,7 +151,7 @@ def parse_video(url):
     raise ValidationError("Unable to parse the URL.")
 
 
-class convertDuration(object):
+class convertDuration:
     def __init__(self, iso_duration):
         self.iso = iso_duration
 

@@ -43,6 +43,7 @@ const loadItems = (url = '', data = {}) => {
                 const thumb = template_clone.querySelector('.video-img');
                 thumb.src = item.thumbnails.medium.url;
                 thumb.alt = item.title;
+                thumb.srcset = item.srcset;
                 template_clone.querySelector('.video-title').innerHTML = item.title;
                 const remove = template_clone.querySelector('.remove-option');
                 if (remove) {
