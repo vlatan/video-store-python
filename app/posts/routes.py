@@ -24,9 +24,6 @@ def post(video_id):
     # how many related posts should we fetch
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
-    print(post.thumbnails.values())
-    # print(max(post.thumbnails.values(), key=lambda x: x["width"]))
-
     return render_template(
         "post.html",
         post=post,
