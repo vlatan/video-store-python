@@ -1,23 +1,23 @@
 .scroll-content {
   display: grid;
-  grid-template-columns: repeat(4, minmax(50px, auto));
+  grid-template-columns: repeat(4, 1fr);
   justify-content: stretch;
   gap: var(--content-padding);
 }
 
 @media screen and (max-width: 1024px) {
   .scroll-content {
-    grid-template-columns: repeat(3, minmax(50px, 320px));
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 @media screen and (max-width: 700px) {
   .scroll-content {
-    grid-template-columns: repeat(2, minmax(50px, 320px));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 @media screen and (max-width: 360px) {
   .scroll-content {
-    grid-template-columns: minmax(50px, 320px);
+    grid-template-columns: 1fr;
   }
 }
 .video-block {
@@ -29,10 +29,11 @@ a.video-link {
   flex-direction: column;
   gap: calc(var(--content-padding) / 2);
   text-decoration: none;
+  transition: var(--img-hover-transition-duration) filter;
 }
 
 a.video-link:hover {
-  color: white;
+  filter: var(--img-hover-filter);
 }
 
 .video-img-wrap {
@@ -57,7 +58,6 @@ img.video-img {
   height: auto;
   border: none;
   cursor: pointer;
-  transition: 0.4s all;
 }
 
 h2.video-title {

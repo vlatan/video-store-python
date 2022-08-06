@@ -38,11 +38,11 @@
     height: auto;
     border: none;
     cursor: pointer;
-    transition: .4s all;
+    transition: var(--img-hover-transition-duration) filter;
 }
 
 .player img:hover {
-    filter: brightness(80%);
+    filter: var(--img-hover-filter);
 }
 
 .player .play {
@@ -196,10 +196,11 @@ button.edit-description {
     grid-template-columns: 45% auto;
     column-gap: 1rem;
     text-decoration: none;
+    transition: var(--img-hover-transition-duration) filter;
 }
 
 .related-video:hover {
-    filter: brightness(80%);
+    filter: var(--img-hover-filter);
 }
 
 img.related-img {
