@@ -93,7 +93,9 @@
 					<form class="modal-content" action="{{ url_for('users.delete_account') }}" method="POST">
 						<span data-close="account" class="close-modal" title="Close">&times;</span>
 						<h2 class="modal-title">Delete Account</h2>
-						<p>Are you sure you want to delete your account?</p>
+						<p>Are you sure you want to delete your account?<br>
+							This will delete your data including your likes and favorites.
+						</p>
 						<div class="modal-buttons-wrap">
 							<button aria-label="Cancel Delete Account" data-close="account" type="button"
 								class="modal-button cancel-button">Cancel</button>
