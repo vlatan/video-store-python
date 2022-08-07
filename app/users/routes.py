@@ -30,13 +30,16 @@ def liked():
         time.sleep(0.4)
         return make_response(posts, 200)
 
-    total = current_user.liked.count()
+    content_title = "Documentaries you like will show up here."
+    if total := current_user.liked.count():
+        content_title = "Documentaries You Like:"
+
     return render_template(
         "library.html",
         posts=posts,
         total=total,
         title="Liked",
-        content_title="Documentaries You Liked:",
+        content_title=content_title,
     )
 
 
@@ -61,13 +64,16 @@ def favorites():
         time.sleep(0.4)
         return make_response(posts, 200)
 
-    total = current_user.faved.count()
+    content_title = "Your favorite documentaries will show up here."
+    if total := current_user.faved.count():
+        content_title = "Your Favorite Documentaries:"
+
     return render_template(
         "library.html",
         posts=posts,
         total=total,
         title="Favorites",
-        content_title="Your Favorite Documentaries:",
+        content_title=content_title,
     )
 
 

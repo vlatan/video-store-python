@@ -20,9 +20,10 @@
     <div class="video-block">
         <span data-id="{{ post.video_id }}" class="remove-option">&times;</span>
         <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
-            <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}"
-                width="{{ post.thumbnails['medium']['width'] }}" height="{{ post.thumbnails['medium']['height'] }}"
-                alt="{{ post.title }}">
+            <span class="video-img-wrap">
+                <img class="video-img" alt="{{ post.title }}" src="{{ post.thumbnails['medium']['url'] }}"
+                    srcset="{{post.srcset}}">
+            </span>
             <h2 class="video-title">{{ post.title }}</h2>
         </a>
     </div>
@@ -33,7 +34,9 @@
         <div class="video-block">
             <span class="remove-option">&times;</span>
             <a class="video-link" href="#">
-                <img class="video-img" src="#">
+                <span class="video-img-wrap">
+                    <img class="video-img" src="#">
+                </span>
                 <h2 class="video-title"></h2>
             </a>
         </div>
@@ -42,7 +45,7 @@
 </div>
 
 <div class="sentinel" id="sentinel">
-    <div id="spinner" role="status"></div>
+    <div role="status"></div>
 </div>
 
 {% endblock content %}
