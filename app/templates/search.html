@@ -20,7 +20,11 @@
 
 {% block content %}
 <h1 class="content-title">
+    {% if total %}
     About <strong>{{ total }}</strong> results <small>({{ time_took }} seconds)</small>
+    {% else %}
+    Sorry, no matching results for this query.
+    {% endif %}
 </h1>
 {% include 'content.html' %}
 {% endblock content %}
