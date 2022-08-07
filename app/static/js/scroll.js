@@ -2,7 +2,8 @@
 const scroller = document.getElementById("scroller");
 const template = document.getElementById("post_template");
 const sentinel = document.getElementById("sentinel");
-const spinner = document.getElementById("spinner");
+const spinner = sentinel.querySelector('div');
+spinner.setAttribute("id", "spinner");
 let page = 2; // Use infinite scroll from the second page onwards
 let nextPage = true; // Assume there is next page to load
 
@@ -63,7 +64,7 @@ const loadItems = (url = '', data = {}) => {
 if ('IntersectionObserver' in window) {
     // Create a new IntersectionObserver instance
     let intersectionObserver = new IntersectionObserver(([entry]) => {
-        // If there are still videos and the entry is intersecting
+        // If there is next page and the entry is intersecting
         if (nextPage && entry.isIntersecting) {
             // Call the loadItems function
             loadItems(`${window.location.href}`, { page: page });
