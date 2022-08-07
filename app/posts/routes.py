@@ -28,7 +28,7 @@ def post(video_id):
         "post.html",
         post=post,
         thumb=thumb,
-        srcset=post.srcset,
+        srcset=post.srcset(),
         duration=convertDuration(post.duration).human,
         likes=likes,
         title=post.title,

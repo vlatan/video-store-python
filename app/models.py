@@ -137,11 +137,14 @@ class Post(Base, SearchableMixin):
         "PostFave", backref="post", cascade="all,delete-orphan", lazy="dynamic"
     )
 
-    @property
-    def srcset(self):
+    def srcset(self, max_width=1280):
         """Return string of srcset images for a post."""
         thumbs = sorted(self.thumbnails.values(), key=lambda x: x["width"])
-        srcset = [f"{item['url']} {item['width']}w" for item in thumbs]
+        srcset = [
+            f"{item['url']} {item['width']}w"
+            for item in thumbs
+            if item["width"] <= max_width
+        ]
         return ", ".join(srcset)
 
     @property
@@ -154,7 +157,7 @@ class Post(Base, SearchableMixin):
             "thumbnails": self.thumbnails,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
-            "srcset": self.srcset,
+            "srcset": self.srcset(max_width=480),
         }
 
     @classmethod

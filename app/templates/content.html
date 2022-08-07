@@ -4,7 +4,7 @@
 
     <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
         <span class="video-img-wrap">
-            <img class="video-img" src="{{ post.thumbnails['medium']['url'] }}" alt="{{ post.title }}"
+            <img class="video-img" alt="{{ post.title }}" src="{{ post.thumbnails['medium']['url'] }}"
                 srcset="{{post.srcset}}">
         </span>
         <h2 class="video-title">{{ post.title }}</h2>
