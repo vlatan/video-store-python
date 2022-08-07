@@ -58,9 +58,7 @@ def google():
 
     try:
         # verify ID token, log in user
-        finalize_google_login(credentials.id_token)
-        # store revoke token in session in case the user wants to revoke access
-        session["revoke_token"] = credentials.token
+        finalize_google_login(credentials)
         # successfully completed the process
         return render_template("bingo_popup.html")
 
@@ -194,6 +192,7 @@ def facebook():
         # process user data for login
         pic = data.get("picture", {}).get("data", {}).get("url")
         user_info = {
+            "token": ACCESS_TOKEN,
             "facebook_id": USER_ID,
             "email": data.get("email"),
             "name": data.get("first_name", "Guest"),
@@ -202,8 +201,6 @@ def facebook():
 
         # get user ready, log user in
         finalize_fb_login(user_info)
-        # store revoke token in session in case the user wants to revoke access
-        session["revoke_token"] = ACCESS_TOKEN
         # successfully completed the process
         return render_template("bingo_popup.html")
 

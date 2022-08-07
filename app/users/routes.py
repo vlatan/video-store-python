@@ -75,7 +75,7 @@ def favorites():
 @login_required
 def delete_account():
     # try to revoke Doxder app from user's Google/Facebook account
-    if revoke_token := session.get("revoke_token"):
+    if revoke_token := current_user.token:
         if current_user.google_id:
             # https://tinyurl.com/ymadyw2k
             requests.post(

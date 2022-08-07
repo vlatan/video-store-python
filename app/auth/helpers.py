@@ -43,6 +43,8 @@ def get_user_ready(user_info):
         return user
 
     # otherwise update mutable info for this user if changed
+    if user.token != user_info["token"]:
+        user.token = user_info["token"]
     if user.email != user_info["email"]:
         user.email = user_info["email"]
     if user.name != user_info["name"]:
@@ -54,11 +56,19 @@ def get_user_ready(user_info):
     return user
 
 
-def finalize_google_login(token):
+def finalize_google_login(credentials):
     """Verify token, get user info, log user in."""
 
-    # verify the integrity of the ID token and get the user info
-    user_info = verify_google_token(token)
+    # if credentials is string it comes from OneTap and is in fact an ID token
+    if isinstance(credentials, str):
+        # verify the integrity of the ID token and get the user info
+        user_info = verify_google_token(credentials)
+    else:
+        # verify the integrity of the ID token and get the user info
+        user_info = verify_google_token(credentials.id_token)
+        # store refresh token
+        user_info["token"] = credentials.refresh_token
+
     # get user ready (create or update their info)
     user = get_user_ready(user_info)
     # begin user session by logging the user in

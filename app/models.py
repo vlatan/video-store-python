@@ -82,6 +82,7 @@ class SearchableMixin:
 
 class User(Base, UserMixin, ActionMixin):
     id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(2048))
     google_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
     facebook_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
     analytics_id = db.Column(db.String(512))
