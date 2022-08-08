@@ -91,12 +91,12 @@ def process_videos(app):
                 if posted.playlist_id != video["playlist_id"]:
                     # match playlist id
                     posted.playlist_id = video["playlist_id"]
-                    # asscoiate with existing playlist in our db
+                    # associate with existing playlist in our db
                     posted.playlist = video["playlist"]
                     db.session.commit()
                     time.sleep(1)
 
-                # update simlar_ids if there's a change
+                # update similar_ids if there's a change
                 similar = Post.get_related_posts(posted.title, PER_PAGE)
                 similar = [item["id"] for item in similar]
                 if posted.similar != similar:
