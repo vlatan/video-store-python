@@ -17,9 +17,9 @@ It validates the videos against multiple criteria such as:
 
 Once the video satisfies all of this criteria it is validated and whitelisted to be automatically posted.
 
-Via a background process a function is periodically activated which goes through the playlists (video sources) in the database and checks if there are new videos by using the YouTube API and automatically posts the videos if any. The app is autonomous in that regard. The admin can also manually post videos and of course add new video sources (playlists).
+Via a background process a function is periodically called which goes through the playlists (video sources) in the database and checks if there are new videos by using the YouTube API and automatically posts the videos if any. The app is autonomous in that regard. The admin can also manually post videos and of course add new video sources (playlists).
 
-Users can login via Google and Facebook. The app doesn't store passwords so naturally the it makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Facebook's Login Flow](https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow).
+Users can login via Google and Facebook. The app doesn't store passwords so naturally it makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Facebook's Login Flow](https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow).
 
 ## License
 [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
