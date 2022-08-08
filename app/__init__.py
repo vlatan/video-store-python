@@ -1,5 +1,4 @@
 import os.path
-import logging
 from flask import Flask
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
@@ -29,10 +28,6 @@ def create_app(default_config=Config):
     app = Flask(__name__)
     # load config
     app.config.from_object(default_config)
-
-    if not app.debug:
-        # config log file if in production
-        logging.basicConfig(filename=app.config["LOG_FILE"])
 
     # initialize search index
     os.mkdir("index") if not os.path.exists("index") else None
