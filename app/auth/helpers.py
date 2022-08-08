@@ -67,7 +67,7 @@ def finalize_google_login(credentials):
         # verify the integrity of the ID token and get the user info
         user_info = verify_google_token(credentials.id_token)
         # store refresh token
-        user_info["token"] = credentials.refresh_token
+        user_info["token"] = credentials.token
 
     # get user ready (create or update their info)
     user = get_user_ready(user_info)
