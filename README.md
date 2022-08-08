@@ -1,28 +1,25 @@
 # Doxder
 
-### Description:
+[https://doxder.com](https://doxder.com)
 
-This is a web app made in Flask, HTML, CSS, JavaScript and SQLite. It is basically a documentary library that automatically fetches and posts videos (documentaries) from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
+This web app is made with Flask, HTML, CSS, JavaScript and SQLite. It is basically a documentary library that automatically fetches and posts videos (documentaries) from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
 
-It has multiple criteria for validating the videos such as:
+It validates the videos against multiple criteria such as:
 
 - not already posted
 - 30+ minutes in length
 - must be public
 - not age restricted
 - not region restricted
-- embeddable and
-- audio and title/description must be in English
+- embeddable
+- must have English audio, title and description, and
+- it is not an ongoing or scheduled broadcast
 
-This info for every video is available at the YouTube API, so once the video satisfies this criteria it is validated and ready to be posted.
+Once the video satisfies all of this criteria it is validated and whitelisted to be automatically posted.
 
-The admin can add sources (playlists) to the database. Via cron a Flask view is hit with a POST request several times a day which activates a function in a thread which goes through the playlists in the database and checks if there are new videos by using the YouTube API and automatically posts the videos if any. The app is self-sufficient in that regard. The admin can also post single videos which are automatically checked if they belong to a playlist. If yes that relationship is added to the database.
+Via a background process a function is periodically activated which goes through the playlists (video sources) in the database and checks if there are new videos by using the YouTube API and automatically posts the videos if any. The app is autonomous in that regard. The admin can also manually post videos and of course add new video sources (playlists).
 
-Users can login using Google. The app doesn't store passwords, just users' Google openid, name and email, so naturally the app makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2). For accessing both the YouTube API and the OAuth 2.0 the app uses the [Google API Python client library](https://github.com/googleapis/google-api-python-client).
+Users can login via Google and Facebook. The app doesn't store passwords so naturally the it makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Facebook's Login Flow](https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow).
 
-The app is structured in such a way that Flask is used as an [Application Factory](https://flask.palletsprojects.com/en/2.0.x/patterns/appfactories/) and it is modularized with [blueprints](https://flask.palletsprojects.com/en/2.0.x/blueprints/) such as:
-
-- main (dealing with the homepage and other generic pages)
-- posts (for the actual posts/documentaries)
-- users (for managing the users and their login logic) and
-- errors (for showing custom errors on the front-end)
+## License
+[GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
