@@ -115,7 +115,7 @@ def sources_sitemap():
     data, per_page = OrderedDict(), current_app.config["POSTS_PER_PAGE"]
     for source in Playlist.query:
         url = url_for(
-            "lists.playlist_videos", playlist_id=source.playlist_id, _external=True
+            "sources.playlist_videos", playlist_id=source.playlist_id, _external=True
         )
         posts = Post.get_playlist_posts(source.playlist_id, 1, per_page)
         dates = [post["created_at"] for post in posts]
@@ -123,7 +123,7 @@ def sources_sitemap():
 
     if other_posts := Post.get_orphans(1, per_page):
         lastmods = [post["created_at"] for post in other_posts]
-        url = url_for("lists.orphan_videos", _external=True)
+        url = url_for("sources.orphan_videos", _external=True)
         data[url] = max(lastmods).strftime("%Y-%m-%d")
 
     if not data:
@@ -145,7 +145,7 @@ def misc_sitemap():
 
     if sources_last := Playlist.query.order_by(Playlist.id.desc()).first():
         sources_lastmod = sources_last.created_at.strftime("%Y-%m-%d")
-        data[url_for("lists.playlists", _external=True)] = sources_lastmod
+        data[url_for("sources.playlists", _external=True)] = sources_lastmod
 
     if not data:
         abort(404)

@@ -8,7 +8,7 @@
 {% endblock css %}
 
 {% block meta %}
-{% set url = url_for('lists.playlists', _external=True) %}
+{% set url = url_for('sources.playlists', _external=True) %}
 <link rel="canonical" href="{{ url }}" />
 <meta property='og:title' content='{{ title }}'>
 <meta property='og:type' content='article'>
@@ -25,7 +25,7 @@
 <div class="playlists-content">
 
     {% for post in posts %}
-    <a class="playlist-link" href="{{ url_for('lists.playlist_videos', playlist_id=post.playlist_id) }}">
+    <a class="playlist-link" href="{{ url_for('sources.playlist_videos', playlist_id=post.playlist_id) }}">
         <img class="channel-img" src="{{ post.channel_thumbnails['medium']['url'] }}"
             width="{{ post.channel_thumbnails['medium']['width'] }}"
             height="{{ post.channel_thumbnails['medium']['height'] }}" alt="{{ post.title }}">
@@ -38,7 +38,7 @@
     </a>
     {% endfor %}
 
-    <a class="playlist-link" href="{{ url_for('lists.orphan_videos') }}">
+    <a class="playlist-link" href="{{ url_for('sources.orphan_videos') }}">
         <span class="orphans">Other</span>
         <h2 class="playlist-title">Other Uploads</h2>
     </a>

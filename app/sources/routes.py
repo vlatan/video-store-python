@@ -5,12 +5,12 @@ from flask_login import current_user
 from app import db
 from app.models import Post, Playlist
 from app.helpers import admin_required
-from app.lists.forms import PlaylistForm
+from app.sources.forms import PlaylistForm
 
-lists = Blueprint("lists", __name__)
+sources = Blueprint("sources", __name__)
 
 
-@lists.route("/source/new", methods=["GET", "POST"])
+@sources.route("/source/new", methods=["GET", "POST"])
 @admin_required
 def new_playlist():
     form = PlaylistForm()
@@ -26,14 +26,14 @@ def new_playlist():
         db.session.commit()
 
         flash("Playlist has been added to the database!", "success")
-        return redirect(url_for("lists.playlists"))
+        return redirect(url_for("sources.playlists"))
 
     return render_template(
         "form.html", title="Suggest YouTube Playlist", form=form, legend="New Playlist"
     )
 
 
-@lists.route("/source/<string:playlist_id>/", methods=["GET", "POST"])
+@sources.route("/source/<string:playlist_id>/", methods=["GET", "POST"])
 def playlist_videos(playlist_id):
     """Route to return all videos in a playlist"""
 
@@ -58,7 +58,7 @@ def playlist_videos(playlist_id):
     )
 
 
-@lists.route("/source/other/", methods=["GET", "POST"])
+@sources.route("/source/other/", methods=["GET", "POST"])
 def orphan_videos():
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
@@ -76,7 +76,7 @@ def orphan_videos():
     return render_template("source.html", posts=posts, title="Other Uploads")
 
 
-@lists.route("/sources/")
+@sources.route("/sources/")
 def playlists():
     """Route to return the channels"""
     # Query the Playlist table

@@ -6,7 +6,7 @@ from app import db
 from app.models import Post, Playlist
 from app.cron.helpers import get_playlist_videos
 from app.posts.helpers import validate_video
-from app.lists.helpers import validate_playlist
+from app.sources.helpers import validate_playlist
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler

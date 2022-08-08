@@ -6,7 +6,7 @@
 {% endblock css %}
 
 {% block meta %}
-{% set url = url_for('lists.playlist_videos', playlist_id=playlist_id, _external=True) %}
+{% set url = url_for('sources.playlist_videos', playlist_id=playlist_id, _external=True) %}
 <link rel="canonical" href="{{ url }}" />
 <meta property='og:title' content='{{ title }}'>
 <meta property='og:type' content='article'>

@@ -1,5 +1,5 @@
 from app.models import Playlist
-from app.lists.helpers import parse_playlist, validate_playlist
+from app.sources.helpers import parse_playlist, validate_playlist
 from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
