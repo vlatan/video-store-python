@@ -20,7 +20,7 @@ def before_request():
 
 @search.route("/search/", methods=["GET", "POST"])
 def search_results():
-    """Route to return search results using Elasticsearch"""
+    """Route to return the search results."""
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
 
