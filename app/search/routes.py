@@ -4,7 +4,6 @@ from flask import url_for, Blueprint, jsonify, make_response, session
 from app.helpers import query_index_all
 from app.search.forms import SearchForm
 from app.models import Post
-from app import db
 
 
 search = Blueprint("search", __name__)
