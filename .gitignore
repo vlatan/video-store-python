@@ -132,12 +132,7 @@ dmypy.json
 *.db
 .vscode
 todo.txt
-testing/
-logs/
 migrations/
 certs/
 user_images/
-favicons/
-*_test*
-resources.txt
 index/
