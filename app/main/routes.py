@@ -12,7 +12,7 @@ main = Blueprint("main", __name__)
 
 
 @main.app_template_filter("autoversion")
-def autoversion_filter(filename):
+def autoversion_file(filename):
     """Autoversion css/js files based on mtime."""
     fullpath = os.path.join("app/", filename[1:])
     try:
