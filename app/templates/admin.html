@@ -19,16 +19,17 @@
 {% block content %}
 
 <div class="dashboard">
+    <div class="dashboard-item">#</div>
     <div class="dashboard-item">Picture</div>
     <div class="dashboard-item">Name</div>
     <div class="dashboard-item">Email</div>
     <div class="dashboard-item">Login Provider</div>
-    {% for user in users %}
 
+    {% for user in users %}
+    <div class="dashboard-item">{{ loop.index }}.</div>
     <div class="dashboard-item dashboard-user-img-container">
         <img class="dashboard-user-img" src="{{ user.picture }}">
     </div>
-
     <div class="dashboard-item">{{ user.name }}</div>
     <div class="dashboard-item">{{ user.email }}</div>
     {% if user.google_id %}
