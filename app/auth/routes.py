@@ -217,9 +217,10 @@ def logout():
     logout_user()
     login_needed = [
         url_for("users.liked", _external=True),
+        url_for("users.favorites", _external=True),
         url_for("posts.new_post", _external=True),
         url_for("sources.new_playlist", _external=True),
-        url_for("users.favorites", _external=True),
+        url_for("admin.dashboard", _external=True),
     ]
     referrer = request.referrer
     flash("You've been logged out!", "info")
