@@ -22,6 +22,12 @@ def autoversion_file(filename):
     return f"{filename}?v={timestamp}"
 
 
+@main.app_template_filter()
+def format_datetime(value):
+    """Datetime formater to use in templates."""
+    return value.strftime("%Y-%m-%d %H:%M")
+
+
 def get_analytics_id():
     analytics_id, authenticated = None, current_user.is_authenticated
     if authenticated and not (analytics_id := current_user.analytics_id):

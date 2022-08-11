@@ -38,7 +38,7 @@
     {% else %}
     <div class="dashboard-item">Facebook</div>
     {% endif %}
-    <div class="dashboard-item">{{ user.created_at }}</div>
+    <div class="dashboard-item">{{ user.created_at | format_datetime }}</div>
     {% endfor %}
 </div>
 
