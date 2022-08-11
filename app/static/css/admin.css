@@ -1,0 +1,38 @@
+.dashboard {
+  display: grid;
+  justify-content: flex-start;
+  grid-template-columns: repeat(4, auto);
+}
+
+.dashboard-user-img-container {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-user-img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+/* Add padding, bottom and right border to all dashboard items */
+.dashboard-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #696969;
+  border-right: 1px solid #696969;
+}
+
+/* Remove left padding from the first grid column */
+.dashboard-item:nth-child(4n+1) {
+  padding-left: 0;
+}
+
+/* Remove bottom border from the last grid row */
+.dashboard-item:nth-last-child(-n+4) {
+  border-bottom: none;
+}
+
+/* Remove right border from the last grid column */
+.dashboard-item:nth-child(4n) {
+  border-right: none;
+}
