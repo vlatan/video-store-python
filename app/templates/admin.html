@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
-{% block css %}
 {% set admin_css_url = url_for('static', filename='css/admin.css') | autoversion %}
+
+{% block preload_css %}
+{{ super() }}
 <link rel="preload" href="{{ admin_css_url }}" as="style">
+{% endblock preload_css %}
+
+{% block css %}
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ admin_css_url }}">
 {% endblock css %}

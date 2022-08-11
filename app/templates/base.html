@@ -6,9 +6,13 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	{% block css %}
 	{% set shared_css_url = url_for('static', filename='css/shared.css') | autoversion %}
+
+	{% block preload_css %}
 	<link rel="preload" href="{{ shared_css_url }}" as="style">
+	{% endblock preload_css %}
+
+	{% block css %}
 	<link rel="stylesheet" type="text/css" href="{{ shared_css_url }}">
 	{% endblock css %}
 

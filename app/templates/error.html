@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
+{% set error_css_url = url_for('static', filename='css/error.css') | autoversion %}
+
+{% block preload_css %}
+{{ super() }}
+<link rel="preload" href="{{ error_css_url }}" as="style">
+{% endblock preload_css %}
+
 {% block css %}
 {{ super() }}
-{% set error_css_url = url_for('static', filename='css/error.css') | autoversion %}
-<link rel="preload" href="{{ error_css_url }}" as="style">
 <link rel="stylesheet" type="text/css" href="{{ error_css_url }}">
 {% endblock css %}
 

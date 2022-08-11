@@ -1,9 +1,14 @@
 {% extends "base.html" %}
 
+{% set page_css_url = url_for('static', filename='css/page.css') | autoversion %}
+
+{% block preload_css %}
+{{ super() }}
+<link rel="preload" href="{{ page_css_url }}" as="style">
+{% endblock preload_css %}
+
 {% block css %}
 {{ super() }}
-{% set page_css_url = url_for('static', filename='css/page.css') | autoversion %}
-<link rel="preload" href="{{ page_css_url }}" as="style">
 <link rel="stylesheet" type="text/css" href="{{ page_css_url }}">
 {% endblock css %}
 

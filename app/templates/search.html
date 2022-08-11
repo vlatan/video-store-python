@@ -1,8 +1,15 @@
 {% extends "base.html" %}
 
+{% set content_css_url = url_for('static', filename='css/content.css') | autoversion %}
+
+{% block preload_css %}
+{{ super() }}
+<link rel="preload" href="{{ content_css_url }}" as="style">
+{% endblock preload_css %}
+
 {% block css %}
 {{ super() }}
-{% include 'content_css.html' %}
+<link rel="stylesheet" type="text/css" href="{{ content_css_url }}">
 {% endblock css %}
 
 {% block meta %}
