@@ -12,6 +12,10 @@
 <link rel="stylesheet" type="text/css" href="{{ admin_css_url }}">
 {% endblock css %}
 
+{% block title_tag %}
+{{ title }} | {{ super() }}
+{% endblock title_tag %}
+
 {% block content %}
 
 <div class="dashboard">
