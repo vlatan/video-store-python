@@ -1,3 +1,12 @@
+.dashboard-title {
+    display: inline-block;
+    font-size: 1.2rem;
+    line-height: normal;
+    margin-bottom: var(--content-padding);
+    padding-bottom: calc(var(--content-padding) / 2);
+    border-bottom: 1px solid #696969;
+}
+
 .dashboard {
     display: grid;
     justify-content: flex-start;
@@ -19,8 +28,8 @@
 /* Add padding, bottom and right border to all dashboard items */
 .dashboard-item {
     padding: 15px 20px;
-    border-bottom: 1px solid #696969, ;
-    border-right: 1px solid #696969, ;
+    border-bottom: 1px solid #696969;
+    border-right: 1px solid #696969;
 }
 
 /* Remove left padding from the first grid column */
