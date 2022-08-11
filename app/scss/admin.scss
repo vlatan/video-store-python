@@ -3,7 +3,7 @@
     font-size: 1.2rem;
     line-height: normal;
     margin-bottom: var(--content-padding);
-    padding-bottom: calc(var(--content-padding) / 2);
+    padding-bottom: calc(var(--content-padding) / 3);
     border-bottom: 1px solid #696969;
 }
 
@@ -13,16 +13,8 @@
     grid-template-columns: repeat(6, auto);
 }
 
-.dashboard-user-img-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.dashboard-user-img {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+.dashboard-header-item {
+    color: #E95420;
 }
 
 /* Add padding, bottom and right border to all dashboard items */
@@ -45,4 +37,16 @@
 /* Remove right border from the last grid column */
 .dashboard-item:nth-child(6n) {
     border-right: none;
+}
+
+.dashboard-user-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-user-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
 }
