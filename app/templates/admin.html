@@ -24,6 +24,7 @@
     <div class="dashboard-item">Name</div>
     <div class="dashboard-item">Email</div>
     <div class="dashboard-item">Login Provider</div>
+    <div class="dashboard-item">Signup Date / Time</div>
 
     {% for user in users %}
     <div class="dashboard-item">{{ loop.index }}.</div>
@@ -37,6 +38,7 @@
     {% else %}
     <div class="dashboard-item">Facebook</div>
     {% endif %}
+    <div class="dashboard-item">{{ user.created_at }}</div>
     {% endfor %}
 </div>
 
