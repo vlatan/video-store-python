@@ -1,1 +1,17 @@
 {% extends "base.html" %}
+
+{% block css %}
+{{ super() }}
+{% endblock css %}
+
+{% block content %}
+
+{% for user in users %}
+<div>
+    <img src="{{ user.picture }}" alt="">
+    {{ user.name }}
+    {{ user.email }}
+</div>
+{% endfor %}
+
+{% endblock content %}
