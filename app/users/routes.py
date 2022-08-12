@@ -2,11 +2,31 @@ import os
 import time
 import requests
 from flask import render_template, url_for, flash, request, jsonify
-from flask import redirect, Blueprint, session, current_app, make_response
+from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
 from app import db
 
 users = Blueprint("users", __name__)
+
+
+def save_avatar(source_url, avatar_path):
+    response = requests.get(source_url)
+    if response.ok:
+        with open(avatar_path, "wb") as file:
+            file.write(response.content)
+            return True
+    return False
+
+
+@users.route("/static/images/avatars/<path:filename>")
+def get_avatar(filename):
+    static_path = os.path.join(current_app.root_path, "static")
+    img_path = os.path.join(static_path, filename)
+    avatar_path = url_for("static", filename=f"/images/avatars/{filename}")
+    if not os.path.isfile(img_path):
+        if not save_avatar(current_user.picture, avatar_path):
+            return url_for("static", filename="/images/avatars/default.jpg")
+    return avatar_path
 
 
 @users.route("/liked/", methods=["GET", "POST"])
