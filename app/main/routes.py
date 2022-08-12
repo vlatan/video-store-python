@@ -29,6 +29,7 @@ def format_datetime(value):
 
 
 def get_analytics_id():
+    """Create user google analytics id."""
     analytics_id, authenticated = None, current_user.is_authenticated
     if authenticated and not (analytics_id := current_user.analytics_id):
         google_id, fb_id = current_user.google_id, current_user.facebook_id
@@ -86,7 +87,7 @@ def home():
     return render_template("home.html", posts=posts)
 
 
-@main.route("/<path:name>")
-def favicons(name):
-    """Serve favicon icons as if from root"""
-    return send_from_directory("static/favicons/", name)
+@main.route("/<path:filename>")
+def favicons(filename):
+    """Serve favicon icons as if from root."""
+    return send_from_directory("static/favicons/", filename)
