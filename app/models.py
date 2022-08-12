@@ -100,6 +100,8 @@ class User(Base, UserMixin, ActionMixin):
     )
 
     def __init__(self, *args, **kwargs):
+        """Perform aditional tasks upon user instantiation."""
+        # if the user doesn't have analytics id create one
         if not "analytics_id" in kwargs:
             open_id = kwargs.get("google_id", kwargs.get("facebook_id"))
             value = str(kwargs.get("id")) + str(open_id)
@@ -109,6 +111,7 @@ class User(Base, UserMixin, ActionMixin):
 
     @property
     def is_admin(self):
+        """Check if user is admin."""
         admin_openid = current_app.config["ADMIN_OPENID"]
         return True if self.google_id == admin_openid else False
 
