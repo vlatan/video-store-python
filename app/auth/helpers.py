@@ -1,5 +1,6 @@
 from app import db
 from app.models import User
+from app.main.routes import generate_analytics_id
 from flask import flash, redirect, request, current_app
 from flask_login import login_user
 from google.oauth2 import id_token
@@ -38,6 +39,7 @@ def get_user_ready(user_info):
     # if this user does not exist, create it
     if not user:
         user = User(**user_info)
+        user.analytics_id = generate_analytics_id(user)
         db.session.add(user)
         db.session.commit()
         return user
