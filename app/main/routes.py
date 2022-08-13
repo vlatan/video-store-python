@@ -1,8 +1,9 @@
-import os
+import os.path
 import time
 import hashlib
+import requests
 from datetime import datetime
-from flask import render_template, request, current_app
+from flask import render_template, request, current_app, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
 from app.models import Post
@@ -46,13 +47,38 @@ def get_analytics_id():
     return current_user.analytics_id
 
 
+def save_image(image_url, file_path):
+    response = requests.get(image_url)
+    if response.ok:
+        with open(file_path, "wb") as file:
+            file.write(response.content)
+            return True
+    return False
+
+
+def avatar(user):
+    # absolute path to the static folder
+    static_folder = os.path.join(current_app.root_path, "static")
+    # avatar path relative to the static folder
+    rel_avatar = f"images/avatars/{user.id}.jpg"
+    # absolute path to the user avatar
+    abs_avatar = os.path.join(static_folder, rel_avatar)
+    # if avatar image exists or it is created just now
+    if os.path.isfile(abs_avatar) or save_image(user.picture, abs_avatar):
+        # return avatar url
+        return url_for("static", filename=rel_avatar)
+    # return default avatar
+    return os.path.join("static", filename="images/avatar.default.jpg")
+
+
 @main.app_context_processor
 def template_vars():
     """Make variables available in templates."""
     return dict(
         now=datetime.utcnow(),
         app_name=current_app.config["APP_NAME"],
-        analytics_id=get_analytics_id(),
+        analytics_id=get_analytics_id,
+        avatar=avatar,
     )
 
 

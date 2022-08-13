@@ -31,7 +31,7 @@
     {% for user in users %}
     <div class="dashboard-item">{{ loop.index }}.</div>
     <div class="dashboard-item dashboard-user-img-container">
-        <img class="dashboard-user-img" src="{{ user.picture }}">
+        <img class="dashboard-user-img" src="{{ avatar(user) }}">
     </div>
     <div class="dashboard-item">{{ user.name }}</div>
     <div class="dashboard-item">{{ user.email }}</div>
