@@ -19,15 +19,6 @@ def admin_required(func):
     return only_admin
 
 
-def save_image(image_url, file_path):
-    response = requests.get(image_url)
-    if response.ok:
-        with open(file_path, "wb") as file:
-            file.write(response.content)
-            return True
-    return False
-
-
 def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
