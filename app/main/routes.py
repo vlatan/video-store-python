@@ -28,17 +28,22 @@ def format_datetime(value):
     return value.strftime("%Y-%m-%d %H:%M")
 
 
+def generate_analytics_id(user):
+    """Generate user google analytics id."""
+    google_id, fb_id = user.google_id, user.facebook_id
+    open_id = google_id if google_id else fb_id
+    value = str(user.id) + str(open_id)
+    return hashlib.md5(value.encode()).hexdigest()
+
+
 def get_analytics_id():
-    """Create user google analytics id."""
-    analytics_id, authenticated = None, current_user.is_authenticated
-    if authenticated and not (analytics_id := current_user.analytics_id):
-        google_id, fb_id = current_user.google_id, current_user.facebook_id
-        open_id = google_id if google_id else fb_id
-        value = str(current_user.id) + str(open_id)
-        analytics_id = hashlib.md5(value.encode()).hexdigest()
-        current_user.analytics_id = analytics_id
+    """Get user google analytics id."""
+    if not current_user.is_authenticated:
+        return None
+    if not current_user.analytics_id:
+        current_user.analytics_id = generate_analytics_id(current_user)
         db.session.commit()
-    return analytics_id
+    return current_user.analytics_id
 
 
 @main.app_context_processor
