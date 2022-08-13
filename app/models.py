@@ -1,12 +1,14 @@
 import hashlib
+import os.path
 from markdown import markdown
 from slugify import slugify
 from sqlalchemy import func, inspect
 from datetime import datetime
-from flask import current_app, escape
+from flask import current_app, escape, url_for
 from flask_login import UserMixin
 from app import db, login_manager, cache
-from app.helpers import add_to_index, remove_from_index, query_index
+from app.helpers import add_to_index, remove_from_index
+from app.helpers import query_index, save_avatar, avatar_exists
 
 
 @login_manager.user_loader
@@ -98,16 +100,6 @@ class User(Base, UserMixin, ActionMixin):
     faved = db.relationship(
         "PostFave", backref="user", cascade="all,delete-orphan", lazy="dynamic"
     )
-
-    def __init__(self, *args, **kwargs):
-        """Perform aditional tasks upon user instantiation."""
-        # if the user doesn't have analytics id create one
-        if not "analytics_id" in kwargs:
-            open_id = kwargs.get("google_id", kwargs.get("facebook_id"))
-            value = str(kwargs.get("id")) + str(open_id)
-            value = hashlib.md5(value.encode()).hexdigest()
-            kwargs["analytics_id"] = value
-        super().__init__(*args, **kwargs)
 
     @property
     def is_admin(self):
