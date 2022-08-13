@@ -77,7 +77,7 @@ def template_vars():
     return dict(
         now=datetime.utcnow(),
         app_name=current_app.config["APP_NAME"],
-        analytics_id=get_analytics_id,
+        analytics_id=get_analytics_id(),
         avatar=avatar,
     )
 
