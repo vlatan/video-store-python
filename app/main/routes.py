@@ -66,7 +66,7 @@ def avatar(user):
         # return avatar url
         return url_for("static", filename=rel_avatar)
     # return default avatar
-    return os.path.join("static", filename="images/avatars/default.jpg")
+    return url_for("static", filename="images/avatars/default.jpg")
 
 
 @main.app_context_processor
