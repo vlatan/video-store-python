@@ -179,7 +179,7 @@ def facebook():
         # get user info
         USER_ID = data["user_id"]
         GRAPH_ENDPOINT = current_app.config["FB_GRAPH_ENDPOINT"]
-        user_graph_endpoint = f"{GRAPH_ENDPOINT}/{USER_ID}"
+        user_graph_endpoint = os.path.join(GRAPH_ENDPOINT, USER_ID)
         # parameters for the graph endpoint
         payload = {
             "access_token": ACCESS_TOKEN,
