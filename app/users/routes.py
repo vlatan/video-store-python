@@ -96,7 +96,17 @@ def delete_account():
                 data={"access_token": revoke_token},
             )
 
+    # save img_id to variable before deleting the user
+    img_id = current_user.analytics_id
+
+    # remove user
     db.session.delete(current_user)
     db.session.commit()
+
+    # remove local avatar
+    rel_path = f"static/images/avatars/{img_id}.jpg"
+    abs_path = os.path.join(current_app.root_path, rel_path)
+    os.remove(abs_path)
+
     flash("Your account has been deleted", "success")
     return redirect(url_for("main.home"))
