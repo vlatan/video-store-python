@@ -1,4 +1,5 @@
 import hashlib
+import requests
 from app import db
 from app.models import User
 from flask import flash, redirect, request, current_app
@@ -83,6 +84,16 @@ def get_user_ready(user_info):
 
     db.session.commit()
     return user
+
+
+def save_image(image_url, file_path):
+    """Save image to file."""
+    response = requests.get(image_url)
+    if response.ok:
+        with open(file_path, "wb") as file:
+            file.write(response.content)
+            return True
+    return False
 
 
 def generate_hash(user):
