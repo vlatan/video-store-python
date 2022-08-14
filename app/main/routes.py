@@ -29,7 +29,7 @@ def format_datetime(value):
     return value.strftime("%Y-%m-%d %H:%M")
 
 
-def hash_id(user):
+def generate_hash(user):
     """Generate user's hash id."""
     google_id, fb_id = user.google_id, user.facebook_id
     open_id = google_id if google_id else fb_id
@@ -37,14 +37,12 @@ def hash_id(user):
     return hashlib.md5(value.encode()).hexdigest()
 
 
-def get_analytics_id():
+def hash_id(user):
     """Get user google analytics id."""
-    if not current_user.is_authenticated:
-        return None
-    if not current_user.analytics_id:
-        current_user.analytics_id = hash_id(current_user)
+    if not user.analytics_id:
+        current_user.analytics_id = generate_hash(user)
         db.session.commit()
-    return current_user.analytics_id
+    return user.analytics_id
 
 
 def save_image(image_url, file_path):
@@ -77,7 +75,7 @@ def template_vars():
     return dict(
         now=datetime.utcnow(),
         app_name=current_app.config["APP_NAME"],
-        analytics_id=get_analytics_id(),
+        analytics_id=hash_id,
         avatar=avatar,
     )
 
