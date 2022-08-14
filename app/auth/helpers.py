@@ -8,18 +8,31 @@ from google.auth.transport import requests as google_requests
 from datetime import timedelta
 
 
-def generate_hash(user):
-    """Generate user's hash id."""
-    google_id, fb_id = user.google_id, user.facebook_id
-    open_id = google_id if google_id else fb_id
-    value = str(user.id) + str(open_id)
-    return hashlib.md5(value.encode()).hexdigest()
+def finalize_google_login(credentials):
+    """Verify token, get user info, log user in."""
+
+    # if credentials is string it comes from OneTap and is in fact an ID token
+    if isinstance(credentials, str):
+        # verify the integrity of the ID token and get the user info
+        user_info = verify_google_token(credentials)
+    else:
+        # verify the integrity of the ID token and get the user info
+        user_info = verify_google_token(credentials.id_token)
+        # store refresh token
+        user_info["token"] = credentials.token
+
+    # get user ready (create or update their info)
+    user = get_user_ready(user_info)
+    # begin user session by logging the user in
+    login_user(user, remember=True, duration=timedelta(days=30))
 
 
-def failed_login():
-    """Generate flash message and return the referrer."""
-    flash("Sorry, there was a problem signing in to your account.", "info")
-    return redirect(request.referrer)
+def finalize_fb_login(user_info):
+    """Get user ready, log user in."""
+    # get user ready (create or update their info)
+    user = get_user_ready(user_info)
+    # begin user session by logging the user in
+    login_user(user, remember=True, duration=timedelta(days=30))
 
 
 def verify_google_token(token):
@@ -40,6 +53,11 @@ def verify_google_token(token):
 
 
 def get_user_ready(user_info):
+    """
+    Create new user or update the existing one if needed.
+    Commit the changes, return the user object.
+    """
+
     if facebook_id := user_info.get("facebook_id"):
         user = User.query.filter_by(facebook_id=facebook_id).first()
     else:
@@ -67,27 +85,15 @@ def get_user_ready(user_info):
     return user
 
 
-def finalize_google_login(credentials):
-    """Verify token, get user info, log user in."""
-
-    # if credentials is string it comes from OneTap and is in fact an ID token
-    if isinstance(credentials, str):
-        # verify the integrity of the ID token and get the user info
-        user_info = verify_google_token(credentials)
-    else:
-        # verify the integrity of the ID token and get the user info
-        user_info = verify_google_token(credentials.id_token)
-        # store refresh token
-        user_info["token"] = credentials.token
-
-    # get user ready (create or update their info)
-    user = get_user_ready(user_info)
-    # begin user session by logging the user in
-    login_user(user, remember=True, duration=timedelta(days=30))
+def generate_hash(user):
+    """Generate user's hash id."""
+    google_id, fb_id = user.google_id, user.facebook_id
+    open_id = google_id if google_id else fb_id
+    value = str(user.id) + str(open_id)
+    return hashlib.md5(value.encode()).hexdigest()
 
 
-def finalize_fb_login(user_info):
-    # get user ready (create or update their info)
-    user = get_user_ready(user_info)
-    # begin user session by logging the user in
-    login_user(user, remember=True, duration=timedelta(days=30))
+def failed_login():
+    """Generate flash message and return the referrer."""
+    flash("Sorry, there was a problem signing in to your account.", "info")
+    return redirect(request.referrer)
