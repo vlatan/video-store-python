@@ -46,6 +46,7 @@ def hash_id(user):
 
 
 def save_image(image_url, file_path):
+    """Save image to file."""
     response = requests.get(image_url)
     if response.ok:
         with open(file_path, "wb") as file:
@@ -55,6 +56,11 @@ def save_image(image_url, file_path):
 
 
 def avatar(user):
+    """
+    Check if user has localy saved avatar.
+    If so serve it, if not save to file if possible and serve it.
+    Otherwise serve default avatar.
+    """
     # absolute path to the static folder
     static_folder = os.path.join(current_app.root_path, "static")
     # avatar path relative to the static folder
