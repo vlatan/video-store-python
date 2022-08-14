@@ -29,8 +29,8 @@ def format_datetime(value):
     return value.strftime("%Y-%m-%d %H:%M")
 
 
-def generate_analytics_id(user):
-    """Generate user google analytics id."""
+def hash_id(user):
+    """Generate user's hash id."""
     google_id, fb_id = user.google_id, user.facebook_id
     open_id = google_id if google_id else fb_id
     value = str(user.id) + str(open_id)
@@ -42,7 +42,7 @@ def get_analytics_id():
     if not current_user.is_authenticated:
         return None
     if not current_user.analytics_id:
-        current_user.analytics_id = generate_analytics_id(current_user)
+        current_user.analytics_id = hash_id(current_user)
         db.session.commit()
     return current_user.analytics_id
 
@@ -60,7 +60,7 @@ def avatar(user):
     # absolute path to the static folder
     static_folder = os.path.join(current_app.root_path, "static")
     # avatar path relative to the static folder
-    rel_avatar = f"images/avatars/{user.id}.jpg"
+    rel_avatar = f"images/avatars/{hash_id(user)}.jpg"
     # absolute path to the user avatar
     abs_avatar = os.path.join(static_folder, rel_avatar)
     # if avatar image exists or it is created just now
@@ -68,7 +68,7 @@ def avatar(user):
         # return avatar url
         return url_for("static", filename=rel_avatar)
     # return default avatar
-    return os.path.join("static", filename="images/avatar.default.jpg")
+    return os.path.join("static", filename="images/avatars/default.jpg")
 
 
 @main.app_context_processor
