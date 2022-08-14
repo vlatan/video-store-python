@@ -40,7 +40,7 @@ def generate_hash(user):
 def hash_id(user):
     """Get user google analytics id."""
     if not user.analytics_id:
-        current_user.analytics_id = generate_hash(user)
+        user.analytics_id = generate_hash(user)
         db.session.commit()
     return user.analytics_id
 
