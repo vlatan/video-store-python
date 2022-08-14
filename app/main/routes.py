@@ -1,13 +1,11 @@
-import os.path
 import time
-import hashlib
+import os.path
 import requests
 from datetime import datetime
 from flask import render_template, request, current_app, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
 from app.models import Post
-from app import db
 
 main = Blueprint("main", __name__)
 
@@ -27,14 +25,6 @@ def autoversion_file(filename):
 def format_datetime(value):
     """Datetime formater to use in templates."""
     return value.strftime("%Y-%m-%d %H:%M")
-
-
-def generate_hash(user):
-    """Generate user's hash id."""
-    google_id, fb_id = user.google_id, user.facebook_id
-    open_id = google_id if google_id else fb_id
-    value = str(user.id) + str(open_id)
-    return hashlib.md5(value.encode()).hexdigest()
 
 
 def save_image(image_url, file_path):

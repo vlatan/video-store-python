@@ -1,11 +1,19 @@
+import hashlib
 from app import db
 from app.models import User
-from app.main.routes import generate_hash
 from flask import flash, redirect, request, current_app
 from flask_login import login_user
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from datetime import timedelta
+
+
+def generate_hash(user):
+    """Generate user's hash id."""
+    google_id, fb_id = user.google_id, user.facebook_id
+    open_id = google_id if google_id else fb_id
+    value = str(user.id) + str(open_id)
+    return hashlib.md5(value.encode()).hexdigest()
 
 
 def failed_login():
