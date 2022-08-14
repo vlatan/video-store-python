@@ -76,7 +76,8 @@
 				{% if current_user.is_authenticated %}
 				<div class="dropdown">
 					<button aria-label="Drop User Menu" class="nav-item username">
-						<img src="{{ avatar(current_user) }}" class="username-image" width="20" height="20" alt="">
+						<img src="{{ avatar(current_user) | autoversion }}" class="username-image" width="20"
+							height="20" alt="">
 						<span class="username-text">{{ current_user.name }}</span>
 					</button>
 					<div class="dropdown-content">
