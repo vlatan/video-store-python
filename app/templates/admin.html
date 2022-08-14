@@ -27,6 +27,7 @@
     <div class="dashboard-item dashboard-header-item">Email</div>
     <div class="dashboard-item dashboard-header-item">Login Provider</div>
     <div class="dashboard-item dashboard-header-item">Signup Date / Time</div>
+    <div class="dashboard-item dashboard-header-item">Last Seen</div>
 
     {% for user in users %}
     <div class="dashboard-item">{{ loop.index }}.</div>
@@ -41,6 +42,13 @@
     <div class="dashboard-item">Facebook</div>
     {% endif %}
     <div class="dashboard-item">{{ user.created_at | format_datetime }}</div>
+    <div class="dashboard-item">
+        {% if user.last_seen %}
+        {{ user.last_seen | format_datetime }}
+        {% else %}
+        N/A
+        {% endif %}
+    </div>
     {% endfor %}
 </div>
 

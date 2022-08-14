@@ -10,7 +10,7 @@
 .dashboard {
     display: grid;
     justify-content: flex-start;
-    grid-template-columns: repeat(6, auto);
+    grid-template-columns: repeat(7, auto);
 }
 
 .dashboard-header-item {
@@ -25,17 +25,17 @@
 }
 
 /* Remove left padding from the first grid column */
-.dashboard-item:nth-child(6n+1) {
+.dashboard-item:nth-child(7n+1) {
     padding-left: 0;
 }
 
 /* Remove bottom border from the last grid row */
-.dashboard-item:nth-last-child(-n+6) {
+.dashboard-item:nth-last-child(-n+7) {
     border-bottom: none;
 }
 
 /* Remove right border from the last grid column */
-.dashboard-item:nth-child(6n) {
+.dashboard-item:nth-child(7n) {
     border-right: none;
 }
 

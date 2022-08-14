@@ -88,6 +88,7 @@ class User(Base, UserMixin, ActionMixin):
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
     picture = db.Column(db.String(512))
+    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship("Post", backref="author", lazy=True)
     playlists = db.relationship("Playlist", backref="author", lazy=True)

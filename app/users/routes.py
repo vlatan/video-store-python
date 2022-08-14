@@ -1,6 +1,7 @@
 import os
 import time
 import requests
+from datetime import datetime
 from flask import render_template, url_for, flash, request, jsonify
 from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
@@ -8,6 +9,13 @@ from app import db
 from app.auth.helpers import get_avatar_abs_path
 
 users = Blueprint("users", __name__)
+
+
+@users.before_app_request
+def record_last_visit():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 @users.route("/liked/", methods=["GET", "POST"])
