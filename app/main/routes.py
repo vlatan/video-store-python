@@ -37,14 +37,6 @@ def generate_hash(user):
     return hashlib.md5(value.encode()).hexdigest()
 
 
-def hash_id(user):
-    """Get user google analytics id."""
-    if not user.analytics_id:
-        user.analytics_id = generate_hash(user)
-        db.session.commit()
-    return user.analytics_id
-
-
 def save_image(image_url, file_path):
     """Save image to file."""
     response = requests.get(image_url)
@@ -58,17 +50,16 @@ def save_image(image_url, file_path):
 def avatar(user):
     """
     Check if user has localy saved avatar.
-    If so serve it, if not save to file if possible and serve it.
-    Otherwise serve default avatar.
+    If so serve it, otherwise serve default avatar.
     """
     # absolute path to the static folder
     static_folder = os.path.join(current_app.root_path, "static")
     # avatar path relative to the static folder
-    rel_avatar = f"images/avatars/{hash_id(user)}.jpg"
+    rel_avatar = f"images/avatars/{user.analytics_id}.jpg"
     # absolute path to the user avatar
     abs_avatar = os.path.join(static_folder, rel_avatar)
-    # if avatar image exists or it is created just now
-    if os.path.isfile(abs_avatar) or save_image(user.picture, abs_avatar):
+    # if avatar image exists
+    if os.path.isfile(abs_avatar):
         # return avatar url
         return url_for("static", filename=rel_avatar)
     # return default avatar
@@ -81,7 +72,6 @@ def template_vars():
     return dict(
         now=datetime.utcnow(),
         app_name=current_app.config["APP_NAME"],
-        analytics_id=hash_id,
         avatar=avatar,
     )
 
