@@ -81,7 +81,8 @@ def favorites():
 @users.route("/account/delete/", methods=["POST"])
 @login_required
 def delete_account():
-    # try to revoke Doxder app from user's Google/Facebook account
+    """Delete users's account."""
+    # if user has token try to remove the app from user's Google/Facebook account
     if revoke_token := current_user.token:
         if current_user.google_id:
             # https://tinyurl.com/ymadyw2k
@@ -97,9 +98,8 @@ def delete_account():
                 data={"access_token": revoke_token},
             )
 
-    # save avatar abs path before deleting user
+    # save avatar absolute path before deleting user
     avatar_path = get_avatar_abs_path(current_user)
-
     # remove user
     db.session.delete(current_user)
     db.session.commit()
