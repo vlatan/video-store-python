@@ -1,5 +1,6 @@
 import hashlib
 import requests
+import os.path
 from app import db
 from app.models import User
 from flask import flash, redirect, request, current_app
@@ -70,6 +71,7 @@ def get_user_ready(user_info):
         user.analytics_id = generate_hash(user)
         db.session.add(user)
         db.session.commit()
+        save_avatar(user)
         return user
 
     # otherwise update mutable info for this user if changed
@@ -81,19 +83,10 @@ def get_user_ready(user_info):
         user.name = user_info["name"]
     if user.picture != user_info["picture"]:
         user.picture = user_info["picture"]
+        save_avatar(user)
 
     db.session.commit()
     return user
-
-
-def save_image(image_url, file_path):
-    """Save image to file."""
-    response = requests.get(image_url)
-    if response.ok:
-        with open(file_path, "wb") as file:
-            file.write(response.content)
-            return True
-    return False
 
 
 def generate_hash(user):
@@ -102,6 +95,21 @@ def generate_hash(user):
     open_id = google_id if google_id else fb_id
     value = str(user.id) + str(open_id)
     return hashlib.md5(value.encode()).hexdigest()
+
+
+def get_avatar_abs_path(user):
+    """Get the local avatar absolute path."""
+    root = current_app.root_path
+    return os.path.join(root, "static", "images", "avatars", f"{user.analytics_id}.jpg")
+
+
+def save_avatar(user):
+    """Save avatar to file."""
+    response = requests.get(user.picture)
+    if response.ok:
+        avatar_path = get_avatar_abs_path(user)
+        with open(avatar_path, "wb") as file:
+            file.write(response.content)
 
 
 def failed_login():

@@ -5,6 +5,7 @@ from flask import render_template, request, current_app, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
 from app.models import Post
+from app.auth.helpers import get_avatar_abs_path
 
 main = Blueprint("main", __name__)
 
@@ -31,18 +32,18 @@ def avatar(user):
     Check if user has localy saved avatar.
     If so serve it, otherwise serve default avatar.
     """
-    # absolute path to the static folder
-    static_folder = os.path.join(current_app.root_path, "static")
-    # avatar path relative to the static folder
-    rel_avatar = f"images/avatars/{user.analytics_id}.jpg"
-    # absolute path to the user avatar
-    abs_avatar = os.path.join(static_folder, rel_avatar)
+    # get the avatar absolute path
+    avatar_path = get_avatar_abs_path(user)
     # if avatar image exists
-    if os.path.isfile(abs_avatar):
+    if os.path.isfile(avatar_path):
+        # avatar path within the static folder
+        filename = os.path.join("images", "avatars", f"{user.analytics_id}.jpg")
         # return avatar url
-        return url_for("static", filename=rel_avatar)
+        return url_for("static", filename=filename)
+    # path to default avatar
+    default = os.path.join("images", "avatars", "default.jpg")
     # return default avatar
-    return url_for("static", filename="images/avatars/default.jpg")
+    return url_for("static", filename=default)
 
 
 @main.app_context_processor

@@ -5,6 +5,7 @@ from flask import render_template, url_for, flash, request, jsonify
 from flask import redirect, Blueprint, current_app, make_response
 from flask_login import current_user, login_required
 from app import db
+from app.auth.helpers import get_avatar_abs_path
 
 users = Blueprint("users", __name__)
 
@@ -96,17 +97,14 @@ def delete_account():
                 data={"access_token": revoke_token},
             )
 
-    # save img_id to variable before deleting the user
-    img_id = current_user.analytics_id
+    # save avatar abs path before deleting user
+    avatar_path = get_avatar_abs_path(current_user)
 
     # remove user
     db.session.delete(current_user)
     db.session.commit()
-
     # remove local avatar
-    rel_path = f"static/images/avatars/{img_id}.jpg"
-    abs_path = os.path.join(current_app.root_path, rel_path)
-    os.remove(abs_path)
+    os.remove(avatar_path)
 
     flash("Your account has been deleted", "success")
     return redirect(url_for("main.home"))
