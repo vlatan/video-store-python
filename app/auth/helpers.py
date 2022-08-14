@@ -17,6 +17,7 @@ def generate_hash(user):
 
 
 def failed_login():
+    """Generate flash message and return the referrer."""
     flash("Sorry, there was a problem signing in to your account.", "info")
     return redirect(request.referrer)
 
