@@ -97,12 +97,6 @@ def generate_hash(user):
     return hashlib.md5(value.encode()).hexdigest()
 
 
-def get_avatar_abs_path(user):
-    """Get the local avatar absolute path."""
-    root = current_app.root_path
-    return os.path.join(root, "static", "images", "avatars", f"{user.analytics_id}.jpg")
-
-
 def save_avatar(user):
     """Save avatar to file."""
     response = requests.get(user.picture)
@@ -110,6 +104,12 @@ def save_avatar(user):
         avatar_path = get_avatar_abs_path(user)
         with open(avatar_path, "wb") as file:
             file.write(response.content)
+
+
+def get_avatar_abs_path(user):
+    """Get the local avatar absolute path."""
+    root = current_app.root_path
+    return os.path.join(root, "static", "images", "avatars", f"{user.analytics_id}.jpg")
 
 
 def failed_login():
