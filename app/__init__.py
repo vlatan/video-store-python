@@ -69,4 +69,8 @@ def create_app(default_config=Config):
     app.register_blueprint(sitemap)
     app.register_blueprint(errors)
 
+    # create the tables if they don't exist
+    with app.app_context():
+        db.create_all()
+
     return app
