@@ -30,11 +30,12 @@ def create_app(default_config=Config):
     app.config.from_object(default_config)
 
     # initialize search index
-    os.mkdir("index") if not os.path.exists("index") else None
+    index = os.path.abspath("index")
+    os.mkdir(index) if not os.path.exists(index) else None
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    exists = exists_in("index")
-    app.index = open_dir("index") if exists else create_in("index", schema)
+    exists = exists_in(index)
+    app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
 
     # initialize plugins
     cache.init_app(app)
