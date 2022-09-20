@@ -18,8 +18,9 @@ def google():
     https://developers.google.com/identity/protocols/oauth2/web-server/
     """
 
+    DEBUG = current_app.config["DEBUG"]
     CLIENT_CONFIG = current_app.config["GOOGLE_CLIENT_CONFIG"]
-    scheme = None if current_app.config["DEBUG"] else "https"
+    scheme = None if DEBUG else "https"
     REDIRECT_URL = url_for("auth.google", _scheme=scheme, _external=True)
     SCOPES = current_app.config["GOOGLE_SCOPES"]
 
@@ -53,11 +54,9 @@ def google():
     flow.redirect_uri = REDIRECT_URL
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    # authorization_response = request.url
-    # print(request.args)
-    # authorization_response_v2 = os.path.join(REDIRECT_URL, "?", urlencode(request.args))
-    # print(authorization_response_v2)
-    authorization_response = urlparse(request.url)._replace(scheme="https").geturl()
+    # Ensure https if in production
+    https_request_url = urlparse(request.url)._replace(scheme="https").geturl()
+    authorization_response = request.url if DEBUG else https_request_url
     flow.fetch_token(authorization_response=authorization_response)
     credentials = flow.credentials
 
