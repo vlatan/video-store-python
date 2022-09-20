@@ -15,4 +15,4 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY . /doxder
 
 # command to start the webserver and run the app (with 3 workers)
-CMD ["gunicorn -w 3 run:app"]
+CMD ["gunicorn", "-w", "3", "run:app"]
