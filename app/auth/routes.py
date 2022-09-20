@@ -1,7 +1,7 @@
 import os
 import hashlib
 import requests
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 from google_auth_oauthlib.flow import Flow
 from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
@@ -53,7 +53,11 @@ def google():
     flow.redirect_uri = REDIRECT_URL
 
     # Use the authorization server's response to fetch the OAuth 2.0 tokens.
-    authorization_response = request.url
+    # authorization_response = request.url
+    # print(request.args)
+    # authorization_response_v2 = os.path.join(REDIRECT_URL, "?", urlencode(request.args))
+    # print(authorization_response_v2)
+    authorization_response = urlparse(request.url)._replace(scheme="https").geturl()
     flow.fetch_token(authorization_response=authorization_response)
     credentials = flow.credentials
 
