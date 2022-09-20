@@ -34,7 +34,6 @@ def create_app(default_config=Config):
     os.mkdir(index) if not os.path.exists(index) else None
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    exists = exists_in(index)
     app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
 
     # initialize plugins
