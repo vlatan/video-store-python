@@ -19,7 +19,8 @@ def google():
     """
 
     CLIENT_CONFIG = current_app.config["GOOGLE_CLIENT_CONFIG"]
-    REDIRECT_URL = url_for("auth.google", _external=True)
+    scheme = None if current_app.config["DEBUG"] else "https"
+    REDIRECT_URL = url_for("auth.google", _scheme=scheme, _external=True)
     SCOPES = current_app.config["GOOGLE_SCOPES"]
 
     # if the request DOESN'T have 'code' argument in the URL
@@ -110,7 +111,8 @@ def facebook():
     """
 
     CLIENT_ID = current_app.config["FB_CLIENT_ID"]
-    REDIRECT_URI = url_for("auth.facebook", _external=True)
+    scheme = None if current_app.config["DEBUG"] else "https"
+    REDIRECT_URI = url_for("auth.facebook", _scheme=scheme, _external=True)
 
     # check if this view has 'code' argument in it
     if not (CODE := request.args.get("code")):
