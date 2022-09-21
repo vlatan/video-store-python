@@ -10,6 +10,7 @@ from app.sources.helpers import validate_playlist
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
+from threading import Thread
 from pytz import utc
 from sqlalchemy.exc import IntegrityError, StatementError
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -159,3 +160,15 @@ def init_scheduler_jobs(app):
 
     atexit.register(lambda: scheduler.shutdown(wait=False))
     scheduler.start()
+
+
+def reindex(app):
+    with app.app_context():
+        Post.reindex()
+
+
+def populate_search_index(app):
+    if app.index.is_empty():
+        app_object = app._get_current_object()
+        thread = Thread(target=reindex, name="search_index", args=[app_object])
+        thread.start()

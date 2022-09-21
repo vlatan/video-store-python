@@ -29,13 +29,6 @@ def create_app(default_config=Config):
     # load config
     app.config.from_object(default_config)
 
-    # initialize search index
-    index = os.path.abspath("index")
-    os.mkdir(index) if not os.path.exists(index) else None
-    id_num = ID(unique=True, stored=True)
-    schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
-
     # initialize plugins
     cache.init_app(app)
     db.init_app(app)
@@ -52,7 +45,7 @@ def create_app(default_config=Config):
     from app.search.routes import search
     from app.admin.routes import admin
     from app.auth.routes import auth
-    from app.cron.handlers import cron, init_scheduler_jobs
+    from app.cron.handlers import cron, init_scheduler_jobs, populate_search_index
     from app.sitemap.routes import sitemap
     from app.errors.handlers import errors
 
@@ -69,8 +62,17 @@ def create_app(default_config=Config):
     app.register_blueprint(sitemap)
     app.register_blueprint(errors)
 
+    # initialize search index
+    index = os.path.abspath("index")
+    os.mkdir(index) if not os.path.exists(index) else None
+    id_num = ID(unique=True, stored=True)
+    schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
+    app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
+
+    # work within app context
     with app.app_context():
         db.create_all()  # create the tables if they don't exist
-        init_scheduler_jobs(current_app)  # initialize scheduled job
+        populate_search_index(current_app)  # populate search index if empty
+        init_scheduler_jobs(current_app)  # initialize scheduled video posting job
 
     return app

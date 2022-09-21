@@ -6,7 +6,6 @@ from flask import Blueprint, jsonify, make_response, send_from_directory
 from flask_login import current_user
 from app.models import Post
 from app.auth.helpers import get_avatar_abs_path
-from threading import Thread
 
 main = Blueprint("main", __name__)
 
@@ -57,20 +56,9 @@ def template_vars():
     )
 
 
-def populate_index(app):
-    with app.app_context():
-        Post.reindex()
-
-
 @main.route("/", methods=["GET", "POST"])
 def home():
     """Route to return the posts."""
-
-    # Populate the search index if empty (in a thread)
-    # https://whoosh.readthedocs.io/en/latest/api/#whoosh.index.Index.is_empty
-    if current_app.index.is_empty():
-        thread = Thread(target=populate_index, args=[current_app._get_current_object()])
-        thread.start()
 
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
