@@ -1,5 +1,5 @@
 import os.path
-from flask import Flask
+from flask import Flask, current_app
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -52,7 +52,7 @@ def create_app(default_config=Config):
     from app.search.routes import search
     from app.admin.routes import admin
     from app.auth.routes import auth
-    from app.cron.handlers import cron
+    from app.cron.handlers import cron, init_scheduler_jobs
     from app.sitemap.routes import sitemap
     from app.errors.handlers import errors
 
@@ -69,8 +69,8 @@ def create_app(default_config=Config):
     app.register_blueprint(sitemap)
     app.register_blueprint(errors)
 
-    # create the tables if they don't exist
     with app.app_context():
-        db.create_all()
+        db.create_all()  # create the tables if they don't exist
+        init_scheduler_jobs(current_app)  # initialize scheduled job
 
     return app

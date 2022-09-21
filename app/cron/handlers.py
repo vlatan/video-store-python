@@ -141,8 +141,7 @@ def process_videos(app):
             time.sleep(1)
 
 
-@cron.before_app_first_request
-def init_scheduler_jobs():
+def init_scheduler_jobs(app):
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/2.0.x/reqcontext/#notes-on-proxies
 
@@ -151,9 +150,9 @@ def init_scheduler_jobs():
     # add background job that posts new videos once a day
     scheduler.add_job(
         func=process_videos,
-        args=[current_app._get_current_object()],
+        args=[app._get_current_object()],
         trigger="cron",
-        hour=current_app.config["CRON_HOUR"],
+        hour=app.config["CRON_HOUR"],
         id="post",
         replace_existing=True,
     )
