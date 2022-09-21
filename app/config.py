@@ -17,9 +17,10 @@ class Config:
     GTAG_ID = os.getenv("GTAG_ID")
     CRON_HOUR = int(os.getenv("CRON_HOUR"))
 
-    # cache
-    CACHE_TYPE = "SimpleCache"  # Flask-Caching related configs
-    CACHE_DEFAULT_TIMEOUT = 300
+    # Flask-Caching
+    CACHE_TYPE = os.getenv("CACHE_TYPE")
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT"))
+    CACHE_REDIS_URL = os.getenv("CACHE_REDIS_URL")
 
     # Admin Google openid
     ADMIN_OPENID = os.getenv("ADMIN_OPENID")
