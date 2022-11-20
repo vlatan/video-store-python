@@ -22,6 +22,7 @@ cfg = import_string(CONFIG_TYPE)()
 cache_cfg = {
     "CACHE_TYPE": cfg.CACHE_TYPE,
     "CACHE_DEFAULT_TIMEOUT": cfg.CACHE_DEFAULT_TIMEOUT,
+    "CACHE_REDIS_URL": cfg.CACHE_REDIS_URL,
 }
 cache = Cache(config=cache_cfg)
 db = SQLAlchemy()
