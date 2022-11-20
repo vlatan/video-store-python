@@ -19,7 +19,12 @@ CONFIG_TYPE = os.getenv("CONFIG_TYPE")
 cfg = import_string(CONFIG_TYPE)()
 
 
-cache = Cache()
+cache = Cache(
+    config={
+        "CACHE_TYPE": cfg.CACHE_TYPE,
+        "CACHE_DEFAULT_TIMEOUT": cfg.CACHE_DEFAULT_TIMEOUT,
+    }
+)
 db = SQLAlchemy()
 migrate = Migrate(render_as_batch=True, compare_type=True)
 minify = Minify()
