@@ -1,19 +1,13 @@
 import os
 import json
-from dotenv import load_dotenv
 
 
 class Config:
-    # load the enviroment variables
-    load_dotenv()
-
     # app
     APP_NAME = os.getenv("APP_NAME")
     APP_DESCRIPTION = os.getenv("APP_DESCRIPTION")
     DOMAIN = os.getenv("DOMAIN")
     SECRET_KEY = os.getenv("SECRET_KEY")
-    DEBUG = json.loads(os.getenv("DEBUG").lower())
-    ENV = "development" if DEBUG else "production"
     GTAG_ID = os.getenv("GTAG_ID")
     CRON_HOUR = int(os.getenv("CRON_HOUR"))
 
@@ -61,3 +55,13 @@ class Config:
             "javascript_origins": GOOGLE_JS_ORIGINS,
         }
     }
+
+
+class DevConfig(Config):
+    DEBUG = True
+    TESTING = True
+
+
+class ProdConfig(Config):
+    DEBUG = False
+    TESTING = False

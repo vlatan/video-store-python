@@ -1,13 +1,23 @@
-import os.path
-from flask import Flask, current_app
+import os
+from dotenv import load_dotenv
+from flask import Flask
 from flask_caching import Cache
-from flask_sqlalchemy import SQLAlchemy
+from flask_minify import Minify
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from flask_minify import Minify
-from app.config import Config
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import import_string
 from whoosh.index import create_in, open_dir, exists_in
 from whoosh.fields import Schema, TEXT, ID
+
+
+# load the enviroment variables from an .env file
+load_dotenv()
+# get config type/class from the environment
+CONFIG_TYPE = os.getenv("CONFIG_TYPE")
+# import and instantiate the class
+cfg = import_string(CONFIG_TYPE)()
+
 
 cache = Cache()
 db = SQLAlchemy()
@@ -21,13 +31,13 @@ login_manager.login_view = "main.home"
 login_manager.login_message_category = "warning"
 
 
-def create_app(default_config=Config):
+def create_app():
     """Create a new app instance."""
 
     # create application object
     app = Flask(__name__)
     # load config
-    app.config.from_object(default_config)
+    app.config.from_object(cfg)
 
     # initialize plugins
     cache.init_app(app)
@@ -45,7 +55,7 @@ def create_app(default_config=Config):
     from app.search.routes import search
     from app.admin.routes import admin
     from app.auth.routes import auth
-    from app.cron.handlers import cron, init_scheduler_jobs, populate_search_index
+    from app.cron.handlers import cron
     from app.sitemap.routes import sitemap
     from app.errors.handlers import errors
 
@@ -68,6 +78,9 @@ def create_app(default_config=Config):
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
     app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
+
+    # import background tasks functions
+    from app.cron.handlers import init_scheduler_jobs, populate_search_index
 
     # work within app context
     with app.app_context():
