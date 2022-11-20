@@ -4,4 +4,4 @@ app = create_app()
 
 if __name__ == "__main__":
     ssl_context = ("certs/cert.pem", "certs/key.pem")
-    app.run(ssl_context=ssl_context)
+    app.run("localhost", ssl_context=ssl_context)
