@@ -17,10 +17,6 @@ def test_new_google_user(new_google_user):
     assert new_google_user.google_id == "12345677890"
     assert new_google_user.facebook_id == None
 
-    value = str(new_google_user.id) + new_google_user.google_id
-    analytics_id = hashlib.md5(value.encode()).hexdigest()
-    assert new_google_user.analytics_id == analytics_id
-
 
 def test_new_facebook_user(new_facebook_user):
     """
@@ -31,7 +27,3 @@ def test_new_facebook_user(new_facebook_user):
     assert_new_user(new_facebook_user)
     assert new_facebook_user.google_id == None
     assert new_facebook_user.facebook_id == "0987654321"
-
-    value = str(new_facebook_user.id) + new_facebook_user.facebook_id
-    analytics_id = hashlib.md5(value.encode()).hexdigest()
-    assert new_facebook_user.analytics_id == analytics_id
