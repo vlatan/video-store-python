@@ -63,7 +63,7 @@ jsonschema==4.3.2
 jupyter==1.0.0
 jupyter-client==7.1.0
 jupyter-console==6.4.0
-jupyter-core==4.9.1
+jupyter_core==5.0.0
 jupyterlab-pygments==0.1.2
 jupyterlab-widgets==1.0.2
 lesscpy==0.15.0
@@ -86,13 +86,13 @@ parso==0.8.3
 pathspec==0.9.0
 pexpect==4.8.0
 pickleshare==0.7.5
-Pillow==9.2.0
+Pillow==9.3.0
 platformdirs==2.5.2
 pluggy==1.0.0
 ply==3.11
 prometheus-client==0.12.0
 prompt-toolkit==3.0.24
-protobuf==3.15.7
+protobuf==4.21.9
 psycopg2-binary==2.9.3
 ptyprocess==0.7.0
 pure-eval==0.2.2
