@@ -72,7 +72,7 @@ def create_app(default_config=Config):
     # work within app context
     with app.app_context():
         db.create_all()  # create the tables if they don't exist
-        populate_search_index(current_app)  # populate search index if empty
-        init_scheduler_jobs(current_app)  # initialize scheduled video posting job
+        populate_search_index()  # populate search index if empty
+        init_scheduler_jobs()  # initialize scheduled video posting job
 
     return app

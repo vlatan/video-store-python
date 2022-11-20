@@ -142,18 +142,19 @@ def process_videos(app):
             time.sleep(1)
 
 
-def init_scheduler_jobs(app):
+def init_scheduler_jobs():
     # https://stackoverflow.com/a/38501328
     # https://flask.palletsprojects.com/en/2.0.x/reqcontext/#notes-on-proxies
 
     scheduler = BackgroundScheduler(timezone=utc)
+    app = current_app._get_current_object()
 
     # add background job that posts new videos once a day
     scheduler.add_job(
         func=process_videos,
-        args=[app._get_current_object()],
+        args=[app],
         trigger="cron",
-        hour=app.config["CRON_HOUR"],
+        hour=current_app.config["CRON_HOUR"],
         id="post",
         replace_existing=True,
     )
@@ -167,8 +168,10 @@ def reindex(app):
         Post.reindex()
 
 
-def populate_search_index(app):
-    if app.index.is_empty():
-        app_object = app._get_current_object()
-        thread = Thread(target=reindex, name="search_index", args=[app_object])
-        thread.start()
+def populate_search_index():
+    if not current_app.index.is_empty():
+        return
+
+    app = current_app._get_current_object()
+    thread = Thread(target=reindex, name="search_index", args=[app])
+    thread.start()
