@@ -7,8 +7,8 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import import_string
-from whoosh.index import create_in, open_dir, exists_in
 from whoosh.fields import Schema, TEXT, ID
+from whoosh.index import create_in, open_dir, exists_in
 
 
 # load the enviroment variables from an .env file
@@ -19,12 +19,11 @@ CONFIG_TYPE = os.getenv("CONFIG_TYPE")
 cfg = import_string(CONFIG_TYPE)()
 
 
-cache = Cache(
-    config={
-        "CACHE_TYPE": cfg.CACHE_TYPE,
-        "CACHE_DEFAULT_TIMEOUT": cfg.CACHE_DEFAULT_TIMEOUT,
-    }
-)
+cache_cfg = {
+    "CACHE_TYPE": cfg.CACHE_TYPE,
+    "CACHE_DEFAULT_TIMEOUT": cfg.CACHE_DEFAULT_TIMEOUT,
+}
+cache = Cache(config=cache_cfg)
 db = SQLAlchemy()
 migrate = Migrate(render_as_batch=True, compare_type=True)
 minify = Minify()
