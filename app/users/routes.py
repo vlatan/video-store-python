@@ -8,17 +8,18 @@ from flask_login import current_user, login_required
 from app import db
 from app.auth.helpers import get_avatar_abs_path
 
-users = Blueprint("users", __name__)
+
+bp = Blueprint("users", __name__)
 
 
-@users.before_app_request
+@bp.before_app_request
 def record_last_visit():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.utcnow()
         db.session.commit()
 
 
-@users.route("/liked/", methods=["GET", "POST"])
+@bp.route("/liked/", methods=["GET", "POST"])
 @login_required
 def liked():
     """Route to return the liked posts."""
@@ -52,7 +53,7 @@ def liked():
     )
 
 
-@users.route("/favorites/", methods=["GET", "POST"])
+@bp.route("/favorites/", methods=["GET", "POST"])
 @login_required
 def favorites():
     """Route to return the liked posts"""
@@ -86,7 +87,7 @@ def favorites():
     )
 
 
-@users.route("/account/delete/", methods=["POST"])
+@bp.route("/account/delete/", methods=["POST"])
 @login_required
 def delete_account():
     """Delete users's account."""

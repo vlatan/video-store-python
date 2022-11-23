@@ -7,10 +7,11 @@ from flask_login import current_user
 from app.models import Post
 from app.auth.helpers import get_avatar_abs_path
 
-main = Blueprint("main", __name__)
+
+bp = Blueprint("main", __name__)
 
 
-@main.app_template_filter("autoversion")
+@bp.app_template_filter("autoversion")
 def autoversion_file(filename):
     """Autoversion css/js files based on mtime."""
     fullpath = os.path.join("app/", filename[1:])
@@ -21,7 +22,7 @@ def autoversion_file(filename):
     return f"{filename}?v={timestamp}"
 
 
-@main.app_template_filter()
+@bp.app_template_filter()
 def format_datetime(value):
     """Datetime formater to use in templates."""
     return value.strftime("%Y-%m-%d %H:%M")
@@ -46,7 +47,7 @@ def avatar(user):
     return url_for("static", filename=default)
 
 
-@main.app_context_processor
+@bp.app_context_processor
 def template_vars():
     """Make variables available in templates."""
     return dict(
@@ -56,7 +57,7 @@ def template_vars():
     )
 
 
-@main.route("/", methods=["GET", "POST"])
+@bp.route("/", methods=["GET", "POST"])
 def home():
     """Route to return the posts."""
 
@@ -93,7 +94,7 @@ def home():
     return render_template("home.html", posts=posts)
 
 
-@main.route("/<path:filename>")
+@bp.route("/<path:filename>")
 def favicons(filename):
     """Serve favicon icons as if from root."""
     return send_from_directory("static/favicons/", filename)

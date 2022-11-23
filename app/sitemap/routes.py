@@ -9,7 +9,8 @@ from app import cache
 from app.models import Playlist, Post, Page
 from sqlalchemy import func
 
-sitemap = Blueprint("sitemap", __name__)
+
+bp = Blueprint("sitemap", __name__)
 
 
 def serve_as(content_type="text/html", charset="utf-8"):
@@ -28,7 +29,7 @@ def serve_as(content_type="text/html", charset="utf-8"):
     return decorator
 
 
-@sitemap.route("/sitemap.xml")
+@bp.route("/sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
 def sitemap_index():
@@ -74,7 +75,7 @@ def sitemap_index():
     return render_template("sitemap_index.xml", data=data)
 
 
-@sitemap.route("/posts-sitemap-<string:date>.xml")
+@bp.route("/posts-sitemap-<string:date>.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
 def posts_sitemap(date):
@@ -91,7 +92,7 @@ def posts_sitemap(date):
     return render_template("sitemap_page.xml", data=data)
 
 
-@sitemap.route("/pages-sitemap.xml")
+@bp.route("/pages-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
 def pages_sitemap():
@@ -107,7 +108,7 @@ def pages_sitemap():
     return render_template("sitemap_page.xml", data=data)
 
 
-@sitemap.route("/sources-sitemap.xml")
+@bp.route("/sources-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
 def sources_sitemap():
@@ -132,7 +133,7 @@ def sources_sitemap():
     return render_template("sitemap_page.xml", data=data)
 
 
-@sitemap.route("/misc-sitemap.xml")
+@bp.route("/misc-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
 def misc_sitemap():
@@ -153,7 +154,7 @@ def misc_sitemap():
     return render_template("sitemap_page.xml", data=data)
 
 
-@sitemap.route("/sitemap.xsl")
+@bp.route("/sitemap.xsl")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xsl")
 def sitemap_style():

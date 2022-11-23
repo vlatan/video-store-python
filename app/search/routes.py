@@ -6,10 +6,10 @@ from app.search.forms import SearchForm
 from app.models import Post
 
 
-search = Blueprint("search", __name__)
+bp = Blueprint("search", __name__)
 
 
-@search.before_app_request
+@bp.before_app_request
 def before_request():
     # before the request make this search form available application wide
     # stored in the global flask variable g
@@ -17,7 +17,7 @@ def before_request():
     g.search_form = SearchForm(formdata=request.args, meta={"csrf": False})
 
 
-@search.route("/search/", methods=["GET", "POST"])
+@bp.route("/search/", methods=["GET", "POST"])
 def search_results():
     """Route to return the search results."""
     # posts per page

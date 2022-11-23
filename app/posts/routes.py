@@ -7,10 +7,11 @@ from app.models import Post, DeletedPost
 from app.posts.forms import PostForm
 from app.posts.helpers import convertDuration, video_banned
 
-posts = Blueprint("posts", __name__)
+
+bp = Blueprint("posts", __name__)
 
 
-@posts.route("/video/<string:video_id>/")
+@bp.route("/video/<string:video_id>/")
 def post(video_id):
     # query the post
     post = Post.query.filter_by(video_id=video_id).first_or_404()
@@ -36,7 +37,7 @@ def post(video_id):
     )
 
 
-@posts.route("/video/new", methods=["GET", "POST"])
+@bp.route("/video/new", methods=["GET", "POST"])
 @admin_required
 def new_post():
     form = PostForm()
@@ -62,7 +63,7 @@ def new_post():
     )
 
 
-@posts.route("/video/<string:video_id>/<string:action>", methods=["POST"])
+@bp.route("/video/<string:video_id>/<string:action>", methods=["POST"])
 @login_required
 def perform_action(video_id, action):
     post = Post.query.filter_by(video_id=video_id).first_or_404()

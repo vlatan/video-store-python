@@ -7,10 +7,11 @@ from app.models import Post, Playlist
 from app.helpers import admin_required
 from app.sources.forms import PlaylistForm
 
-sources = Blueprint("sources", __name__)
+
+bp = Blueprint("sources", __name__)
 
 
-@sources.route("/source/new", methods=["GET", "POST"])
+@bp.route("/source/new", methods=["GET", "POST"])
 @admin_required
 def new_playlist():
     form = PlaylistForm()
@@ -33,7 +34,7 @@ def new_playlist():
     )
 
 
-@sources.route("/source/<string:playlist_id>/", methods=["GET", "POST"])
+@bp.route("/source/<string:playlist_id>/", methods=["GET", "POST"])
 def playlist_videos(playlist_id):
     """Route to return all videos in a playlist"""
 
@@ -58,7 +59,7 @@ def playlist_videos(playlist_id):
     )
 
 
-@sources.route("/source/other/", methods=["GET", "POST"])
+@bp.route("/source/other/", methods=["GET", "POST"])
 def orphan_videos():
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
@@ -76,7 +77,7 @@ def orphan_videos():
     return render_template("source.html", posts=posts, title="Other Uploads")
 
 
-@sources.route("/sources/")
+@bp.route("/sources/")
 def playlists():
     """Route to return the channels"""
     # Query the Playlist table

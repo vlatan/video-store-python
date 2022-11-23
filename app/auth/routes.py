@@ -8,10 +8,11 @@ from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, logout_user, login_required
 from app.auth.helpers import failed_login, finalize_google_login, finalize_fb_login
 
-auth = Blueprint("auth", __name__)
+
+bp = Blueprint("auth", __name__)
 
 
-@auth.route("/authorize/google")
+@bp.route("/authorize/google")
 def google():
     """
     Use Google to authenticate the user.
@@ -71,7 +72,7 @@ def google():
         return render_template("bummer_popup.html")
 
 
-@auth.route("/authorize/onetap", methods=["POST"])
+@bp.route("/authorize/onetap", methods=["POST"])
 def onetap():
     """
     Use Google's One Tap to authenticate the user.
@@ -106,7 +107,7 @@ def onetap():
         return failed_login()
 
 
-@auth.route("/authorize/facebook")
+@bp.route("/authorize/facebook")
 def facebook():
     """
     Use Facebook to authenticate the user.
@@ -214,7 +215,7 @@ def facebook():
         return render_template("bummer_popup.html")
 
 
-@auth.route("/logout")
+@bp.route("/logout")
 @login_required
 def logout():
     """Logout the user and redirect."""

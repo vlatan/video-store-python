@@ -4,16 +4,17 @@ from app.models import Page
 from app.pages.forms import PageForm
 from app.helpers import admin_required
 
-pages = Blueprint("pages", __name__)
+
+bp = Blueprint("pages", __name__)
 
 
-@pages.route("/page/<string:slug>/")
+@bp.route("/page/<string:slug>/")
 def page(slug):
     page = Page.query.filter_by(slug=slug).first_or_404()
     return render_template("page.html", page=page)
 
 
-@pages.route("/page/new", methods=["GET", "POST"])
+@bp.route("/page/new", methods=["GET", "POST"])
 @admin_required
 def new_page():
     form = PageForm()
@@ -28,7 +29,7 @@ def new_page():
     )
 
 
-@pages.route("/page/<string:slug>/edit", methods=["GET", "POST"])
+@bp.route("/page/<string:slug>/edit", methods=["GET", "POST"])
 @admin_required
 def edit_page(slug):
     page = Page.query.filter_by(slug=slug).first_or_404()

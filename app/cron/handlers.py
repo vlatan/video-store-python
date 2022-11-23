@@ -15,8 +15,6 @@ from pytz import utc
 from sqlalchemy.exc import IntegrityError, StatementError
 from sqlalchemy.orm.exc import ObjectDeletedError
 
-cron = Blueprint("cron", __name__)
-
 
 def get_youtube_videos(api_key):
     all_videos, complete = [], True
