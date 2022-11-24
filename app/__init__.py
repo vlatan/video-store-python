@@ -18,12 +18,14 @@ CONFIG_TYPE = os.getenv("CONFIG_TYPE")
 # import and instantiate the class
 cfg = import_string(CONFIG_TYPE)()
 
-
+# flask-caching config
 cache_cfg = {
     "CACHE_TYPE": cfg.CACHE_TYPE,
     "CACHE_DEFAULT_TIMEOUT": cfg.CACHE_DEFAULT_TIMEOUT,
     "CACHE_REDIS_URL": cfg.CACHE_REDIS_URL,
 }
+
+# instantiate flask plugins
 cache = Cache(config=cache_cfg)
 db = SQLAlchemy()
 migrate = Migrate(render_as_batch=True, compare_type=True)
