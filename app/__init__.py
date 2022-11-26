@@ -8,7 +8,7 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import import_string, find_modules
 from whoosh.fields import Schema, TEXT, ID
-from whoosh.index import create_in, open_dir, exists_in
+from whoosh.filedb.filestore import FileStorage
 
 
 # load the enviroment variables from an .env file
@@ -81,8 +81,12 @@ def register_blueprints(app):
 
 
 def initialize_search_index(app):
-    index = os.path.abspath("index")
-    os.mkdir(index) if not os.path.exists(index) else None
+    indexdir = os.path.abspath("index")
+    storage = FileStorage(indexdir).create()
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    app.index = open_dir(index) if exists_in(index) else create_in(index, schema)
+    app.index = (
+        storage.open_index(schema=schema)
+        if storage.index_exists()
+        else storage.create_index(schema)
+    )
