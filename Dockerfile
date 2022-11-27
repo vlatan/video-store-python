@@ -6,6 +6,7 @@ WORKDIR /doxder
 
 # copy requirements file and install dependencies
 COPY ./requirements.txt /doxder
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 # copy all of the app files to the working directory
