@@ -1,5 +1,5 @@
 # Docker image
-FROM python:latest
+FROM python:3.10-slim
 
 # set the container's working directory
 WORKDIR /doxder
