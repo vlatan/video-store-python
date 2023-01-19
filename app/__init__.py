@@ -14,7 +14,7 @@ from whoosh.filedb.filestore import FileStorage
 # load the enviroment variables from an .env file
 load_dotenv()
 # get config type/class from the environment
-CONFIG_TYPE = os.getenv("CONFIG_TYPE")
+CONFIG_TYPE = os.getenv("CONFIG_TYPE", default="config.DevConfig")
 # import and instantiate the class
 cfg = import_string(CONFIG_TYPE)()
 
