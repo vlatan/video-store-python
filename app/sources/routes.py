@@ -44,7 +44,7 @@ def playlist_videos(playlist_id):
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
     # if it's POST request this should contain data
-    frontend_data = request.get_json()
+    frontend_data = request.get_json(silent=True)
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
 
@@ -64,7 +64,7 @@ def orphan_videos():
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
     # if it's POST request this should contain data
-    frontend_data = request.get_json()
+    frontend_data = request.get_json(silent=True)
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
     # get orpahn posts

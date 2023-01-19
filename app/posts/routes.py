@@ -81,7 +81,7 @@ def perform_action(video_id, action):
         flash("The video has been deleted", "success")
         return redirect(url_for("main.home"))
     elif action == "edit" and current_user.is_admin:
-        frontend_data = request.get_json()
+        frontend_data = request.get_json(silent=True)
         if title := frontend_data.get("title"):
             post.title = title
             db.session.commit()

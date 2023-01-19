@@ -52,7 +52,7 @@ def search_results():
 
     # load the next page (POST request)
     ids, total = session.get("ids"), session.get("total")
-    if (frontend_data := request.get_json()) and ids and total:
+    if (frontend_data := request.get_json(silent=True)) and ids and total:
         # get the page number
         page = frontend_data.get("page")
         # if there are subsequent posts send content to frontend
