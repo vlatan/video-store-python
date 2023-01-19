@@ -9,11 +9,11 @@ class Config:
     DOMAIN = os.getenv("DOMAIN")
     SECRET_KEY = os.getenv("SECRET_KEY")
     GTAG_ID = os.getenv("GTAG_ID")
-    CRON_HOUR = int(os.getenv("CRON_HOUR"))
+    CRON_HOUR = int(os.getenv("CRON_HOUR", default="5"))
 
     # Flask-Caching
     CACHE_TYPE = os.getenv("CACHE_TYPE")
-    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT"))
+    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", default="300"))
     CACHE_REDIS_URL = os.getenv("CACHE_REDIS_URL")
 
     # Admin Google openid
@@ -24,8 +24,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
-    POSTS_PER_PAGE = int(os.getenv("POSTS_PER_PAGE"))
-    NUM_RELATED_POSTS = int(os.getenv("NUM_RELATED_POSTS"))
+    POSTS_PER_PAGE = int(os.getenv("POSTS_PER_PAGE", default="24"))
+    NUM_RELATED_POSTS = int(os.getenv("NUM_RELATED_POSTS", default="5"))
 
     # Facebook authentication
     FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
