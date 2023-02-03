@@ -1,4 +1,3 @@
-import requests
 from flask import current_app
 from functools import wraps
 from flask import current_app, flash, redirect, url_for
