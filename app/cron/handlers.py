@@ -1,6 +1,6 @@
 import time
 import atexit
-from flask import current_app, Blueprint
+from flask import current_app
 from wtforms.validators import ValidationError
 from app import db
 from app.models import Post, Playlist
