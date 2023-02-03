@@ -31,7 +31,7 @@ class Config:
     CACHE_REDIS_URL = load_env("CACHE_REDIS_URL")
 
     # Admin Google openid
-    ADMIN_OPENID = load_env("ADMIN_OPENID")
+    ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
     # SQLAlchemy
     SQLALCHEMY_DATABASE_URI = load_env("SQLALCHEMY_DATABASE_URI")
@@ -42,7 +42,7 @@ class Config:
     NUM_RELATED_POSTS = load_env("NUM_RELATED_POSTS") or 5
 
     # Facebook authentication
-    FB_CLIENT_ID = load_env("FB_CLIENT_ID")
+    FB_CLIENT_ID = str(load_env("FB_CLIENT_ID"))
     FB_CLIENT_SECRET = load_env("FB_CLIENT_SECRET")
     FB_GRAPH_ENDPOINT = "https://graph.facebook.com/v12.0"
     FB_DIALOG_ENDPOINT = "https://www.facebook.com/v12.0/dialog/oauth"
