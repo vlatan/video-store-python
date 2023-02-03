@@ -102,8 +102,7 @@ class User(Base, UserMixin, ActionMixin):
     @property
     def is_admin(self):
         """Check if user is admin."""
-        admin_openid = current_app.config["ADMIN_OPENID"]
-        return True if self.google_id == admin_openid else False
+        return self.google_id == current_app.config["ADMIN_OPENID"]
 
 
 class Post(Base, SearchableMixin):
