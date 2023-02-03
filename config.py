@@ -2,47 +2,61 @@ import os
 import json
 
 
+def load_env(var):
+    """
+    Fetch value from environment variable.
+    If var doesn't exist or its value is empty string return None.
+    If var value is not a valid JSON document return the value AS IS.
+    """
+    result = os.getenv(var)
+    try:
+        parse_nums = {"parse_float": float, "parse_int": int}
+        return json.loads(result, **parse_nums) if result else None
+    except (TypeError, json.decoder.JSONDecodeError):
+        return result
+
+
 class Config:
     # app
-    APP_NAME = os.getenv("APP_NAME")
-    APP_DESCRIPTION = os.getenv("APP_DESCRIPTION")
-    DOMAIN = os.getenv("DOMAIN")
-    SECRET_KEY = os.getenv("SECRET_KEY")
-    GTAG_ID = os.getenv("GTAG_ID")
-    CRON_HOUR = int(os.getenv("CRON_HOUR", default="5"))
+    APP_NAME = load_env("APP_NAME")
+    APP_DESCRIPTION = load_env("APP_DESCRIPTION")
+    DOMAIN = load_env("DOMAIN")
+    SECRET_KEY = load_env("SECRET_KEY")
+    GTAG_ID = load_env("GTAG_ID")
+    CRON_HOUR = load_env("CRON_HOUR") or 5
 
     # Flask-Caching
-    CACHE_TYPE = os.getenv("CACHE_TYPE")
-    CACHE_DEFAULT_TIMEOUT = int(os.getenv("CACHE_DEFAULT_TIMEOUT", default="300"))
-    CACHE_REDIS_URL = os.getenv("CACHE_REDIS_URL")
+    CACHE_TYPE = load_env("CACHE_TYPE")
+    CACHE_DEFAULT_TIMEOUT = load_env("CACHE_DEFAULT_TIMEOUT") or 300
+    CACHE_REDIS_URL = load_env("CACHE_REDIS_URL")
 
     # Admin Google openid
-    ADMIN_OPENID = os.getenv("ADMIN_OPENID")
+    ADMIN_OPENID = load_env("ADMIN_OPENID")
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = load_env("SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
-    POSTS_PER_PAGE = int(os.getenv("POSTS_PER_PAGE", default="24"))
-    NUM_RELATED_POSTS = int(os.getenv("NUM_RELATED_POSTS", default="5"))
+    POSTS_PER_PAGE = load_env("POSTS_PER_PAGE") or 24
+    NUM_RELATED_POSTS = load_env("NUM_RELATED_POSTS") or 5
 
     # Facebook authentication
-    FB_CLIENT_ID = os.getenv("FB_CLIENT_ID")
-    FB_CLIENT_SECRET = os.getenv("FB_CLIENT_SECRET")
+    FB_CLIENT_ID = load_env("FB_CLIENT_ID")
+    FB_CLIENT_SECRET = load_env("FB_CLIENT_SECRET")
     FB_GRAPH_ENDPOINT = "https://graph.facebook.com/v12.0"
     FB_DIALOG_ENDPOINT = "https://www.facebook.com/v12.0/dialog/oauth"
     FB_ACCESS_TOKEN_ENDPOINT = os.path.join(FB_GRAPH_ENDPOINT, "oauth", "access_token")
     FB_INSPECT_TOKEN_ENDPOINT = "https://graph.facebook.com/debug_token"
 
     # Google/Youtube authentication
-    YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
-    GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID")
-    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
-    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-    GOOGLE_SCOPES = json.loads(os.getenv("GOOGLE_SCOPES"))
-    GOOGLE_REDIRECT_URIS = json.loads(os.getenv("GOOGLE_REDIRECT_URIS"))
-    GOOGLE_JS_ORIGINS = json.loads(os.getenv("GOOGLE_JAVASCRIPT_ORIGINS"))
+    YOUTUBE_API_KEY = load_env("YOUTUBE_API_KEY")
+    GOOGLE_PROJECT_ID = load_env("GOOGLE_PROJECT_ID")
+    GOOGLE_CLIENT_ID = load_env("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = load_env("GOOGLE_CLIENT_SECRET")
+    GOOGLE_SCOPES = load_env("GOOGLE_SCOPES")
+    GOOGLE_REDIRECT_URIS = load_env("GOOGLE_REDIRECT_URIS")
+    GOOGLE_JS_ORIGINS = load_env("GOOGLE_JAVASCRIPT_ORIGINS")
     GOOGLE_CLIENT_CONFIG = {
         "web": {
             "client_id": GOOGLE_CLIENT_ID,
