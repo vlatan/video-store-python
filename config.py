@@ -4,9 +4,9 @@ import json
 
 def load_env(var):
     """
-    Fetch value from environment variable.
+    Fetch and JSON decode the value from environment variable.
     If var doesn't exist or its value is empty string return None.
-    If var value is not a valid JSON document return the value AS IS.
+    If var value is not a valid JSON document return the value as string.
     """
     result = os.getenv(var)
     try:
