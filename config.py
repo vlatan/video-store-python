@@ -26,15 +26,15 @@ class Config:
     CRON_HOUR = load_env("CRON_HOUR") or 5
 
     # Flask-Caching
-    CACHE_TYPE = load_env("CACHE_TYPE")
+    CACHE_TYPE = load_env("CACHE_TYPE") or "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = load_env("CACHE_DEFAULT_TIMEOUT") or 300
-    CACHE_REDIS_URL = load_env("CACHE_REDIS_URL")
+    CACHE_REDIS_URL = load_env("CACHE_REDIS_URL") or "http://localhost:6379"
 
     # Admin Google openid
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = load_env("SQLALCHEMY_DATABASE_URI")
+    SQLALCHEMY_DATABASE_URI = load_env("SQLALCHEMY_DATABASE_URI") or "sqlite:///site.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
