@@ -157,7 +157,7 @@ class Post(Base, SearchableMixin):
     @cache.memoize(86400)
     def get_posts(cls, page, per_page):
         query = cls.query.order_by(cls.upload_date.desc())
-        posts = query.paginate(page, per_page, False).items
+        posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
 
     @classmethod
@@ -169,7 +169,7 @@ class Post(Base, SearchableMixin):
         """
         query = cls.query.outerjoin(PostLike).group_by(cls.id)
         query = query.order_by(func.count().desc())
-        posts = query.paginate(page, per_page, False).items
+        posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
 
     @classmethod
@@ -184,7 +184,7 @@ class Post(Base, SearchableMixin):
     def get_playlist_posts(cls, playlist_id, page, per_page):
         query = cls.query.filter_by(playlist_id=playlist_id)
         query = query.order_by(cls.upload_date.desc())
-        posts = query.paginate(page, per_page, False).items
+        posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
 
     @classmethod
@@ -193,7 +193,7 @@ class Post(Base, SearchableMixin):
         src_ids = [pl.playlist_id for pl in Playlist.query.all()]
         orphans = (cls.playlist_id == None) | (cls.playlist_id.not_in(src_ids))
         query = cls.query.filter(orphans).order_by(cls.upload_date.desc())
-        posts = query.paginate(page, per_page, False).items
+        posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
 
     @classmethod

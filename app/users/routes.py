@@ -30,7 +30,7 @@ def liked():
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
 
-    items = current_user.liked.paginate(page, per_page, False).items
+    items = current_user.liked.paginate(page=page, per_page=per_page, error_out=False).items
     posts = [item.post for item in items]
 
     if request.method == "POST":
@@ -64,7 +64,7 @@ def favorites():
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
 
-    items = current_user.faved.paginate(page, per_page, False).items
+    items = current_user.faved.paginate(page=page, per_page=per_page, error_out=False).items
     posts = [item.post for item in items]
 
     if request.method == "POST":

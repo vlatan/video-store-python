@@ -74,7 +74,7 @@ def home():
         elif request.args.get("short_desc") == "no":
             date = Post.upload_date.desc()
             query = Post.query.filter_by(short_description=None).order_by(date)
-            posts = query.paginate(page, per_page, False).items
+            posts = query.paginate(page=page, per_page=per_page, error_out=False).items
             posts = [post.serialize for post in posts]
         else:
             uncached_posts = Post.get_posts.uncached
