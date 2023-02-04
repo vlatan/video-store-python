@@ -46,7 +46,7 @@ class SearchableMixin:
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]
-        query = cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id))
+        query = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
         return query, total
 
     @classmethod
