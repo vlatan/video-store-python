@@ -202,7 +202,7 @@ class Post(Base, SearchableMixin):
         if not ids:
             return ids
         when = [(ids[i], i) for i in range(len(ids))]
-        posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id))
+        posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
         return [post.serialize for post in posts]
 
 
