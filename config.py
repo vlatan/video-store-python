@@ -2,6 +2,10 @@ import os
 import json
 
 
+# get absolute path to the root dir of this project
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 def load_env(var):
     """
     Fetch and JSON decode the value from environment variable.
@@ -34,7 +38,7 @@ class Config:
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = load_env("SQLALCHEMY_DATABASE_URI") or "sqlite:///site.db"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, load_env("DATABASE_NAME"))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
