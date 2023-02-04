@@ -42,7 +42,7 @@ def create_app():
     """Create a new app instance."""
 
     # create application object
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=True)
     # load config
     app.config.from_object(cfg)
 
