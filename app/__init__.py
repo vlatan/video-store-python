@@ -1,14 +1,15 @@
 import os
 from dotenv import load_dotenv
+from whoosh.fields import Schema, TEXT, ID
+from whoosh.filedb.filestore import FileStorage
+from werkzeug.utils import import_string, find_modules
+
 from flask import Flask
 from flask_caching import Cache
 from flask_minify import Minify
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from werkzeug.utils import import_string, find_modules
-from whoosh.fields import Schema, TEXT, ID
-from whoosh.filedb.filestore import FileStorage
 
 
 # load the enviroment variables from an .env file
