@@ -112,8 +112,11 @@ def process_videos(app):
                 # if (title := video["title"]) != posted.title:
                 #     generate_description(title)
 
-                # temorarely generate short desc for all docs
-                generate_description(posted.title)
+                # temporarely generate short desc for all posted docs
+                if short_desc := generate_description(posted.title):
+                    posted.short_description = short_desc
+                    db.session.commit()
+                    time.sleep(1)
 
             else:
                 if short_desc := generate_description(video["title"]):
