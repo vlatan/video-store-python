@@ -110,6 +110,11 @@ button.edit-description {
   padding-bottom: calc(var(--content-padding) / 2);
 }
 
+.description_discliamer {
+  color: gray;
+  font-size: 0.85rem;
+}
+
 .unpublished {
   display: flex;
   flex-direction: column;
@@ -121,17 +126,19 @@ button.edit-description {
 }
 
 @media screen and (max-width: 900px) {
-  .video-description {
+  .short_desc_wrap {
     border-bottom: 1px solid var(--primary-border-color);
+    padding-bottom: calc(var(--content-padding) / 2);
   }
 }
 @media screen and (max-width: 700px) {
   .metadata,
-.unpublished {
+  .unpublished {
     gap: var(--content-padding);
   }
   h1.video-title,
-.video-description {
+  .video-description,
+  .short_desc_wrap {
     padding-bottom: var(--content-padding);
   }
 }

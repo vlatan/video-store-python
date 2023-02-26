@@ -1,19 +1,24 @@
 import time
 import atexit
-from flask import current_app
-from wtforms.validators import ValidationError
-from app import db
-from app.models import Post, Playlist
-from app.cron.helpers import get_playlist_videos
-from app.posts.helpers import validate_video
-from app.sources.helpers import validate_playlist
+import openai
+import logging
+from pytz import utc
+from threading import Thread
+from openai.error import TryAgain
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
-from threading import Thread
-from pytz import utc
-from sqlalchemy.exc import IntegrityError, StatementError
+
+from flask import current_app
+from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
+from sqlalchemy.exc import IntegrityError, StatementError
+
+from app import db
+from app.models import Post, Playlist
+from app.posts.helpers import validate_video
+from app.cron.helpers import get_playlist_videos
+from app.sources.helpers import validate_playlist
 
 
 def get_youtube_videos(api_key):
@@ -103,7 +108,16 @@ def process_videos(app):
                     db.session.commit()
                     time.sleep(1)
 
+                # update short description if the title was manually edited
+                # if (title := video["title"]) != posted.title:
+                #     generate_description(title)
+
+                # temorarely generate short desc for all docs
+                generate_description(posted.title)
+
             else:
+                if short_desc := generate_description(video["title"]):
+                    video["short_description"] = short_desc
                 # create object from Model
                 post = Post(**video)
                 try:
@@ -173,3 +187,22 @@ def populate_search_index():
     app = current_app._get_current_object()
     thread = Thread(target=reindex, name="search_index", args=[app])
     thread.start()
+
+
+def generate_description(title):
+    openai.api_key = current_app.config.get("OPENAI_KEY")
+    try:
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=f'Write a short text about "{title}".',
+            temperature=0.7,
+            max_tokens=260,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=1,
+        )
+        return response["choices"][0]["text"].lstrip()
+    except (KeyError, IndexError, TryAgain) as e:
+        logging.warning(f"Was unable to generate a summary via OpenAI for: {title}")
+        logging.warning(str(e))
+        return None

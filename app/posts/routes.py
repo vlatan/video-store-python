@@ -1,10 +1,12 @@
+from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, request
 from flask import redirect, Blueprint, current_app, make_response
-from flask_login import current_user, login_required
+
 from app import db
+from app.posts.forms import PostForm
 from app.helpers import admin_required
 from app.models import Post, DeletedPost
-from app.posts.forms import PostForm
+from app.cron.handlers import generate_description
 from app.posts.helpers import convertDuration, video_banned
 
 
@@ -51,6 +53,11 @@ def new_post():
 
         # form.content.data is a dict, just unpack to transform into kwargs
         post = Post(**form.processed_content, author=current_user)
+
+        # fetch short description from openAI
+        if short_desc := generate_description(post.title):
+            post.short_description = short_desc
+
         # add post to database
         db.session.add(post)
         db.session.commit()
