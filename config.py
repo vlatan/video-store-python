@@ -76,6 +76,8 @@ class Config:
 
 
 class DevConfig(Config):
+    HOST = load_env("HOST")
+    PORT = load_env("PORT")
     DEBUG = True
     TESTING = True
 
