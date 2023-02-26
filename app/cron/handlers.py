@@ -109,14 +109,14 @@ def process_videos(app):
                     posted.similar = similar
                     db.session.commit()
 
-                # update short description if the title was manually edited
+                # # update short description if the title was manually edited
                 # if (title := video["title"]) != posted.title:
                 #     generate_description(title)
 
-                # temporarely generate short desc for all posted docs
-                if short_desc := generate_description(posted.title):
-                    posted.short_description = short_desc
-                    db.session.commit()
+                # # temporarely generate short desc for all posted docs
+                # if short_desc := generate_description(posted.title):
+                #     posted.short_description = short_desc
+                #     db.session.commit()
 
             else:
                 if short_desc := generate_description(video["title"]):
