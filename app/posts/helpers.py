@@ -25,9 +25,8 @@ def validate_video(response):
 
     text_language = response["snippet"].get("defaultLanguage")
     if text_language and not text_language.startswith("en"):
-        raise ValidationError(
-            "This video's title and/or description is not in English."
-        )
+        msg = "This video's title and/or description is not in English."
+        raise ValidationError(msg)
 
     broadcast = response["snippet"].get("liveBroadcastContent")
     if broadcast and broadcast != "none":
