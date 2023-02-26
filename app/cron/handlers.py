@@ -4,7 +4,7 @@ import openai
 import logging
 from pytz import utc
 from threading import Thread
-from openai.error import TryAgain
+from openai.error import TryAgain, RateLimitError
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -89,6 +89,9 @@ def process_videos(app):
 
         # loop through total number of videos
         for video in all_videos:
+            # take a break befoere going to the next video
+            time.sleep(1.2)
+
             # if video is already posted
             if posted := Post.query.filter_by(video_id=video["video_id"]).first():
                 # if it doesn't match the playlist id
@@ -98,7 +101,6 @@ def process_videos(app):
                     # associate with existing playlist in our db
                     posted.playlist = video["playlist"]
                     db.session.commit()
-                    time.sleep(1)
 
                 # update similar_ids if there's a change
                 similar = Post.get_related_posts(posted.title, PER_PAGE)
@@ -106,7 +108,6 @@ def process_videos(app):
                 if posted.similar != similar:
                     posted.similar = similar
                     db.session.commit()
-                    time.sleep(1)
 
                 # update short description if the title was manually edited
                 # if (title := video["title"]) != posted.title:
@@ -116,11 +117,11 @@ def process_videos(app):
                 if short_desc := generate_description(posted.title):
                     posted.short_description = short_desc
                     db.session.commit()
-                    time.sleep(1)
 
             else:
                 if short_desc := generate_description(video["title"]):
                     video["short_description"] = short_desc
+
                 # create object from Model
                 post = Post(**video)
                 try:
@@ -128,7 +129,6 @@ def process_videos(app):
                     db.session.commit()
                 except IntegrityError:
                     db.session.rollback()
-                time.sleep(1)
 
         # get sources ids
         sources = [pl.playlist_id for pl in Playlist.query.all()]
@@ -205,7 +205,7 @@ def generate_description(title):
             presence_penalty=1,
         )
         return response["choices"][0]["text"].lstrip()
-    except (KeyError, IndexError, TryAgain) as e:
+    except (KeyError, IndexError, TryAgain, RateLimitError) as e:
         logging.warning(f"Was unable to generate a summary via OpenAI for: {title}")
         logging.warning(str(e))
         return None
