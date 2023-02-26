@@ -45,6 +45,9 @@ class Config:
     POSTS_PER_PAGE = load_env("POSTS_PER_PAGE") or 24
     NUM_RELATED_POSTS = load_env("NUM_RELATED_POSTS") or 5
 
+    # OpenAI key to fectch summaries for the videos
+    OPENAI_KEY = load_env("OPENAI_KEY")
+
     # Facebook authentication
     FB_CLIENT_ID = str(load_env("FB_CLIENT_ID"))
     FB_CLIENT_SECRET = load_env("FB_CLIENT_SECRET")
