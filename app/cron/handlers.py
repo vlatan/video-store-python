@@ -4,9 +4,9 @@ import openai
 import logging
 from pytz import utc
 from threading import Thread
-from openai.error import TryAgain, RateLimitError
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from openai.error import TryAgain, RateLimitError
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from flask import current_app
