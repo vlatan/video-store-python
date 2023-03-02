@@ -89,7 +89,7 @@ def process_videos(app):
 
         # loop through total number of videos
         for video in all_videos:
-            # take a break befoere going to the next video
+            # take a short break before processing the next video
             time.sleep(1.2)
 
             # if video is already posted
