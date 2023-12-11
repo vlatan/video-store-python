@@ -21,6 +21,18 @@ Via a background process a function is periodically called which goes through th
 
 Users can login via Google and Facebook. The app doesn't store passwords so naturally it makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Facebook's Login Flow](https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow).
 
+## Run the app locally
+
+Firs build a docker image:
+```
+docker build . --tag doxder-image
+```
+
+Then run a docker container on port 5000:
+```
+docker run --rm -p 5000:5000 -v .:/app doxder-image python run.py
+```
+
 ## License
 
 [![License: GNU GPLv3](https://img.shields.io/github/license/vlatan/doxder?label=License)](/LICENSE "License: GNU GPLv3")
