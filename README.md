@@ -33,6 +33,8 @@ Then run a docker container on port 5000:
 docker run --rm -p 5000:5000 -v .:/app doxder-image python run.py
 ```
 
+Access the app on `https://localhost:5000`
+
 ## License
 
 [![License: GNU GPLv3](https://img.shields.io/github/license/vlatan/doxder?label=License)](/LICENSE "License: GNU GPLv3")
