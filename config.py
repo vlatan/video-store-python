@@ -1,5 +1,6 @@
 import os
 import json
+from celery.schedules import crontab
 
 
 # get absolute path to the root dir of this project
@@ -38,7 +39,9 @@ class Config:
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
     # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, load_env("DATABASE_NAME"))
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
+        basedir, load_env("DATABASE_NAME")
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
@@ -75,6 +78,13 @@ class Config:
             "redirect_uris": GOOGLE_REDIRECT_URIS,
             "javascript_origins": GOOGLE_JS_ORIGINS,
         }
+    }
+
+    CELERY = {
+        "broker_url": load_env("CELERY_BROKER_URL"),
+        "result_backend": load_env("CELERY_RESULT_BACKEND"),
+        "task_ignore_result": load_env("CELERY_IGNORE_RESULT"),
+        "broker_connection_retry_on_startup": True,
     }
 
 

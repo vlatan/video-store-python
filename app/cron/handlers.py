@@ -1,13 +1,11 @@
 import time
-import atexit
 import openai
 import logging
-from pytz import utc
 from threading import Thread
+from celery import shared_task
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from openai.error import TryAgain, RateLimitError
-from apscheduler.schedulers.background import BackgroundScheduler
 
 from flask import current_app
 from wtforms.validators import ValidationError
@@ -79,103 +77,82 @@ def revalidate_single_video(post, api_key):
             pass
 
 
-def process_videos(app):
-    with app.app_context():
-        API_KEY = current_app.config["YOUTUBE_API_KEY"]
-        PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
+@shared_task
+def process_videos():
+    API_KEY = current_app.config["YOUTUBE_API_KEY"]
+    PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
-        # get all VALID videos from our playlists from YouTube
-        all_videos, complete = get_youtube_videos(API_KEY)
+    # get all VALID videos from our playlists from YouTube
+    all_videos, complete = get_youtube_videos(API_KEY)
 
-        # loop through total number of videos
-        for video in all_videos:
-            # take a short break before processing the next video
-            time.sleep(1.2)
+    # loop through total number of videos
+    for video in all_videos:
+        # take a short break before processing the next video
+        time.sleep(1.2)
 
-            # if video is already posted
-            if posted := Post.query.filter_by(video_id=video["video_id"]).first():
-                # if it doesn't match the playlist id
-                if posted.playlist_id != video["playlist_id"]:
-                    # match playlist id
-                    posted.playlist_id = video["playlist_id"]
-                    # associate with existing playlist in our db
-                    posted.playlist = video["playlist"]
-                    db.session.commit()
+        # if video is already posted
+        if posted := Post.query.filter_by(video_id=video["video_id"]).first():
+            # if it doesn't match the playlist id
+            if posted.playlist_id != video["playlist_id"]:
+                # match playlist id
+                posted.playlist_id = video["playlist_id"]
+                # associate with existing playlist in our db
+                posted.playlist = video["playlist"]
+                db.session.commit()
 
-                # update similar_ids if there's a change
-                similar = Post.get_related_posts(posted.title, PER_PAGE)
-                similar = [item["id"] for item in similar]
-                if posted.similar != similar:
-                    posted.similar = similar
-                    db.session.commit()
+            # update similar_ids if there's a change
+            similar = Post.get_related_posts(posted.title, PER_PAGE)
+            similar = [item["id"] for item in similar]
+            if posted.similar != similar:
+                posted.similar = similar
+                db.session.commit()
 
-                # # update short description if the title was manually edited
-                # if (title := video["title"]) != posted.title:
-                #     generate_description(title)
+            # # update short description if the title was manually edited
+            # if (title := video["title"]) != posted.title:
+            #     generate_description(title)
 
-                # # temporarely generate short desc for all posted docs
-                # if short_desc := generate_description(posted.title):
-                #     posted.short_description = short_desc
-                #     db.session.commit()
+            # # temporarely generate short desc for all posted docs
+            # if short_desc := generate_description(posted.title):
+            #     posted.short_description = short_desc
+            #     db.session.commit()
 
-            else:
-                if short_desc := generate_description(video["title"]):
-                    video["short_description"] = short_desc
+        else:
+            if short_desc := generate_description(video["title"]):
+                video["short_description"] = short_desc
 
-                # create object from Model
-                post = Post(**video)
-                try:
-                    db.session.add(post)
-                    db.session.commit()
-                except IntegrityError:
-                    db.session.rollback()
+            # create object from Model
+            post = Post(**video)
+            try:
+                db.session.add(post)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
 
-        # get sources ids
-        sources = [pl.playlist_id for pl in Playlist.query.all()]
+    # get sources ids
+    sources = [pl.playlist_id for pl in Playlist.query.all()]
 
-        # delete missing videos if all VALID videos are fetched from YT
-        if complete:
-            fetched_ids = {video["video_id"] for video in all_videos}
-            posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
-            posted_ids = {post.video_id for post in posted}
-            to_delete = posted_ids - fetched_ids
-            to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
-            for post in to_delete:
-                try:
-                    db.session.delete(post)
-                    db.session.commit()
-                except (ObjectDeletedError, StatementError):
-                    db.session.rollback()
-                time.sleep(1)
-
-        # revalidate orphan videos (not attached to any source/playlist)
-        orphan_posts = Post.query.filter(
-            (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
-        ).all()
-        for post in orphan_posts:
-            revalidate_single_video(post, API_KEY)
+    # delete missing videos if all VALID videos are fetched from YT
+    if complete:
+        fetched_ids = {video["video_id"] for video in all_videos}
+        posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
+        posted_ids = {post.video_id for post in posted}
+        to_delete = posted_ids - fetched_ids
+        to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
+        for post in to_delete:
+            try:
+                db.session.delete(post)
+                db.session.commit()
+            except (ObjectDeletedError, StatementError):
+                db.session.rollback()
             time.sleep(1)
 
-
-def init_scheduler_jobs():
-    # https://stackoverflow.com/a/38501328
-    # https://flask.palletsprojects.com/en/2.0.x/reqcontext/#notes-on-proxies
-
-    scheduler = BackgroundScheduler(timezone=utc)
-    app = current_app._get_current_object()
-
-    # add background job that posts new videos once a day
-    scheduler.add_job(
-        func=process_videos,
-        args=[app],
-        trigger="cron",
-        hour=current_app.config["CRON_HOUR"],
-        id="post",
-        replace_existing=True,
-    )
-
-    atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.start()
+    # revalidate orphan videos (not attached to any source/playlist)
+    orphan_posts = Post.query.filter(
+        (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
+    ).all()
+    for post in orphan_posts:
+        revalidate_single_video(post, API_KEY)
+        time.sleep(1)
 
 
 def reindex(app):

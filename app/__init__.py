@@ -7,6 +7,7 @@ from werkzeug.utils import import_string, find_modules
 from flask import Flask
 from flask_caching import Cache
 from flask_minify import Minify
+from celery import Celery, Task
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -46,7 +47,6 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     # load config
     app.config.from_object(cfg)
-
     # initialize plugins
     initialize_plugins(app)
     # register blueprints
@@ -54,13 +54,11 @@ def create_app():
     # initialize search index
     initialize_search_index(app)
 
-    # import background jobs functions
-    from app.cron.handlers import init_scheduler_jobs, populate_search_index
+    from app.cron.handlers import populate_search_index
 
     with app.app_context():
         db.create_all()  # create db tables if they don't exist
         populate_search_index()  # populate search index if empty
-        init_scheduler_jobs()  # initialize scheduled video posting job
 
     return app
 
@@ -71,6 +69,7 @@ def initialize_plugins(app):
     migrate.init_app(app, db)
     minify.init_app(app)
     login_manager.init_app(app)
+    celery_init_app(app)
 
 
 def register_blueprints(app):
@@ -91,3 +90,16 @@ def initialize_search_index(app):
         if storage.index_exists()
         else storage.create_index(schema)
     )
+
+
+def celery_init_app(app: Flask) -> Celery:
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
