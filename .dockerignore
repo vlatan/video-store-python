@@ -1,3 +1,23 @@
+# extensions
+**/*.pyc
+**/*.pyo
+**/*.mo
+**/*.md
+**/*.swp
+**/*.swo
+
+# folders
+**/__pycache__/
+**/.pytest_cache/
+.vscode/
+.venv/
+postgres_data/
+redis_data/
+
+# files in the root
 Dockerfile
-.git
+docker-compose.yml
+.dockerignore
 .gitignore
+.git
+.env
