@@ -56,9 +56,12 @@ def create_app():
 
     from app.cron.handlers import populate_search_index
 
-    with app.app_context():
-        db.create_all()  # create db tables if they don't exist
-        populate_search_index()  # populate search index if empty
+    # no need to re-create database and index
+    # if this is a celery container/service
+    if not app.config["CELERY_SERVICE"]:
+        with app.app_context():
+            db.create_all()  # create db tables if they don't exist
+            populate_search_index()  # populate search index if empty
 
     return app
 
