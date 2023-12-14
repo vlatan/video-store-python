@@ -1,5 +1,6 @@
 import os
 import json
+from sqlalchemy import URL
 
 
 # get absolute path to the root dir of this project
@@ -37,10 +38,16 @@ class Config:
     # Admin Google openid
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
-    # SQLAlchemy
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-        basedir, str(load_env("DATABASE_NAME"))
+    # Database
+    SQLALCHEMY_DATABASE_URI = URL.create(
+        "postgresql+psycopg",
+        username=load_env("DB_USER"),
+        password=load_env("DB_PASSWORD"),
+        host=load_env("DB_HOST"),
+        port=5432,
+        database=load_env("DB_NAME"),
     )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Other
@@ -79,6 +86,7 @@ class Config:
         }
     }
 
+    CELERY_SERVICE = load_env("CELERY_SERVICE") or False
     CELERY = {
         "broker_url": load_env("CELERY_BROKER_URL"),
         "result_backend": load_env("CELERY_RESULT_BACKEND"),
