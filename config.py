@@ -1,6 +1,5 @@
 import os
 import json
-from celery.schedules import crontab
 
 
 # get absolute path to the root dir of this project
@@ -40,7 +39,7 @@ class Config:
 
     # SQLAlchemy
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-        basedir, load_env("DATABASE_NAME")
+        basedir, str(load_env("DATABASE_NAME"))
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
