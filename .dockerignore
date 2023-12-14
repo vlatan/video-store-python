@@ -11,10 +11,12 @@
 **/.pytest_cache/
 .vscode/
 .venv/
+migrations/
 postgres_data/
 redis_data/
 
 # files in the root
+db.load
 Dockerfile
 docker-compose.yml
 .dockerignore
