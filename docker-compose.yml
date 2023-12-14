@@ -1,0 +1,48 @@
+services:
+
+  redis:
+    image: redis:6
+    container_name: redis
+    ports:
+      - "${EXPOSE_REDIS_PORT:-}:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "INCR", "ping" ]
+      interval: 3s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./redis_data/:/data
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command:
+      [
+        "celery",
+        "-A",
+        "make_celery",
+        "worker",
+        "-B",
+        "--uid=nobody",
+        "--gid=nogroup",
+        "--loglevel=INFO"
+      ]
+    env_file: .env
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  app:
+    build: .
+    container_name: app
+    ports:
+      - $PORT:$PORT
+    command: [ "python", "run.py" ]
+    env_file: .env
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
