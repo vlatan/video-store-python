@@ -1,6 +1,9 @@
 # Docker image
 FROM python:3.10-slim
 
+# Allow statements and log messages to immediately appear in logs
+ENV PYTHONUNBUFFERED True
+
 # run and add virtual env in PATH
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
