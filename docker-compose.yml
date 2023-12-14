@@ -1,6 +1,7 @@
 services:
 
   redis:
+    restart: always
     image: redis:6
     container_name: redis
     ports:
@@ -14,6 +15,7 @@ services:
       - ./redis_data/:/data
 
   celery_worker:
+    restart: always
     build: .
     container_name: celery_worker
     command:
@@ -23,8 +25,6 @@ services:
         "make_celery",
         "worker",
         "-B",
-        "--uid=nobody",
-        "--gid=nogroup",
         "--loglevel=INFO"
       ]
     env_file: .env
@@ -35,6 +35,7 @@ services:
         condition: service_healthy
 
   app:
+    restart: always
     build: .
     container_name: app
     ports:
