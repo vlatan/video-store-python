@@ -21,7 +21,9 @@ class Base(db.Model):
     )
 
 
-class ActionMixin:
+class ActionMixin(db.Model):
+    __abstract__ = True
+
     def cast(self, post, action):
         obj = PostLike if action in ["like", "unlike"] else PostFave
         # if user hasn't liked/faved the post record her like/fave
@@ -39,7 +41,9 @@ class ActionMixin:
         return query.count() > 0
 
 
-class SearchableMixin:
+class SearchableMixin(db.Model):
+    __abstract__ = True
+
     @classmethod
     def search(cls, keyword, page, per_page):
         ids, total = query_index(cls.__searchable__, keyword, page, per_page)
