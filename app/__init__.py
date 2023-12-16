@@ -1,5 +1,7 @@
 import os
+import functools
 from dotenv import load_dotenv
+import google.generativeai as genai
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.filedb.filestore import FileStorage
 from werkzeug.utils import import_string, find_modules
@@ -40,11 +42,11 @@ login_manager.login_view = "main.home"
 login_manager.login_message_category = "warning"
 
 
-def create_app():
+def create_app() -> Flask:
     """Create a new app instance."""
 
     # create application object
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(cfg.APP_NAME, instance_relative_config=True)
     # load config
     app.config.from_object(cfg)
     # initialize plugins
@@ -66,7 +68,7 @@ def create_app():
     return app
 
 
-def initialize_plugins(app):
+def initialize_plugins(app: Flask) -> None:
     cache.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
@@ -75,7 +77,7 @@ def initialize_plugins(app):
     celery_init_app(app)
 
 
-def register_blueprints(app):
+def register_blueprints(app: Flask) -> None:
     for module in find_modules("app", recursive=True):
         try:
             app.register_blueprint(import_string(f"{module}.bp"))
@@ -83,7 +85,7 @@ def register_blueprints(app):
             pass
 
 
-def initialize_search_index(app):
+def initialize_search_index(app: Flask) -> None:
     indexdir = os.path.abspath("index")
     storage = FileStorage(indexdir).create()
     id_num = ID(unique=True, stored=True)
@@ -106,3 +108,22 @@ def celery_init_app(app: Flask) -> Celery:
     celery_app.set_default()
     app.extensions["celery"] = celery_app
     return celery_app
+
+
+def setup_generative_ai(app: Flask) -> None:
+    """
+    Place generative ai ready partial method in the app config
+    that requires just the prompt.
+    """
+    GEMINI_API_KEY = app.config["GEMINI_API_KEY"]
+    genai.configure(api_key=GEMINI_API_KEY)
+    model = genai.GenerativeModel("gemini-pro")
+
+    # create partial function by supplying safety_settings
+    generate_content = functools.partial(
+        model.generate_content,
+        safety_settings={"HATE_SPEECH": "block_none", "HARASSMENT": "block_none"},
+    )
+
+    # place the func object in the app config
+    app.config["generate_content"] = generate_content

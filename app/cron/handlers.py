@@ -1,11 +1,9 @@
 import time
-import openai
 import logging
 from threading import Thread
 from celery import shared_task
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from openai.error import TryAgain, RateLimitError
 
 from flask import current_app
 from wtforms.validators import ValidationError
@@ -107,18 +105,25 @@ def process_videos():
                 posted.similar = similar
                 db.session.commit()
 
-            # # update short description if the title was manually edited
-            # if (title := video["title"]) != posted.title:
-            #     generate_description(title)
+            # update short description if the title was manually edited
+            if (title := video["title"]) != posted.title:
+                if short_desc := generate_description(title):
+                    posted.short_description = short_desc
+                    db.session.commit()
 
-            # # temporarely generate short desc for all posted docs
-            # if short_desc := generate_description(posted.title):
-            #     posted.short_description = short_desc
-            #     db.session.commit()
+            # if there is NO short description in DB generate one
+            elif not posted.short_description:
+                if short_desc := generate_description(posted.title):
+                    posted.short_description = short_desc
+                    db.session.commit()
+
+            # TODO: Categorize the video using generative AI
 
         else:
             if short_desc := generate_description(video["title"]):
                 video["short_description"] = short_desc
+
+            # TODO: Categorize the video using generative AI
 
             # create object from Model
             post = Post(**video)
@@ -169,20 +174,29 @@ def populate_search_index():
     thread.start()
 
 
-def generate_description(title):
-    openai.api_key = current_app.config.get("OPENAI_KEY")
+def generate_description(title: str) -> str | None:
+    """Generate description from a generative AI given a title."""
+
+    generate_content = current_app.config["generate_content"]
+    prompt = f"Write a short text about: {title}."
+
     try:
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f'Write a short text about "{title}".',
-            temperature=0.7,
-            max_tokens=260,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=1,
-        )
-        return response["choices"][0]["text"].lstrip()
-    except (KeyError, IndexError, TryAgain, RateLimitError) as e:
-        logging.warning(f"Was unable to generate a summary via OpenAI for: {title}")
+        return generate_content(prompt)
+    except (KeyError, IndexError) as e:
+        logging.warning(f"Was unable to generate a summary for: {title}")
+        logging.warning(str(e))
+        return None
+
+
+def categorize(title: str, categories: str) -> str | None:
+    """Generate a category from a generative AI based given a title and categories."""
+
+    generate_content = current_app.config["generate_content"]
+    prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
+
+    try:
+        return generate_content(prompt)
+    except (KeyError, IndexError) as e:
+        logging.warning(f"Was unable to generate category for: {title}")
         logging.warning(str(e))
         return None
