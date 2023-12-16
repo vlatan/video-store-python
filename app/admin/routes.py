@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
-from app.helpers import admin_required
+
 from app.models import User
+from app.helpers import admin_required
 
 
 bp = Blueprint("admin", __name__)

@@ -2,9 +2,11 @@ import os
 import time
 import requests
 from datetime import datetime
-from flask import render_template, url_for, flash, request, jsonify
-from flask import redirect, Blueprint, current_app, make_response
+
 from flask_login import current_user, login_required
+from flask import redirect, Blueprint, current_app, make_response
+from flask import render_template, url_for, flash, request, jsonify
+
 from app import db
 from app.auth.helpers import get_avatar_abs_path
 
@@ -30,7 +32,9 @@ def liked():
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
 
-    items = current_user.liked.paginate(page=page, per_page=per_page, error_out=False).items
+    items = current_user.liked.paginate(
+        page=page, per_page=per_page, error_out=False
+    ).items
     posts = [item.post for item in items]
 
     if request.method == "POST":
@@ -64,7 +68,9 @@ def favorites():
     # if frontend_data get page number, else 1
     page = frontend_data.get("page") if frontend_data else 1
 
-    items = current_user.faved.paginate(page=page, per_page=per_page, error_out=False).items
+    items = current_user.faved.paginate(
+        page=page, per_page=per_page, error_out=False
+    ).items
     posts = [item.post for item in items]
 
     if request.method == "POST":

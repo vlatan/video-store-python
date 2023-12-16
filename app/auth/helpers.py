@@ -1,13 +1,15 @@
 import hashlib
-import requests
 import os.path
-from app import db
-from app.models import User
-from flask import flash, redirect, request, current_app
-from flask_login import login_user
+import requests
+from datetime import timedelta
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from datetime import timedelta
+
+from flask_login import login_user
+from flask import flash, redirect, request, current_app
+
+from app import db
+from app.models import User
 
 
 def finalize_google_login(credentials):

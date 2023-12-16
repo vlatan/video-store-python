@@ -1,6 +1,6 @@
-from app.posts.helpers import video_banned, validate_video, fetch_video_data
-from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
+from wtforms.validators import ValidationError
+from app.posts.helpers import video_banned, validate_video, fetch_video_data
 
 
 def get_playlist_videos(playlist_id, youtube):

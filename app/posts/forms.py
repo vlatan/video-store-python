@@ -1,8 +1,8 @@
 from googleapiclient.errors import HttpError
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, URL, ValidationError
 
 from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired, URL, ValidationError
 
 from app.models import Post
 from app.helpers import youtube_build

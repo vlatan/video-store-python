@@ -1,11 +1,13 @@
 import os
 import hashlib
 import requests
-from urllib.parse import urlencode, urlparse
 from google_auth_oauthlib.flow import Flow
+from urllib.parse import urlencode, urlparse
+
 from flask import request, redirect, session, current_app
 from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, logout_user, login_required
+
 from app.auth.helpers import failed_login, finalize_google_login, finalize_fb_login
 
 
@@ -27,7 +29,6 @@ def google():
 
     # if the request DOESN'T have 'code' argument in the URL
     if "code" not in request.args:
-
         # do not proceed if user is already logged in
         if current_user.is_authenticated:
             return redirect(request.referrer)
@@ -120,7 +121,6 @@ def facebook():
 
     # check if this view has 'code' argument in it
     if not (CODE := request.args.get("code")):
-
         # do not proceed if user is already logged in
         if current_user.is_authenticated:
             return redirect(request.referrer)

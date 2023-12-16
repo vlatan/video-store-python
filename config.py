@@ -1,6 +1,6 @@
 import os
 import json
-from sqlalchemy import URL
+import sqlalchemy
 
 
 # get absolute path to the root dir of this project
@@ -39,7 +39,7 @@ class Config:
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
 
     # Database
-    SQLALCHEMY_DATABASE_URI = URL.create(
+    SQLALCHEMY_DATABASE_URI = sqlalchemy.URL.create(
         "postgresql+psycopg",
         username=load_env("DB_USER"),
         password=load_env("DB_PASSWORD"),

@@ -1,6 +1,3 @@
-import hashlib
-
-
 def assert_new_user(user):
     assert user.name == "Test User"
     assert user.email == "test@email.com"

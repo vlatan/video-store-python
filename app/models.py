@@ -1,9 +1,11 @@
-from markdown import markdown
+import sqlalchemy
 from slugify import slugify
-from sqlalchemy import func, inspect
+from markdown import markdown
 from datetime import datetime
-from flask import current_app, escape
+
 from flask_login import UserMixin
+from flask import current_app, escape
+
 from app import db, login_manager, cache
 from app.helpers import add_to_index, remove_from_index, query_index
 
@@ -57,7 +59,7 @@ class SearchableMixin(db.Model):
     def _fields_dirty(cls, obj):
         if not isinstance(obj, cls):
             return False
-        insp = inspect(obj)  # https://stackoverflow.com/a/28353846
+        insp = sqlalchemy.inspect(obj)  # https://stackoverflow.com/a/28353846
         attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
         return any([attr.history.has_changes() for attr in attrs])
 
@@ -172,7 +174,7 @@ class Post(Base, SearchableMixin):
         https://stackoverflow.com/q/63889938
         """
         query = cls.query.outerjoin(PostLike).group_by(cls.id)
-        query = query.order_by(func.count().desc())
+        query = query.order_by(sqlalchemy.func.count().desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
 
@@ -180,7 +182,7 @@ class Post(Base, SearchableMixin):
     @cache.memoize(86400)
     def get_related_posts(cls, title, per_page):
         if not (posts := cls.search(title, 1, per_page + 1)[0]):
-            posts = cls.query.order_by(func.random()).limit(per_page)
+            posts = cls.query.order_by(sqlalchemy.func.random()).limit(per_page)
         return [post.serialize for post in posts if post.title != title]
 
     @classmethod

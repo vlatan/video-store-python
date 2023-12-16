@@ -1,7 +1,18 @@
 import time
-from flask import render_template, url_for, flash
-from flask import redirect, Blueprint, current_app, request, jsonify, make_response
+
 from flask_login import current_user
+from flask import (
+    redirect,
+    Blueprint,
+    current_app,
+    request,
+    jsonify,
+    make_response,
+    render_template,
+    url_for,
+    flash,
+)
+
 from app import db
 from app.models import Post, Playlist
 from app.helpers import admin_required

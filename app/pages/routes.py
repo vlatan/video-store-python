@@ -1,4 +1,5 @@
 from flask import redirect, render_template, flash, url_for, Blueprint
+
 from app import db
 from app.models import Page
 from app.pages.forms import PageForm

@@ -1,5 +1,6 @@
-from app import create_app
 from celery.schedules import crontab
+
+from app import create_app
 from app.cron.handlers import process_videos
 
 

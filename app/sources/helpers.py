@@ -1,6 +1,6 @@
 from urllib.parse import urlparse, parse_qs
-from wtforms.validators import ValidationError
 from googleapiclient.errors import HttpError
+from wtforms.validators import ValidationError
 
 
 def parse_playlist(url):

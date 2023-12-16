@@ -3,12 +3,12 @@ import logging
 from threading import Thread
 from celery import shared_task
 from googleapiclient.errors import HttpError
-
-from flask import current_app
-from flask.ctx import AppContext
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
+
+from flask import current_app
+from flask.ctx import AppContext
 
 from app import db
 from app.models import Post, Playlist

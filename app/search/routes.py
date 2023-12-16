@@ -1,9 +1,11 @@
 import time
+
 from flask import render_template, request, redirect, current_app, g
 from flask import url_for, Blueprint, jsonify, make_response, session
+
+from app.models import Post
 from app.helpers import query_index_all
 from app.search.forms import SearchForm
-from app.models import Post
 
 
 bp = Blueprint("search", __name__)

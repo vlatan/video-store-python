@@ -1,9 +1,11 @@
 import time
 import os.path
 from datetime import datetime
+
+from flask_login import current_user
 from flask import render_template, request, current_app, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
-from flask_login import current_user
+
 from app.models import Post
 from app.auth.helpers import get_avatar_abs_path
 

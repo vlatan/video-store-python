@@ -1,12 +1,15 @@
 import datetime
-from collections import OrderedDict
+import functools
+import sqlalchemy
 from itertools import groupby
-from functools import wraps
-from flask import render_template, current_app, abort, url_for
+from collections import OrderedDict
+
+
 from flask import Blueprint, make_response
+from flask import render_template, current_app, abort, url_for
+
 from app import cache
 from app.models import Playlist, Post, Page
-from sqlalchemy import func
 
 
 bp = Blueprint("sitemap", __name__)
@@ -16,7 +19,7 @@ def serve_as(content_type="text/html", charset="utf-8"):
     """Modify response's content-type header."""
 
     def decorator(func):
-        @wraps(func)
+        @functools.wraps(func)
         def wrapper(*args, **kwargs):
             template = func(*args, **kwargs)
             response = make_response(template)
@@ -80,7 +83,9 @@ def sitemap_index():
 def posts_sitemap(date):
     """Route to return the posts sitemap."""
     data = OrderedDict()
-    posts = Post.query.filter(func.strftime("%Y-%m", Post.upload_date) == date)
+    posts = Post.query.filter(
+        sqlalchemy.func.strftime("%Y-%m", Post.upload_date) == date
+    )
     for post in posts:
         url = url_for("posts.post", video_id=post.video_id, _external=True)
         data[url] = post.updated_at.strftime("%Y-%m-%d")
