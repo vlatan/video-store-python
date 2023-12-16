@@ -187,7 +187,7 @@ def generate_description(title: str) -> str | None:
     prompt = f"Write a short text about: {title}."
 
     try:
-        return generate_content(prompt)
+        return generate_content(prompt).text
     except (KeyError, IndexError) as e:
         logging.warning(f"Was unable to generate a summary for: {title}")
         logging.warning(str(e))
@@ -201,7 +201,7 @@ def categorize(title: str, categories: str) -> str | None:
     prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
 
     try:
-        return generate_content(prompt)
+        return generate_content(prompt).text
     except (KeyError, IndexError) as e:
         logging.warning(f"Was unable to generate category for: {title}")
         logging.warning(str(e))
