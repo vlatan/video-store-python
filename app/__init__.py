@@ -32,7 +32,7 @@ cache_cfg = {
 
 
 # SQLAlchemy declarative base class
-class Base(DeclarativeBase, MappedAsDataclass):
+class Base(DeclarativeBase):
     pass
 
 
