@@ -33,18 +33,15 @@ def avatar(user):
     Check if user has localy saved avatar.
     If so serve it, otherwise serve default avatar.
     """
-    # get the avatar absolute path
-    avatar_path = get_avatar_abs_path(user)
-    # if avatar image exists
-    if os.path.isfile(avatar_path):
-        # avatar path within the static folder
-        filename = os.path.join("images", "avatars", f"{user.analytics_id}.jpg")
-        # return avatar url
-        return url_for("static", filename=filename)
-    # path to default avatar
-    default = os.path.join("images", "avatars", "default.jpg")
-    # return default avatar
-    return url_for("static", filename=default)
+    # default avatar
+    avatar = os.path.join("images", "avatars", "default.jpg")
+    # if user avatar image exists localy
+    if os.path.isfile(get_avatar_abs_path(user)):
+        # user avatar path within the static folder
+        avatar = os.path.join("images", "avatars", f"{user.analytics_id}.jpg")
+
+    # return user avatar url
+    return url_for("static", filename=avatar)
 
 
 @bp.app_context_processor
