@@ -2,9 +2,11 @@ import sqlalchemy
 from slugify import slugify
 from markdown import markdown
 from datetime import datetime
+from markupsafe import escape
+from sqlalchemy.orm import mapped_column
 
+from flask import current_app
 from flask_login import UserMixin
-from flask import current_app, escape
 
 from app import db, login_manager, cache
 from app.helpers import add_to_index, remove_from_index, query_index
@@ -17,8 +19,8 @@ def load_user(user_id):
 
 class Base(db.Model):
     __abstract__ = True
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(
+    created_at = mapped_column(db.DateTime, default=datetime.utcnow)
+    updated_at = mapped_column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
@@ -86,15 +88,15 @@ class SearchableMixin(db.Model):
 
 
 class User(Base, UserMixin, ActionMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    token = db.Column(db.String(2048))
-    google_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
-    facebook_id = db.Column(db.String(256), unique=True, nullable=True, index=True)
-    analytics_id = db.Column(db.String(512))
-    name = db.Column(db.String(120))
-    email = db.Column(db.String(120))
-    picture = db.Column(db.String(512))
-    last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    id = mapped_column(db.Integer, primary_key=True)
+    token = mapped_column(db.String(2048))
+    google_id = mapped_column(db.String(256), unique=True, nullable=True, index=True)
+    facebook_id = mapped_column(db.String(256), unique=True, nullable=True, index=True)
+    analytics_id = mapped_column(db.String(512))
+    name = mapped_column(db.String(120))
+    email = mapped_column(db.String(120))
+    picture = mapped_column(db.String(512))
+    last_seen = mapped_column(db.DateTime, default=datetime.utcnow)
 
     posts = db.relationship("Post", backref="author", lazy=True)
     playlists = db.relationship("Playlist", backref="author", lazy=True)
@@ -113,21 +115,21 @@ class User(Base, UserMixin, ActionMixin):
 
 class Post(Base, SearchableMixin):
     __searchable__ = ["title", "description", "tags"]
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    provider = db.Column(db.String(7), default="YouTube")
-    video_id = db.Column(db.String(20), unique=True, nullable=False, index=True)
-    playlist_id = db.Column(db.String(50))
-    title = db.Column(db.String(256), nullable=False)
-    thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text)
-    short_description = db.Column(db.Text)
-    tags = db.Column(db.Text)
-    duration = db.Column(db.String(10), nullable=False)
-    upload_date = db.Column(db.DateTime, nullable=False)
-    similar = db.Column(db.PickleType, default=[])
+    id = mapped_column(db.Integer, primary_key=True, index=True)
+    provider = mapped_column(db.String(7), default="YouTube")
+    video_id = mapped_column(db.String(20), unique=True, nullable=False, index=True)
+    playlist_id = mapped_column(db.String(50))
+    title = mapped_column(db.String(256), nullable=False)
+    thumbnails = mapped_column(db.PickleType, nullable=False)
+    description = mapped_column(db.Text)
+    short_description = mapped_column(db.Text)
+    tags = mapped_column(db.Text)
+    duration = mapped_column(db.String(10), nullable=False)
+    upload_date = mapped_column(db.DateTime, nullable=False)
+    similar = mapped_column(db.PickleType, default=[])
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    playlist_db_id = db.Column(db.Integer, db.ForeignKey("playlist.id"))
+    user_id = mapped_column(db.Integer, db.ForeignKey("user.id"))
+    playlist_db_id = mapped_column(db.Integer, db.ForeignKey("playlist.id"))
 
     likes = db.relationship(
         "PostLike", backref="post", cascade="all,delete-orphan", lazy="dynamic"
@@ -213,16 +215,16 @@ class Post(Base, SearchableMixin):
 
 
 class DeletedPost(Base):
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    provider = db.Column(db.String(7), default="YouTube")
-    video_id = db.Column(db.String(20), unique=True, nullable=False, index=True)
+    id = mapped_column(db.Integer, primary_key=True, index=True)
+    provider = mapped_column(db.String(7), default="YouTube")
+    video_id = mapped_column(db.String(20), unique=True, nullable=False, index=True)
 
 
 class Page(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(256), nullable=False)
-    content = db.Column(db.Text)
-    slug = db.Column(db.String(255))
+    id = mapped_column(db.Integer, primary_key=True)
+    title = mapped_column(db.String(256), nullable=False)
+    content = mapped_column(db.Text)
+    slug = mapped_column(db.String(255))
 
     def __init__(self, *args, **kwargs):
         if not "slug" in kwargs:
@@ -240,30 +242,30 @@ class Page(Base):
 
 
 class Playlist(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    playlist_id = db.Column(db.String(50), unique=True, nullable=False)
-    channel_id = db.Column(db.String(50), unique=True, nullable=False)
-    title = db.Column(db.String(256), nullable=False)
-    channel_title = db.Column(db.String(256))
-    thumbnails = db.Column(db.PickleType, nullable=False)
-    channel_thumbnails = db.Column(db.PickleType, nullable=False)
-    description = db.Column(db.Text)
-    channel_description = db.Column(db.Text)
+    id = mapped_column(db.Integer, primary_key=True)
+    playlist_id = mapped_column(db.String(50), unique=True, nullable=False)
+    channel_id = mapped_column(db.String(50), unique=True, nullable=False)
+    title = mapped_column(db.String(256), nullable=False)
+    channel_title = mapped_column(db.String(256))
+    thumbnails = mapped_column(db.PickleType, nullable=False)
+    channel_thumbnails = mapped_column(db.PickleType, nullable=False)
+    description = mapped_column(db.Text)
+    channel_description = mapped_column(db.Text)
 
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user_id = mapped_column(db.Integer, db.ForeignKey("user.id"))
     posts = db.relationship("Post", backref="playlist", lazy=True)
 
 
 class PostLike(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    post_id = db.Column(db.Integer, db.ForeignKey("post.id"))
+    id = mapped_column(db.Integer, primary_key=True)
+    user_id = mapped_column(db.Integer, db.ForeignKey("user.id"))
+    post_id = mapped_column(db.Integer, db.ForeignKey("post.id"))
 
 
 class PostFave(Base):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    post_id = db.Column(db.Integer, db.ForeignKey("post.id"))
+    id = mapped_column(db.Integer, primary_key=True)
+    user_id = mapped_column(db.Integer, db.ForeignKey("user.id"))
+    post_id = mapped_column(db.Integer, db.ForeignKey("post.id"))
 
 
 # listen for commit and make changes to search index
