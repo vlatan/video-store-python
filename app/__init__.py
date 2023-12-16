@@ -46,7 +46,7 @@ def create_app() -> Flask:
     """Create a new app instance."""
 
     # create application object
-    app = Flask(cfg.APP_NAME, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True)
     # load config
     app.config.from_object(cfg)
     # initialize plugins
@@ -55,6 +55,8 @@ def create_app() -> Flask:
     register_blueprints(app)
     # initialize search index
     initialize_search_index(app)
+    # initialize generative AI
+    setup_generative_ai(app)
 
     from app.cron.handlers import populate_search_index
 
