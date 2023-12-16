@@ -1,10 +1,11 @@
-from app.models import Playlist
-from app.sources.helpers import parse_playlist, validate_playlist
-from flask import current_app
-from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
-from googleapiclient.discovery import build
+
+from flask_wtf import FlaskForm
+
+from app.models import Playlist
+from app.helpers import youtube_build
+from app.sources.helpers import parse_playlist, validate_playlist
 
 
 class PlaylistForm(FlaskForm):
@@ -28,10 +29,7 @@ class PlaylistForm(FlaskForm):
             raise ValidationError("Playlist already in the database.")
 
         # construct youtube API service
-        youtube_api_key = current_app.config["YOUTUBE_API_KEY"]
-        with build(
-            "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
-        ) as youtube:
+        with youtube_build() as youtube:
             # get the playlist's metadata
             # this will raise ValidationError if unable to fetch data
             self.processed_content = validate_playlist(playlist_id, youtube)

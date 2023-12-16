@@ -1,11 +1,12 @@
-from flask import current_app
-from flask_wtf import FlaskForm
 from googleapiclient.errors import HttpError
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
+
+from flask_wtf import FlaskForm
+
 from app.models import Post
+from app.helpers import youtube_build
 from app.posts.helpers import parse_video, validate_video, fetch_video_data
-from googleapiclient.discovery import build
 
 
 class PostForm(FlaskForm):
@@ -29,10 +30,7 @@ class PostForm(FlaskForm):
             raise ValidationError("Video already posted.")
 
         # construct youtube API service
-        youtube_api_key = current_app.config["YOUTUBE_API_KEY"]
-        with build(
-            "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
-        ) as youtube:
+        with youtube_build() as youtube:
             try:
                 # the scope for YouTube API
                 part = ["status", "snippet", "contentDetails"]

@@ -1,13 +1,14 @@
-from flask import current_app
-from functools import wraps
-from flask import current_app, flash, redirect, url_for
-from flask_login import current_user, login_required
-from whoosh.qparser import OrGroup, MultifieldParser
+import functools
 from whoosh.writing import AsyncWriter
+from whoosh.qparser import OrGroup, MultifieldParser
+from googleapiclient.discovery import build as google_discovery_build
+
+from flask_login import current_user, login_required
+from flask import current_app, flash, redirect, url_for
 
 
 def admin_required(func):
-    @wraps(func)
+    @functools.wraps(func)
     @login_required
     def only_admin(*args, **kwargs):
         if current_user.google_id == current_app.config["ADMIN_OPENID"]:
@@ -21,6 +22,16 @@ def admin_required(func):
 def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
+
+
+def youtube_build():
+    """Instantiate google discovery build object."""
+    return google_discovery_build(
+        serviceName="youtube",
+        version="v3",
+        developerKey=current_app.config["YOUTUBE_API_KEY"],
+        cache_discovery=False,
+    )
 
 
 def add_to_index(obj):

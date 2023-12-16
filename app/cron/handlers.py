@@ -2,7 +2,6 @@ import time
 import logging
 from threading import Thread
 from celery import shared_task
-from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from flask import current_app
@@ -13,22 +12,18 @@ from sqlalchemy.exc import IntegrityError, StatementError
 
 from app import db
 from app.models import Post, Playlist
+from app.helpers import youtube_build
 from app.posts.helpers import validate_video
 from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
 
 
-def get_youtube_videos(youtube_api_key):
+def get_youtube_videos():
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
     # construct youtube API service
-    with build(
-        serviceName="youtube",
-        version="v3",
-        developerKey=youtube_api_key,
-        cache_discovery=False,
-    ) as youtube:
+    with youtube_build() as youtube:
         # loop through the playlists
         for playlist in playlists:
             # refresh playlist thumbs
@@ -55,10 +50,8 @@ def get_youtube_videos(youtube_api_key):
     return all_videos, complete
 
 
-def revalidate_single_video(post, youtube_api_key):
-    with build(
-        "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
-    ) as youtube:
+def revalidate_single_video(post):
+    with youtube_build() as youtube:
         try:
             scope = {
                 "id": post.video_id,
@@ -85,11 +78,10 @@ def revalidate_single_video(post, youtube_api_key):
 
 @shared_task
 def process_videos():
-    YOUTUBE_API_KEY = current_app.config["YOUTUBE_API_KEY"]
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
     # get all VALID videos from our playlists from YouTube
-    all_videos, complete = get_youtube_videos(YOUTUBE_API_KEY)
+    all_videos, complete = get_youtube_videos()
 
     # loop through total number of videos
     for video in all_videos:
@@ -164,7 +156,7 @@ def process_videos():
         (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
     ).all()
     for post in orphan_posts:
-        revalidate_single_video(post, YOUTUBE_API_KEY)
+        revalidate_single_video(post)
         time.sleep(1)
 
 
