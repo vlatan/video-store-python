@@ -37,7 +37,7 @@ minify = Minify()
 login_manager = LoginManager()
 
 # where the user will be redirected if she's not logged in
-login_manager.login_view = "main.home"
+login_manager.login_view = "main.home"  # type: ignore
 # the class/category of the flash message when the user is not logged in
 login_manager.login_message_category = "warning"
 
