@@ -18,12 +18,17 @@ from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
 
 
-def get_youtube_videos(api_key):
+def get_youtube_videos(youtube_api_key):
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
     # construct youtube API service
-    with build("youtube", "v3", developerKey=api_key, cache_discovery=False) as youtube:
+    with build(
+        serviceName="youtube",
+        version="v3",
+        developerKey=youtube_api_key,
+        cache_discovery=False,
+    ) as youtube:
         # loop through the playlists
         for playlist in playlists:
             # refresh playlist thumbs
@@ -50,8 +55,10 @@ def get_youtube_videos(api_key):
     return all_videos, complete
 
 
-def revalidate_single_video(post, api_key):
-    with build("youtube", "v3", developerKey=api_key, cache_discovery=False) as youtube:
+def revalidate_single_video(post, youtube_api_key):
+    with build(
+        "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
+    ) as youtube:
         try:
             scope = {
                 "id": post.video_id,
@@ -78,11 +85,11 @@ def revalidate_single_video(post, api_key):
 
 @shared_task
 def process_videos():
-    API_KEY = current_app.config["YOUTUBE_API_KEY"]
+    YOUTUBE_API_KEY = current_app.config["YOUTUBE_API_KEY"]
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
     # get all VALID videos from our playlists from YouTube
-    all_videos, complete = get_youtube_videos(API_KEY)
+    all_videos, complete = get_youtube_videos(YOUTUBE_API_KEY)
 
     # loop through total number of videos
     for video in all_videos:
@@ -157,7 +164,7 @@ def process_videos():
         (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
     ).all()
     for post in orphan_posts:
-        revalidate_single_video(post, API_KEY)
+        revalidate_single_video(post, YOUTUBE_API_KEY)
         time.sleep(1)
 
 

@@ -29,9 +29,9 @@ class PostForm(FlaskForm):
             raise ValidationError("Video already posted.")
 
         # construct youtube API service
-        api_key = current_app.config["YOUTUBE_API_KEY"]
+        youtube_api_key = current_app.config["YOUTUBE_API_KEY"]
         with build(
-            "youtube", "v3", developerKey=api_key, cache_discovery=False
+            "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
         ) as youtube:
             try:
                 # the scope for YouTube API

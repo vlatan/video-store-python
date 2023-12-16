@@ -28,9 +28,9 @@ class PlaylistForm(FlaskForm):
             raise ValidationError("Playlist already in the database.")
 
         # construct youtube API service
-        api_key = current_app.config["YOUTUBE_API_KEY"]
+        youtube_api_key = current_app.config["YOUTUBE_API_KEY"]
         with build(
-            "youtube", "v3", developerKey=api_key, cache_discovery=False
+            "youtube", "v3", developerKey=youtube_api_key, cache_discovery=False
         ) as youtube:
             # get the playlist's metadata
             # this will raise ValidationError if unable to fetch data
