@@ -3,10 +3,10 @@ import functools
 from dotenv import load_dotenv
 from celery import Celery, Task
 import google.generativeai as genai
+from sqlalchemy.orm import DeclarativeBase
 from whoosh.fields import Schema, TEXT, ID
 from whoosh.filedb.filestore import FileStorage
 from werkzeug.utils import import_string, find_modules
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
 from flask import Flask
 from flask_caching import Cache
