@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from flask import current_app
+from flask.ctx import AppContext
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -160,17 +161,23 @@ def process_videos():
         time.sleep(1)
 
 
-def reindex(app):
-    with app.app_context():
+def reindex(app_context: AppContext) -> None:
+    if not app_context:
+        return
+
+    with app_context:
         Post.reindex()
 
 
-def populate_search_index():
+def populate_search_index() -> None:
+    """Populate the app search index."""
+    # exit if there's no search index object
     if not current_app.config["search_index"].is_empty():
         return
 
-    app = current_app._get_current_object()
-    thread = Thread(target=reindex, name="search_index", args=[app])
+    # reindex the app in a thread, send app context in the thread
+    app_context = current_app.app_context()
+    thread = Thread(target=reindex, name="search_index", args=[app_context])
     thread.start()
 
 
