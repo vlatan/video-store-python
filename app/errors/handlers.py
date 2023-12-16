@@ -20,7 +20,7 @@ def error_404(error):
 
 
 @bp.app_errorhandler(405)
-def error_403(error):
+def error_405(error):
     heading = "You don't have permission to do that (405)"
     text = "Please check your account and try again."
     return render_template("error.html", title="405", heading=heading, text=text), 405
