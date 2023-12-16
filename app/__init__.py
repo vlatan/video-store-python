@@ -90,7 +90,7 @@ def initialize_search_index(app: Flask) -> None:
     storage = FileStorage(indexdir).create()
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    app.index = (
+    app.config["search_index"] = (
         storage.open_index(schema=schema)
         if storage.index_exists()
         else storage.create_index(schema)

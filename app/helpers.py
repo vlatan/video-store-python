@@ -25,20 +25,20 @@ def dump_datetime(value):
 
 def add_to_index(obj):
     payload = {field: getattr(obj, field) for field in obj.__searchable__}
-    writer = AsyncWriter(current_app.index)
+    writer = AsyncWriter(current_app.config["search_index"])
     writer.update_document(id=str(obj.id), **payload)
     writer.commit()
 
 
 def remove_from_index(obj):
-    writer = AsyncWriter(current_app.index)
+    writer = AsyncWriter(current_app.config["search_index"])
     writer.delete_by_term("id", str(obj.id))
     writer.commit()
 
 
 def query_index(fields, keyword, page, per_page):
-    with current_app.index.searcher() as searcher:
-        schema, og = current_app.index.schema, OrGroup.factory(0.9)
+    with current_app.config["search_index"].searcher() as searcher:
+        schema, og = current_app.config["search_index"].schema, OrGroup.factory(0.9)
         parser = MultifieldParser(fields, schema, group=og)
         query = parser.parse(keyword)
         total = len(searcher.search(query))
@@ -48,8 +48,8 @@ def query_index(fields, keyword, page, per_page):
 
 
 def query_index_all(fields, keyword):
-    with current_app.index.searcher() as searcher:
-        schema, og = current_app.index.schema, OrGroup.factory(0.9)
+    with current_app.config["search_index"].searcher() as searcher:
+        schema, og = current_app.config["search_index"].schema, OrGroup.factory(0.9)
         parser = MultifieldParser(fields, schema, group=og)
         query = parser.parse(keyword)
         results = searcher.search(query, limit=None)

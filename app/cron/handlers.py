@@ -166,7 +166,7 @@ def reindex(app):
 
 
 def populate_search_index():
-    if not current_app.index.is_empty():
+    if not current_app.config["search_index"].is_empty():
         return
 
     app = current_app._get_current_object()
