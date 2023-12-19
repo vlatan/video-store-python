@@ -124,7 +124,7 @@ class Post(Base, SearchableMixin):
     description = mapped_column(db.Text)
     short_description = mapped_column(db.Text)
     tags = mapped_column(db.Text)
-    duration = mapped_column(db.String(10), nullable=False)
+    duration = mapped_column(db.String(20), nullable=False)
     upload_date = mapped_column(db.DateTime, nullable=False)
     similar = mapped_column(db.PickleType, default=[])
 
