@@ -44,7 +44,7 @@ class Config:
         username=load_env("DB_USER"),
         password=load_env("DB_PASSWORD"),
         host=load_env("DB_HOST"),
-        port=5432,
+        port=load_env("DB_PORT") or 5432,  # type: ignore
         database=load_env("DB_NAME"),
     )
 
