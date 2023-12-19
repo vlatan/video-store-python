@@ -20,5 +20,11 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 # copy all of the app files to the working directory
 COPY . .
 
+ENV PORT 8000
+ENV WORKERS 1
+ENV THREADS 6
+ENV TIMEOUT 0
+
 # command to start the webserver and run the app (with 3 workers)
-CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "run:app"]
+CMD exec gunicorn --bind :$PORT --workers $WORKERS --threads $THREADS --timeout $TIMEOUT run:app
+# CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "run:app"]
