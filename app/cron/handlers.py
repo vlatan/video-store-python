@@ -7,8 +7,8 @@ from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
 
-from flask import Flask, current_app
 from flask.ctx import AppContext
+from flask import Flask, current_app
 
 from app import db
 from app.models import Post, Playlist
@@ -170,12 +170,8 @@ def reindex(app_context: AppContext) -> None:
 
 def populate_search_index(app: Flask) -> None:
     """Populate the app search index."""
-    # exit if no search index object in app config
-    if not (search_index := app.config.get("search_index")):
-        return
-
     # exit if there's no search index object
-    if not search_index.is_empty():
+    if not current_app.config["search_index"].is_empty():
         return
 
     # reindex the app in a thread, send app context in the thread

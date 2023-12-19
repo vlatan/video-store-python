@@ -70,8 +70,9 @@ def create_app() -> Flask:
     if not app.config["CELERY_SERVICE"]:
         with app.app_context():
             db.create_all()  # create db tables if they don't exist
-            initialize_search_index(app)  # initialize search index
-            populate_search_index(app)  # populate search index if empty
+
+        initialize_search_index(app)  # initialize search index
+        populate_search_index(app)  # populate search index if empty
 
     return app
 
@@ -98,17 +99,11 @@ def initialize_search_index(app: Flask) -> None:
     storage = FileStorage(indexdir).create()
     id_num = ID(unique=True, stored=True)
     schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-
-    # I assume because multiple workers try to open/create index in production,
-    # there's a race condition so we'll abandon index init if FileNotFoundError
-    try:
-        app.config["search_index"] = (
-            storage.open_index(schema=schema)
-            if storage.index_exists()
-            else storage.create_index(schema)
-        )
-    except FileNotFoundError:
-        pass
+    app.config["search_index"] = (
+        storage.open_index(schema=schema)
+        if storage.index_exists()
+        else storage.create_index(schema)
+    )
 
 
 def celery_init_app(app: Flask) -> Celery:
