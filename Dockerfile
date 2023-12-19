@@ -27,4 +27,3 @@ ENV TIMEOUT 0
 
 # command to start the webserver and run the app (with 3 workers)
 CMD exec gunicorn --bind :$PORT --workers $WORKERS --threads $THREADS --timeout $TIMEOUT run:app
-# CMD ["gunicorn", "-w", "3", "-b", "0.0.0.0", "run:app"]
