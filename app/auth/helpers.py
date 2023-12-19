@@ -101,6 +101,9 @@ def generate_hash(user):
 
 def save_avatar(user):
     """Save avatar to file."""
+    if not user.picture:
+        return
+
     response = requests.get(user.picture)
     if response.ok:
         avatar_path = get_avatar_abs_path(user)
