@@ -71,7 +71,7 @@ def create_app() -> Flask:
         with app.app_context():
             db.create_all()  # create db tables if they don't exist
             initialize_search_index(app)  # initialize search index
-            populate_search_index()  # populate search index if empty
+            populate_search_index(app)  # populate search index if empty
 
     return app
 
