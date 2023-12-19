@@ -1,6 +1,6 @@
 import time
 import logging
-from threading import Thread
+import threading
 from celery import shared_task
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
@@ -170,12 +170,22 @@ def reindex(app_context: AppContext) -> None:
 
 def populate_search_index(app: Flask) -> None:
     """Populate the app search index."""
-    # exit if there's no search index object
+    # exit if there's already a search index object
     if not app.config["search_index"].is_empty():
         return
 
+    thread_name = "search_index"
+    for thread in threading.enumerate():
+        if thread.name == thread_name:
+            return
+
     # reindex the app in a thread, send app context in the thread
-    thread = Thread(target=reindex, name="search_index", args=[app.app_context()])
+    thread = threading.Thread(
+        target=reindex,
+        name=thread_name,
+        args=[app.app_context()],
+    )
+
     thread.start()
 
 
