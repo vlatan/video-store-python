@@ -3,10 +3,6 @@ import json
 import sqlalchemy
 
 
-# get absolute path to the root dir of this project
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-
 def load_env(var):
     """
     Fetch and JSON decode the value from environment variable.
