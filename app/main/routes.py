@@ -1,5 +1,6 @@
 import time
 import os.path
+import functools
 from datetime import datetime
 
 from flask_login import current_user
@@ -7,7 +8,7 @@ from flask import render_template, request, current_app, url_for
 from flask import Blueprint, jsonify, make_response, send_from_directory
 
 from app.models import Post
-from app.auth.helpers import get_avatar_abs_path
+from app.auth.helpers import get_avatar_abs_path, save_avatar
 
 
 bp = Blueprint("main", __name__)
@@ -32,11 +33,17 @@ def format_datetime(value):
 
 def avatar(user):
     """
-    Check if user has localy saved avatar.
+    Check if the user has localy saved avatar.
     If so serve it, otherwise serve default avatar.
     """
     # default avatar
     avatar = os.path.join("images", "avatars", "default.jpg")
+
+    # if user avatar image DOES NOT exist localy
+    if not os.path.isfile(get_avatar_abs_path(user)):
+        # try to save the image locally
+        save_avatar(user)
+
     # if user avatar image exists localy
     if os.path.isfile(get_avatar_abs_path(user)):
         # user avatar path within the static folder

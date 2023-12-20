@@ -113,7 +113,8 @@ def save_avatar(user):
 
 def get_avatar_abs_path(user):
     """Get the local avatar absolute path."""
-    root = current_app.root_path
+    volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+    root = volume if volume else current_app.root_path
     return os.path.join(root, "static", "images", "avatars", f"{user.analytics_id}.jpg")
 
 
