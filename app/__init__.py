@@ -71,6 +71,7 @@ def create_app() -> Flask:
         with app.app_context():
             db.create_all()  # create db tables if they don't exist
 
+        make_dirs(app)  # make avatars directory if it doesn't exist
         initialize_search_index(app)  # initialize search index
         populate_search_index(app)  # populate search index if empty
 
@@ -136,3 +137,10 @@ def setup_generative_ai(app: Flask) -> None:
 
     # place the func object in the app config
     app.config["generate_content"] = generate_content
+
+
+def make_dirs(app: Flask) -> None:
+    volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+    root = volume if volume else app.root_path
+    avatars_dir = os.path.join(root, "static", "images", "avatars")
+    os.makedirs(avatars_dir, exist_ok=True)

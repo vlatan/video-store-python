@@ -1,5 +1,5 @@
+import os
 import hashlib
-import os.path
 import requests
 from datetime import timedelta
 from google.oauth2 import id_token
@@ -115,7 +115,8 @@ def get_avatar_abs_path(user):
     """Get the local avatar absolute path."""
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
     root = volume if volume else current_app.root_path
-    return os.path.join(root, "static", "images", "avatars", f"{user.analytics_id}.jpg")
+    avatars_dir = os.path.join(root, "static", "images", "avatars")
+    return os.path.join(avatars_dir, f"{user.analytics_id}.jpg")
 
 
 def failed_login():
