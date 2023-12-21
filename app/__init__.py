@@ -58,8 +58,6 @@ def create_app() -> Flask:
     app.config.from_object(cfg)
     # initialize plugins
     initialize_plugins(app)
-    # register blueprints
-    register_blueprints(app)
     # initialize generative AI
     setup_generative_ai(app)
 
@@ -71,6 +69,7 @@ def create_app() -> Flask:
         with app.app_context():
             db.create_all()  # create db tables if they don't exist
 
+        register_blueprints(app)  # register blueprints
         make_dirs(app)  # make avatars directory if it doesn't exist
         initialize_search_index(app)  # initialize search index
         populate_search_index(app)  # populate search index if empty
