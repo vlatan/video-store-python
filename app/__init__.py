@@ -139,7 +139,7 @@ def setup_generative_ai(app: Flask) -> None:
 
 
 def make_dirs(app: Flask) -> None:
-    volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
+    volume = app.config["VOLUME_MOUNT_PATH"]
     root = volume if volume else app.root_path
     avatars_dir = os.path.join(root, "static", "images", "avatars")
     os.makedirs(avatars_dir, exist_ok=True)

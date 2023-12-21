@@ -1,6 +1,6 @@
+import os
 import time
-import os.path
-import functools
+import pathlib
 from datetime import datetime
 
 from flask_login import current_user
@@ -36,21 +36,28 @@ def avatar(user):
     Check if the user has localy saved avatar.
     If so serve it, otherwise serve default avatar.
     """
-    # default avatar
-    avatar = os.path.join("images", "avatars", "default.jpg")
+    # get absolute path to the user avatar
+    avatar_path = get_avatar_abs_path(user)
 
-    # if user avatar image DOES NOT exist localy
-    if not os.path.isfile(get_avatar_abs_path(user)):
-        # try to save the image locally
-        save_avatar(user)
+    # # if user avatar image DOES NOT exist localy
+    # if not os.path.isfile(avatar_path):
+    #     # try to save the image locally
+    #     save_avatar(user)
 
     # if user avatar image exists localy
-    if os.path.isfile(get_avatar_abs_path(user)):
+    if os.path.isfile(avatar_path):
         # user avatar path within the static folder
-        avatar = os.path.join("images", "avatars", f"{user.analytics_id}.jpg")
+        avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
 
-    # return user avatar url
-    return url_for("static", filename=avatar)
+        volume = current_app.config["VOLUME_MOUNT_PATH"]
+        static_dir = "main.serve_avatar_from_volume" if volume else "static"
+
+        # return user avatar url
+        return url_for(static_dir, filename=avatar)
+
+    # return default avatar
+    default_avatar = pathlib.Path("images") / "avatars" / "default.jpg"
+    return url_for("static", filename=default_avatar)
 
 
 @bp.app_context_processor
@@ -104,3 +111,11 @@ def home():
 def favicons(filename):
     """Serve favicon icons as if from root."""
     return send_from_directory("static/favicons/", filename)
+
+
+@bp.route("/uploads/static/<path:filename>")
+def serve_avatar_from_volume(filename):
+    """Serve files from mounted volume."""
+    volume = current_app.config["VOLUME_MOUNT_PATH"]
+    volume = pathlib.Path(volume) / "static"
+    return send_from_directory(volume, filename)

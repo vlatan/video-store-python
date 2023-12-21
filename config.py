@@ -91,6 +91,8 @@ class Config:
         "broker_connection_retry_on_startup": True,
     }
 
+    VOLUME_MOUNT_PATH = load_env("RAILWAY_VOLUME_MOUNT_PATH") or ""
+
 
 class DevConfig(Config):
     HOST = load_env("HOST")
