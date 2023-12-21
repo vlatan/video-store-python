@@ -1,4 +1,5 @@
 import os
+import pathlib
 import hashlib
 import requests
 from datetime import timedelta
@@ -114,10 +115,8 @@ def save_avatar(user):
 def get_avatar_abs_path(user):
     """Get the local avatar absolute path."""
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
-    root = volume if volume else current_app.root_path
-    avatars_dir = os.path.join(root, "static", "images", "avatars")
-    print(avatars_dir)
-    return os.path.join(avatars_dir, f"{user.analytics_id}.jpg")
+    root = pathlib.Path(volume if volume else current_app.root_path)
+    return root / "static" / "images" / "avatars" / f"{user.analytics_id}.jpg"
 
 
 def failed_login():
