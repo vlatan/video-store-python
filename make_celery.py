@@ -11,6 +11,6 @@ celery_app = flask_app.extensions["celery"]
 @celery_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
-        crontab(minute="0", hour=str(flask_app.config["CRON_HOUR"])),
+        crontab(minute="20", hour=str(flask_app.config["CRON_HOUR"])),
         process_videos,
     )
