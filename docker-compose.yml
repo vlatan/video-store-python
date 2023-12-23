@@ -38,22 +38,12 @@ services:
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
 
-  celery_worker:
+  worker:
     restart: always
     build: .
-    container_name: celery_worker
+    container_name: worker
+    command: [ "python", "make_celery.py" ]
     env_file: .env
-    environment:
-      - CELERY_SERVICE=true
-    command:
-      [
-        "celery",
-        "-A",
-        "make_celery",
-        "worker",
-        "-B",
-        "--loglevel=INFO"
-      ]
     depends_on:
       postgres:
         condition: service_healthy

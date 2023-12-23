@@ -83,7 +83,6 @@ class Config:
         }
     }
 
-    CELERY_SERVICE = load_env("CELERY_SERVICE") or False
     CELERY = {
         "broker_url": load_env("CELERY_BROKER_URL"),
         "result_backend": load_env("CELERY_RESULT_BACKEND"),

@@ -37,10 +37,13 @@ def get_youtube_videos():
                 complete = False
             # loop through the videos in this playlist
             for video in playlist_videos:
+                print(video)
+                break
                 # add relationship with this playlist to the video metadata
                 video["playlist"] = playlist
             # add this batch of videos to the total list of videos
             all_videos += playlist_videos
+            break
 
     # remove duplicates if any
     all_videos = list({v["video_id"]: v for v in all_videos}.values())
@@ -76,7 +79,6 @@ def revalidate_single_video(post):
             pass
 
 
-@shared_task
 def process_videos():
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 

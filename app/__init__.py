@@ -58,21 +58,23 @@ def create_app() -> Flask:
     app.config.from_object(cfg)
     # initialize plugins
     initialize_plugins(app)
+    # register blueprints
+    register_blueprints(app)
     # initialize generative AI
     setup_generative_ai(app)
 
-    from app.cron.handlers import populate_search_index
+    with app.app_context():
+        # create db tables if they don't exist
+        db.create_all()
+        # make avatars directory if it doesn't exist
+        make_dirs(app)
+        # initialize search index
+        initialize_search_index(app)
 
-    # no need to re-create database and index
-    # if this is a celery container/service
-    if not app.config["CELERY_SERVICE"]:
-        with app.app_context():
-            db.create_all()  # create db tables if they don't exist
+        from app.cron.handlers import populate_search_index
 
-        register_blueprints(app)  # register blueprints
-        make_dirs(app)  # make avatars directory if it doesn't exist
-        initialize_search_index(app)  # initialize search index
-        populate_search_index(app)  # populate search index if empty
+        # populate search index if empty
+        populate_search_index(app)
 
     return app
 
@@ -83,7 +85,6 @@ def initialize_plugins(app: Flask) -> None:
     migrate.init_app(app, db)
     minify.init_app(app)
     login_manager.init_app(app)
-    celery_init_app(app)
 
 
 def register_blueprints(app: Flask) -> None:
