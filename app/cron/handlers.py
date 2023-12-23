@@ -21,9 +21,7 @@ def get_youtube_videos():
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
-    current_app.logger.info(
-        f"Getting videos from {len(playlists)} sources (playlists)..."
-    )
+    current_app.logger.info(f"Getting videos from {len(playlists)} YT sources...")
     # construct youtube API service
     with youtube_build() as youtube:
         # loop through the playlists

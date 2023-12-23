@@ -56,8 +56,10 @@ services:
     container_name: app
     ports:
       - $PORT:$PORT
-    command: [ "python", "run.py" ]
     env_file: .env
+    environment:
+      - CONFIG_TYPE=config.DevConfig
+    command: [ "python", "run.py" ]
     volumes:
       - .:/app
     depends_on:
