@@ -39,10 +39,10 @@ def avatar(user):
     # get absolute path to the user avatar
     avatar_path = get_avatar_abs_path(user)
 
-    # # if user avatar image DOES NOT exist localy
-    # if not os.path.isfile(avatar_path):
-    #     # try to save the image locally
-    #     save_avatar(user)
+    # if user avatar image DOES NOT exist localy
+    if not os.path.isfile(avatar_path):
+        # try to save the image locally
+        save_avatar(user)
 
     # if user avatar image exists localy
     if os.path.isfile(avatar_path):
