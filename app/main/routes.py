@@ -39,22 +39,21 @@ def avatar(user):
     # get absolute path to the user avatar
     avatar_path = get_avatar_abs_path(user)
 
-    # if user avatar image DOES NOT exist localy
-    if not os.path.isfile(avatar_path):
-        # try to save the image locally
-        save_avatar(user)
+    # # if user avatar image DOES NOT exist localy
+    # if not os.path.isfile(avatar_path):
+    #     # try to save the image locally
+    #     save_avatar(user)
+
+    # default avatar
+    avatar = pathlib.Path("images") / "default_avatar.jpg"
 
     # if user avatar image exists localy
     if os.path.isfile(avatar_path):
         # user avatar path within the static folder
         avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
 
-        # return user avatar url
-        return url_for("static", filename=avatar)
-
-    # return default avatar
-    default_avatar = pathlib.Path("images") / "avatars" / "default.jpg"
-    return url_for("static", filename=default_avatar)
+    # return user avatar url
+    return url_for("static", filename=avatar)
 
 
 @bp.app_context_processor
