@@ -1,5 +1,4 @@
 import time
-import logging
 import threading
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
