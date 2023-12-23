@@ -2,7 +2,7 @@ services:
 
   redis:
     restart: always
-    image: redis:6
+    image: redis/redis-stack
     container_name: redis
     env_file: .env
     ports:
