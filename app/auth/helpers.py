@@ -114,8 +114,7 @@ def save_avatar(user):
 
 def get_avatar_abs_path(user):
     """Get the local avatar absolute path."""
-    volume = current_app.config["VOLUME_MOUNT_PATH"]
-    root = pathlib.Path(volume if volume else current_app.root_path)
+    root = pathlib.Path(current_app.root_path)
     return root / "static" / "images" / "avatars" / f"{user.analytics_id}.jpg"
 
 

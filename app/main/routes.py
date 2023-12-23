@@ -49,11 +49,8 @@ def avatar(user):
         # user avatar path within the static folder
         avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
 
-        volume = current_app.config["VOLUME_MOUNT_PATH"]
-        static_dir = "main.serve_avatar_from_volume" if volume else "static"
-
         # return user avatar url
-        return url_for(static_dir, filename=avatar)
+        return url_for("static", filename=avatar)
 
     # return default avatar
     default_avatar = pathlib.Path("images") / "avatars" / "default.jpg"
@@ -111,11 +108,3 @@ def home():
 def favicons(filename):
     """Serve favicon icons as if from root."""
     return send_from_directory("static/favicons/", filename)
-
-
-@bp.route("/uploads/static/<path:filename>")
-def serve_avatar_from_volume(filename):
-    """Serve files from mounted volume."""
-    volume = current_app.config["VOLUME_MOUNT_PATH"]
-    volume = pathlib.Path(volume) / "static"
-    return send_from_directory(volume, filename)

@@ -83,8 +83,6 @@ class Config:
         }
     }
 
-    VOLUME_MOUNT_PATH = load_env("RAILWAY_VOLUME_MOUNT_PATH") or ""
-
 
 class DevConfig(Config):
     HOST = load_env("HOST")
