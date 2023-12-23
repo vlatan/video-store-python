@@ -1,7 +1,6 @@
 import time
 import logging
 import threading
-from celery import shared_task
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -22,6 +21,7 @@ def get_youtube_videos():
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
+    logging.info(f"Getting videos from {len(playlists)} sources (playlists)...")
     # construct youtube API service
     with youtube_build() as youtube:
         # loop through the playlists
@@ -37,13 +37,10 @@ def get_youtube_videos():
                 complete = False
             # loop through the videos in this playlist
             for video in playlist_videos:
-                print(video)
-                break
                 # add relationship with this playlist to the video metadata
                 video["playlist"] = playlist
             # add this batch of videos to the total list of videos
             all_videos += playlist_videos
-            break
 
     # remove duplicates if any
     all_videos = list({v["video_id"]: v for v in all_videos}.values())
@@ -85,6 +82,7 @@ def process_videos():
     # get all VALID videos from our playlists from YouTube
     all_videos, complete = get_youtube_videos()
 
+    logging.info(f"Processing {len(all_videos)} videos...")
     # loop through total number of videos
     for video in all_videos:
         # take a short break before processing the next video
@@ -145,6 +143,7 @@ def process_videos():
         posted_ids = {post.video_id for post in posted}
         to_delete = posted_ids - fetched_ids
         to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
+        logging.info(f"Deleting {len(to_delete)} missing videos...")
         for post in to_delete:
             try:
                 db.session.delete(post)
@@ -157,9 +156,11 @@ def process_videos():
     orphan_posts = Post.query.filter(
         (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
     ).all()
+    logging.info(f"Revalidating {len(orphan_posts)} orphan videos...")
     for post in orphan_posts:
         revalidate_single_video(post)
         time.sleep(1)
+    logging.info("Done.")
 
 
 def reindex(app_context: AppContext) -> None:
