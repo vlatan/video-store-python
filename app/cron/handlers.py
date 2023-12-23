@@ -21,7 +21,9 @@ def get_youtube_videos():
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
-    logging.info(f"Getting videos from {len(playlists)} sources (playlists)...")
+    current_app.logger.info(
+        f"Getting videos from {len(playlists)} sources (playlists)..."
+    )
     # construct youtube API service
     with youtube_build() as youtube:
         # loop through the playlists
@@ -82,7 +84,7 @@ def process_videos():
     # get all VALID videos from our playlists from YouTube
     all_videos, complete = get_youtube_videos()
 
-    logging.info(f"Processing {len(all_videos)} videos...")
+    current_app.logger.info(f"Processing {len(all_videos)} videos...")
     # loop through total number of videos
     for video in all_videos:
         # take a short break before processing the next video
@@ -143,7 +145,7 @@ def process_videos():
         posted_ids = {post.video_id for post in posted}
         to_delete = posted_ids - fetched_ids
         to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
-        logging.info(f"Deleting {len(to_delete)} missing videos...")
+        current_app.logger.info(f"Deleting {len(to_delete)} missing videos...")
         for post in to_delete:
             try:
                 db.session.delete(post)
@@ -156,11 +158,11 @@ def process_videos():
     orphan_posts = Post.query.filter(
         (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
     ).all()
-    logging.info(f"Revalidating {len(orphan_posts)} orphan videos...")
+    current_app.logger.info(f"Revalidating {len(orphan_posts)} orphan videos...")
     for post in orphan_posts:
         revalidate_single_video(post)
         time.sleep(1)
-    logging.info("Done.")
+    current_app.logger.info("Done.")
 
 
 def reindex(app_context: AppContext) -> None:
@@ -200,9 +202,9 @@ def generate_description(title: str) -> str | None:
 
     try:
         return generate_content(prompt).text
-    except (KeyError, IndexError) as e:
-        logging.warning(f"Was unable to generate a summary for: {title}")
-        logging.warning(str(e))
+    except Exception as e:
+        current_app.logger.warning(f"Was unable to generate a summary for: {title}")
+        current_app.logger.warning(str(e))
         return None
 
 
@@ -214,7 +216,7 @@ def categorize(title: str, categories: str) -> str | None:
 
     try:
         return generate_content(prompt).text
-    except (KeyError, IndexError) as e:
-        logging.warning(f"Was unable to generate category for: {title}")
-        logging.warning(str(e))
+    except Exception as e:
+        current_app.logger.warning(f"Was unable to generate category for: {title}")
+        current_app.logger.warning(str(e))
         return None
