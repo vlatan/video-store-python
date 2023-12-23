@@ -83,14 +83,6 @@ class Config:
         }
     }
 
-    CELERY = {
-        "broker_url": load_env("CELERY_BROKER_URL"),
-        "result_backend": load_env("CELERY_RESULT_BACKEND"),
-        "task_ignore_result": load_env("CELERY_IGNORE_RESULT"),
-        "timezone": load_env("CELERY_TIMEZONE"),
-        "broker_connection_retry_on_startup": True,
-    }
-
     VOLUME_MOUNT_PATH = load_env("RAILWAY_VOLUME_MOUNT_PATH") or ""
 
 

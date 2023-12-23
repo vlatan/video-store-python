@@ -160,7 +160,7 @@ def process_videos():
     for post in orphan_posts:
         revalidate_single_video(post)
         time.sleep(1)
-    current_app.logger.info("Done.")
+    current_app.logger.info("Worker job done.")
 
 
 def reindex(app_context: AppContext) -> None:

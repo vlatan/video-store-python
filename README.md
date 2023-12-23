@@ -23,22 +23,17 @@ Users can login via Google and Facebook. The app doesn't store passwords so natu
 
 ## Run the app locally
 
-Firs build a docker image:
 ```
-docker build . --tag doxder-image
-```
-
-Then run a docker container on port 5000:
-```
-docker run --rm -p 5000:5000 -v .:/app doxder-image python run.py
+docker compose up --build --remove-orphans app
 ```
 
 Access the app on `https://localhost:5000`
 
-## Run Celery Beat
+
+## Run the worker locally
 
 ```
-celery -A make_celery worker -B --loglevel INFO
+docker compose up --build --remove-orphans worker
 ```
 
 ## License

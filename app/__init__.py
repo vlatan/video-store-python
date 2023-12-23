@@ -1,7 +1,6 @@
 import os
 import functools
 from dotenv import load_dotenv
-from celery import Celery, Task
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
 from whoosh.fields import Schema, TEXT, ID
@@ -105,19 +104,6 @@ def initialize_search_index(app: Flask) -> None:
         if storage.index_exists()
         else storage.create_index(schema)
     )
-
-
-def celery_init_app(app: Flask) -> Celery:
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
-    celery_app.set_default()
-    app.extensions["celery"] = celery_app
-    return celery_app
 
 
 def setup_generative_ai(app: Flask) -> None:
