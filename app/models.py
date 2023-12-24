@@ -19,6 +19,7 @@ def load_user(user_id):
 
 class Base(db.Model):
     __abstract__ = True
+
     created_at = mapped_column(db.DateTime, default=datetime.utcnow)
     updated_at = mapped_column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
@@ -115,6 +116,7 @@ class User(Base, UserMixin, ActionMixin):
 
 class Post(Base, SearchableMixin):
     __searchable__ = ["title", "description", "tags"]
+
     id = mapped_column(db.Integer, primary_key=True, index=True)
     provider = mapped_column(db.String(7), default="YouTube")
     video_id = mapped_column(db.String(20), unique=True, nullable=False, index=True)
