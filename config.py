@@ -27,10 +27,18 @@ class Config:
     CRON_HOUR = load_env("CRON_HOUR") or 5
     SEND_FILE_MAX_AGE_DEFAULT = load_env("SEND_FILE_MAX_AGE_DEFAULT") or 315360000
 
+    # Redis
+    REDIS_HOST = load_env("REDIS_HOST") or "localhost"
+    REDIS_PORT = load_env("REDIS_PORT") or 6379
+    REDIS_USERNAME = load_env("REDIS_USERNAME") or "default"
+    REDIS_PASSWORD = load_env("REDIS_PASSWORD") or ""
+
     # Flask-Caching
     CACHE_TYPE = load_env("CACHE_TYPE") or "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = load_env("CACHE_DEFAULT_TIMEOUT") or 300
-    CACHE_REDIS_URL = load_env("CACHE_REDIS_URL") or "http://localhost:6379"
+    CACHE_REDIS_URL = (
+        f"redis://{REDIS_USERNAME}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}"
+    )
 
     # Admin Google openid
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))

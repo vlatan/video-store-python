@@ -185,7 +185,7 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_related_posts(cls, title, per_page):
-        if not (posts := cls.search(title, 1, per_page + 1)[0]):
+        if not (posts := cls.search(title, 0, per_page + 1)[0]):
             posts = cls.query.order_by(sqlalchemy.func.random()).limit(per_page)
         return [post.serialize for post in posts if post.title != title]
 

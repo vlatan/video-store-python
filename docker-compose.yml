@@ -2,9 +2,11 @@ services:
 
   redis:
     restart: always
-    image: redis/redis-stack
+    image: redis/redis-stack-server
     container_name: redis
     env_file: .env
+    environment:
+      - REDIS_ARGS="--requirepass ${REDIS_PASSWORD}"
     ports:
       - "${EXPOSE_REDIS_PORT:-}:6379"
     healthcheck:

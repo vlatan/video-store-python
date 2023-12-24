@@ -1,10 +1,12 @@
+import string
 import functools
 from whoosh.writing import AsyncWriter
 from whoosh.qparser import OrGroup, MultifieldParser
 from googleapiclient.discovery import build as google_discovery_build
+from redis.commands.search.query import Query
 
 from flask_login import current_user, login_required
-from flask import current_app, flash, redirect, url_for
+from flask import current_app, flash, redirect, url_for, json
 
 
 def admin_required(func):
@@ -35,33 +37,34 @@ def youtube_build():
 
 
 def add_to_index(obj):
-    payload = {field: getattr(obj, field) for field in obj.__searchable__}
-    writer = AsyncWriter(current_app.config["search_index"])
-    writer.update_document(id=str(obj.id), **payload)
-    writer.commit()
+    search_index = current_app.config["search_index"]
+    document = {field: json.dumps(getattr(obj, field)) for field in obj.__searchable__}
+    search_index.add_document(doc_id=str(obj.id), replace=True, **document)
 
 
 def remove_from_index(obj):
-    writer = AsyncWriter(current_app.config["search_index"])
-    writer.delete_by_term("id", str(obj.id))
-    writer.commit()
+    search_index = current_app.config["search_index"]
+    search_index.delete_document(str(obj.id), delete_actual_document=True)
 
 
-def query_index(fields, keyword, page, per_page):
-    with current_app.config["search_index"].searcher() as searcher:
-        schema, og = current_app.config["search_index"].schema, OrGroup.factory(0.9)
-        parser = MultifieldParser(fields, schema, group=og)
-        query = parser.parse(keyword)
-        total = len(searcher.search(query))
-        results = searcher.search_page(query, page, pagelen=per_page)
-        ids = [int(result["id"]) for result in results]
-        return ids, total
+def query_index(
+    fields: list[str], keyword: str, page: int, per_page: int
+) -> tuple[list[int], int]:
+    """Return limit/offset search result from the index and num of total results."""
+    search_index = current_app.config["search_index"]
+    words = keyword.translate(str.maketrans("", "", string.punctuation))
+    words = " | ".join(words.split())
+    paging = page * per_page, page * per_page + per_page
+    query = Query(words).paging(*paging)
+    search_result = search_index.search(query)
+    ids = [int(document.id) for document in search_result.docs]
+    return ids, int(search_result.total)
 
 
-def query_index_all(fields, keyword):
-    with current_app.config["search_index"].searcher() as searcher:
-        schema, og = current_app.config["search_index"].schema, OrGroup.factory(0.9)
-        parser = MultifieldParser(fields, schema, group=og)
-        query = parser.parse(keyword)
-        results = searcher.search(query, limit=None)
-        return [int(result["id"]) for result in results]
+def query_index_all(fields: list[str], keyword: str) -> list[int]:
+    """Return all search result from the index."""
+    search_index = current_app.config["search_index"]
+    words = keyword.translate(str.maketrans("", "", string.punctuation))
+    words = " | ".join(words.split())
+    search_result = search_index.search(words).docs
+    return [int(document.id) for document in search_result]

@@ -1,9 +1,12 @@
 import os
+import redis
 import functools
 from dotenv import load_dotenv
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
 from whoosh.fields import Schema, TEXT, ID
+from redis.exceptions import ResponseError
+from redis.commands.search.field import TextField
 from whoosh.filedb.filestore import FileStorage
 from werkzeug.utils import import_string, find_modules
 
@@ -93,15 +96,32 @@ def register_blueprints(app: Flask) -> None:
 
 
 def initialize_search_index(app: Flask) -> None:
-    indexdir = os.path.abspath("index")
-    storage = FileStorage(indexdir).create()
-    id_num = ID(unique=True, stored=True)
-    schema = Schema(id=id_num, title=TEXT, description=TEXT, tags=TEXT)
-    app.config["search_index"] = (
-        storage.open_index(schema=schema)
-        if storage.index_exists()
-        else storage.create_index(schema)
+    """
+    Create a search index if not already created
+    and save the object in the app config.
+    """
+
+    redis_client = redis.Redis(
+        host=app.config["REDIS_HOST"],
+        port=app.config["REDIS_PORT"],
+        username=app.config["REDIS_USERNAME"],
+        password=app.config["REDIS_PASSWORD"],
     )
+
+    schema = (
+        TextField("title", weight=2.0),
+        TextField("description"),
+        TextField("tags"),
+    )
+
+    search_index = redis_client.ft("search_index")
+
+    try:
+        search_index.create_index(schema)
+    except ResponseError:
+        pass
+
+    app.config["search_index"] = search_index
 
 
 def setup_generative_ai(app: Flask) -> None:

@@ -172,9 +172,6 @@ def reindex(app_context: AppContext) -> None:
 
 def populate_search_index(app: Flask) -> None:
     """Populate the app search index."""
-    # exit if there's already a search index object
-    if not app.config["search_index"].is_empty():
-        return
 
     thread_name = "search_index"
     for thread in threading.enumerate():
