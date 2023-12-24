@@ -50,8 +50,8 @@ class SearchableMixin(db.Model):
     __abstract__ = True
 
     @classmethod
-    def search(cls, keyword, page, per_page):
-        ids, total = query_index(cls.__searchable__, keyword, page, per_page)
+    def search(cls, phrase, page, per_page):
+        ids, total = query_index(phrase, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = [(ids[i], i) for i in range(len(ids))]

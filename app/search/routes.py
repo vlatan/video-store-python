@@ -28,13 +28,13 @@ def search_results():
     # if it's the first page
     if request.method == "GET":
         # note the time now
-        start_time = time.time()
+        start_time = time.perf_counter()
         # validate the form from which the request is comming
         if not g.search_form.validate():
             return redirect(url_for("main.home"))
-        keyword = g.search_form.q.data
+        phrase = g.search_form.q.data
         # get the search results
-        ids = query_index_all(Post.__searchable__, keyword)
+        ids = query_index_all(phrase)
         # save ids and the total number of posts in session
         session["ids"], session["total"] = ids, len(ids)
 
@@ -42,13 +42,13 @@ def search_results():
         posts = Post.get_posts_by_id(ids[:per_page])
 
         # calculate the time it took to get the search results
-        time_took = round(time.time() - start_time, 2)
+        time_took = time.perf_counter() - start_time
         # render the template
         return render_template(
             "search.html",
             posts=posts,
             total=session["total"],
-            time_took=time_took,
+            time_took=f"{time_took:.2f}",
             title="Search",
         )
 

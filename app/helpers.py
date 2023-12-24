@@ -1,7 +1,5 @@
 import string
 import functools
-from whoosh.writing import AsyncWriter
-from whoosh.qparser import OrGroup, MultifieldParser
 from googleapiclient.discovery import build as google_discovery_build
 from redis.commands.search.query import Query
 
@@ -47,24 +45,28 @@ def remove_from_index(obj):
     search_index.delete_document(str(obj.id), delete_actual_document=True)
 
 
-def query_index(
-    fields: list[str], keyword: str, page: int, per_page: int
-) -> tuple[list[int], int]:
+def query_index(phrase: str, page: int, per_page: int) -> tuple[list[int], int]:
     """Return limit/offset search result from the index and num of total results."""
+    # get RedisSearch search index
     search_index = current_app.config["search_index"]
-    words = keyword.translate(str.maketrans("", "", string.punctuation))
+    # remove punctuation from phrase
+    words = phrase.translate(str.maketrans("", "", string.punctuation))
+    # divide words with pipe symbol (designating OR)
     words = " | ".join(words.split())
-    paging = page * per_page, page * per_page + per_page
-    query = Query(words).paging(*paging)
+    # make query object with offset and number of documents
+    query = Query(words).paging(offset=page * per_page, num=per_page)
+    # get search result
     search_result = search_index.search(query)
+    # get ids from the results
     ids = [int(document.id) for document in search_result.docs]
+    # return ids and total items fetched
     return ids, int(search_result.total)
 
 
-def query_index_all(fields: list[str], keyword: str) -> list[int]:
+def query_index_all(phrase: str) -> list[int]:
     """Return all search result from the index."""
     search_index = current_app.config["search_index"]
-    words = keyword.translate(str.maketrans("", "", string.punctuation))
+    words = phrase.translate(str.maketrans("", "", string.punctuation))
     words = " | ".join(words.split())
     search_result = search_index.search(words).docs
     return [int(document.id) for document in search_result]
