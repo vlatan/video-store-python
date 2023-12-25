@@ -24,7 +24,6 @@ class Config:
     DOMAIN = load_env("DOMAIN")
     SECRET_KEY = load_env("SECRET_KEY")
     GTAG_ID = load_env("GTAG_ID")
-    CRON_HOUR = load_env("CRON_HOUR") or 5
     SEND_FILE_MAX_AGE_DEFAULT = load_env("SEND_FILE_MAX_AGE_DEFAULT") or 315360000
 
     # Redis
