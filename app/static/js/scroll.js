@@ -66,8 +66,10 @@ if ('IntersectionObserver' in window) {
     let intersectionObserver = new IntersectionObserver(([entry]) => {
         // If there is next page and the entry is intersecting
         if (nextPage && entry.isIntersecting) {
+
             // Call the loadItems function
             loadItems(`${window.location.href}`, page);
+
             // Unobserve the entry
             // intersectionObserver.unobserve(entry);
         }
