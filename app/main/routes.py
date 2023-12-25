@@ -10,8 +10,6 @@ from flask import (
     current_app,
     url_for,
     Blueprint,
-    jsonify,
-    make_response,
     send_from_directory,
 )
 
