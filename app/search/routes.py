@@ -1,7 +1,16 @@
 import time
+from werkzeug.wrappers.response import Response
 
-from flask import render_template, request, redirect, current_app, g
-from flask import url_for, Blueprint, jsonify, make_response, session
+from flask import (
+    render_template,
+    request,
+    redirect,
+    current_app,
+    g,
+    url_for,
+    Blueprint,
+    session,
+)
 
 from app.models import Post
 from app.helpers import query_index_all
@@ -19,50 +28,54 @@ def before_request():
     g.search_form = SearchForm(formdata=request.args, meta={"csrf": False})
 
 
-@bp.route("/search/", methods=["GET", "POST"])
-def search_results():
+@bp.route("/search/")
+def search_results() -> Response | str | list:
     """Route to return the search results."""
+
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
 
-    # if it's the first page
-    if request.method == "GET":
-        # note the time now
-        start_time = time.perf_counter()
-        # validate the form from which the request is comming
-        if not g.search_form.validate():
-            return redirect(url_for("main.home"))
-        phrase = g.search_form.q.data
-        # get the search results
-        ids = query_index_all(phrase)
-        # save ids and the total number of posts in session
-        session["ids"], session["total"] = ids, len(ids)
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
 
-        # get the first page results
-        posts = Post.get_posts_by_id(ids[:per_page])
-
-        # calculate the time it took to get the search results
-        time_took = time.perf_counter() - start_time
-        # render the template
-        return render_template(
-            "search.html",
-            posts=posts,
-            total=session["total"],
-            time_took=f"{time_took:.2f}",
-            title="Search",
-        )
-
-    # load the next page (POST request)
+    # return JSON response for scroll content if ids and total in session
     ids, total = session.get("ids"), session.get("total")
-    if (frontend_data := request.get_json(silent=True)) and ids and total:
-        # get the page number
-        page = frontend_data.get("page")
-        # if there are subsequent posts send content to frontend
-        if total > (start := (page - 1) * per_page):
-            # get posts from this page
-            posts = Post.get_posts_by_id(ids[start : start + per_page])
-            time.sleep(0.4)
-            return make_response(jsonify(posts), 200)
+    if page > 1 and ids and total:
+        # if no more search results to serve on scroll
+        if total <= (start := (page - 1) * per_page):
+            return []
+        # get posts for this this page
+        posts = Post.get_posts_by_id(ids[start : start + per_page])
+        time.sleep(0.4)
+        return posts
 
-    # if there are no more pages
-    return make_response(jsonify([]), 200)
+    # note the time now
+    start_time = time.perf_counter()
+
+    # validate the form from which the request is comming
+    if not g.search_form.validate():
+        return redirect(url_for("main.home"))
+
+    # get the search phrase sent via the search form
+    phrase = g.search_form.q.data
+
+    # get the search results
+    ids = query_index_all(phrase)
+    # save ids and the total number of posts in session
+    session["ids"], session["total"] = ids, len(ids)
+
+    # get the first page results
+    posts = Post.get_posts_by_id(ids[:per_page])
+
+    # calculate the time it took to get the search results
+    time_took = time.perf_counter() - start_time
+    # render the template
+    return render_template(
+        "search.html",
+        posts=posts,
+        total=session["total"],
+        time_took=f"{time_took:.2f}",
+        title="Search",
+    )
