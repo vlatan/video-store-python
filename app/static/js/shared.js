@@ -3,7 +3,7 @@ const sleep = time => {
     return new Promise(resolve => setTimeout(resolve, time));
 };
 
-// Send/recieve data to/from backend
+// Send POST request to backend
 const postData = async (url = '', data = {}) => {
     const response = await fetch(url, {
         method: 'POST',
@@ -11,6 +11,11 @@ const postData = async (url = '', data = {}) => {
         body: JSON.stringify(data)
     });
     return response;
+};
+
+// Send GET request to backend
+const getData = async (url = '', page = 2) => {
+    return await fetch(`${url}?page=${page}`);
 };
 
 // Set alert message

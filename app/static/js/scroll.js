@@ -16,9 +16,9 @@ const noMoreScroll = () => {
 };
 
 // Function to request new items and render to the dom
-const loadItems = (url = '', data = {}) => {
+const loadItems = (url = '', pageValue = 2) => {
 
-    postData(url, data).then(response => {
+    getData(url, pageValue).then(response => {
 
         // If bad response exit the function
         if (!response.ok) {
@@ -67,7 +67,7 @@ if ('IntersectionObserver' in window) {
         // If there is next page and the entry is intersecting
         if (nextPage && entry.isIntersecting) {
             // Call the loadItems function
-            loadItems(`${window.location.href}`, { page: page });
+            loadItems(`${window.location.href}`, page);
             // Unobserve the entry
             // intersectionObserver.unobserve(entry);
         }
