@@ -1,4 +1,5 @@
 import time
+from werkzeug.wrappers.response import Response
 
 from flask_login import current_user
 from flask import (
@@ -6,8 +7,6 @@ from flask import (
     Blueprint,
     current_app,
     request,
-    jsonify,
-    make_response,
     render_template,
     url_for,
     flash,
@@ -24,7 +23,7 @@ bp = Blueprint("sources", __name__)
 
 @bp.route("/source/new", methods=["GET", "POST"])
 @admin_required
-def new_playlist():
+def new_playlist() -> Response | str:
     form = PlaylistForm()
     # the form will not validate if the channel is already in the database,
     # or if it can't fetch its medatata for various reasons
@@ -45,45 +44,51 @@ def new_playlist():
     )
 
 
-@bp.route("/source/<string:playlist_id>/", methods=["GET", "POST"])
-def playlist_videos(playlist_id):
-    """Route to return all videos in a playlist"""
-
-    # check if playlist exists
-    playlist = Playlist.query.filter_by(playlist_id=playlist_id).first_or_404()
+@bp.route("/source/<string:playlist_id>/")
+def playlist_videos(playlist_id) -> list | str:
+    """Route to return all videos in a playlist."""
 
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
-    # if it's POST request this should contain data
-    frontend_data = request.get_json(silent=True)
-    # if frontend_data get page number, else 1
-    page = frontend_data.get("page") if frontend_data else 1
 
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
+
+    # check if playlist exists
+    playlist = Playlist.query.filter_by(playlist_id=playlist_id).first_or_404()
     posts = Post.get_playlist_posts(playlist_id, page, per_page)
 
-    if request.method == "POST":
+    # return JSON response for scroll content
+    if page > 1:
         time.sleep(0.4)
-        return make_response(jsonify(posts), 200)
+        return posts
 
     return render_template(
         "source.html", posts=posts, title=playlist.title, playlist_id=playlist_id
     )
 
 
-@bp.route("/source/other/", methods=["GET", "POST"])
-def orphan_videos():
+@bp.route("/source/other/")
+def orphan_videos() -> list | str:
+    """Route to return all videos that don't belong to a playlist."""
+
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
-    # if it's POST request this should contain data
-    frontend_data = request.get_json(silent=True)
-    # if frontend_data get page number, else 1
-    page = frontend_data.get("page") if frontend_data else 1
+
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
+
     # get orpahn posts
     posts = Post.get_orphans(page, per_page)
 
-    if request.method == "POST":
+    # return JSON response for scroll content
+    if page > 1:
         time.sleep(0.4)
-        return make_response(jsonify(posts), 200)
+        return posts
 
     return render_template("source.html", posts=posts, title="Other Uploads")
 
