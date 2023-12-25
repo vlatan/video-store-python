@@ -46,7 +46,7 @@ def remove_from_index(obj):
 
 
 def query_index(phrase: str, page: int, per_page: int) -> tuple[list[int], int]:
-    """Return limit/offset search result from the index and num of total results."""
+    """Return offset and number of search results from the index for a given phrase."""
     # get RedisSearch search index
     search_index = current_app.config["search_index"]
     # remove punctuation from phrase
@@ -68,5 +68,6 @@ def query_index_all(phrase: str) -> list[int]:
     search_index = current_app.config["search_index"]
     words = phrase.translate(str.maketrans("", "", string.punctuation))
     words = " | ".join(words.split())
-    search_result = search_index.search(words).docs
+    query = Query(words).paging(offset=0, num=3000)
+    search_result = search_index.search(query).docs
     return [int(document.id) for document in search_result]
