@@ -9,7 +9,6 @@ from flask import (
     request,
     current_app,
     url_for,
-    Response,
     Blueprint,
     jsonify,
     make_response,
@@ -76,7 +75,7 @@ def template_vars():
 
 
 @bp.route("/")
-def home() -> Response | str:
+def home() -> list | str:
     """Route to return the posts."""
 
     # posts per page
@@ -105,10 +104,10 @@ def home() -> Response | str:
             else Post.get_posts(page, per_page)
         )
 
+    # return JSON response for scroll content
     if page > 1:
         time.sleep(0.4)
-        # return JSON response for scroll content
-        return make_response(jsonify(posts), 200)
+        return posts
 
     # render HTML template for the first view
     return render_template("home.html", posts=posts)
