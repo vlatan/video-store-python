@@ -46,7 +46,18 @@ def remove_from_index(obj):
 
 
 def query_index(phrase: str, page: int, per_page: int) -> tuple[list[int], int]:
-    """Return offset and number of search results from the index for a given phrase."""
+    """
+    Return offset and number of search results from the index for a given phrase.
+
+    Parameters:
+    phrase (str): Phrase to search for in the index.
+    page (int): The search results page number.
+    per_page (int): Number of search results per page.
+
+    Returns:
+    tuple: A tuple of two values, a list of row ids and the total number of results.
+    """
+
     # get RedisSearch search index
     search_index = current_app.config["search_index"]
     # remove punctuation from phrase
