@@ -82,8 +82,10 @@ def home() -> Response | str:
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
 
-    # get page number in URL query args
-    page = int(request.args.get("page") or 1)
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
 
     if current_user.is_authenticated and current_user.is_admin:
         if request.args.get("order_by") == "likes":
@@ -105,9 +107,10 @@ def home() -> Response | str:
 
     if page > 1:
         time.sleep(0.4)
+        # return JSON response for scroll content
         return make_response(jsonify(posts), 200)
 
-    # render template on the first view (GET method)
+    # render HTML template for the first view
     return render_template("home.html", posts=posts)
 
 
