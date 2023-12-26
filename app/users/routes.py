@@ -4,8 +4,15 @@ import requests
 from datetime import datetime
 
 from flask_login import current_user, login_required
-from flask import redirect, Blueprint, current_app, make_response
-from flask import render_template, url_for, flash, request, jsonify
+from flask import (
+    redirect,
+    Blueprint,
+    current_app,
+    render_template,
+    url_for,
+    flash,
+    request,
+)
 
 from app import db
 from app.auth.helpers import get_avatar_abs_path
@@ -21,28 +28,28 @@ def record_last_visit():
         db.session.commit()
 
 
-@bp.route("/liked/", methods=["GET", "POST"])
+@bp.route("/user/likes/")
 @login_required
-def liked():
-    """Route to return the liked posts."""
+def likes() -> list | str:
+    """Route to return the current user liked posts."""
+
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
-    # if it's POST request this should contain data
-    frontend_data = request.get_json(silent=True)
-    # if frontend_data get page number, else 1
-    page = frontend_data.get("page") if frontend_data else 1
+
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
 
     items = current_user.liked.paginate(
         page=page, per_page=per_page, error_out=False
     ).items
+
     posts = [item.post for item in items]
 
-    if request.method == "POST":
-        # if there are subsequent pages send posts as JSON object
-        posts = jsonify([post.serialize for post in posts])
-        # Simulate delay
+    if page > 1:
         time.sleep(0.4)
-        return make_response(posts, 200)
+        return [post.serialize for post in posts]
 
     content_title = "Documentaries you like will show up here."
     if total := current_user.liked.count():
@@ -57,28 +64,28 @@ def liked():
     )
 
 
-@bp.route("/favorites/", methods=["GET", "POST"])
+@bp.route("/user/favorites/")
 @login_required
-def favorites():
-    """Route to return the liked posts"""
+def favorites() -> list | str:
+    """Route to return the current user favorite posts."""
+
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
-    # if it's POST request this should contain data
-    frontend_data = request.get_json(silent=True)
-    # if frontend_data get page number, else 1
-    page = frontend_data.get("page") if frontend_data else 1
+
+    try:  # get page number in URL query params
+        page = int(str(request.args.get("page")))
+    except ValueError:
+        page = 1
 
     items = current_user.faved.paginate(
         page=page, per_page=per_page, error_out=False
     ).items
+
     posts = [item.post for item in items]
 
-    if request.method == "POST":
-        # if there are subsequent pages send posts as JSON object
-        posts = jsonify([post.serialize for post in posts])
-        # Simulate delay
+    if page > 1:
         time.sleep(0.4)
-        return make_response(posts, 200)
+        return [post.serialize for post in posts]
 
     content_title = "Your favorite documentaries will show up here."
     if total := current_user.faved.count():
@@ -113,7 +120,7 @@ def delete_account():
                 data={"access_token": revoke_token},
             )
 
-    # save avatar absolute path before deleting user
+    # get avatar absolute path before deleting user
     avatar_path = get_avatar_abs_path(current_user)
     # remove user
     db.session.delete(current_user)
