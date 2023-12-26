@@ -42,7 +42,7 @@ const loadItems = (url = '', pageValue = 2) => {
                 // Query & update the template content
                 template_clone.querySelector('.video-link').href = `/video/${item.video_id}/`;
                 const thumb = template_clone.querySelector('.video-img');
-                thumb.src = item.thumbnails.medium.url;
+                thumb.src = item.thumbnail.url;
                 thumb.alt = item.title;
                 thumb.srcset = item.srcset;
                 template_clone.querySelector('.video-title').innerHTML = item.title;

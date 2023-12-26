@@ -158,12 +158,9 @@ class Post(Base, SearchableMixin):
     def serialize(self):
         """Return object data in easily serializable format."""
         return {
-            "id": self.id,
             "video_id": self.video_id,
             "title": escape(self.title),
-            "thumbnails": self.thumbnails,
-            "created_at": self.created_at,
-            "updated_at": self.updated_at,
+            "thumbnail": self.thumbnails["medium"],
             "srcset": self.srcset(max_width=480),
         }
 

@@ -113,7 +113,7 @@
 
 	<div class="related_videos">
 		{% for related_post in related_posts %}
-		{% set thumb = related_post.thumbnails['medium'] %}
+		{% set thumb = related_post.thumbnail %}
 		<a href="{{ url_for('posts.post', video_id=related_post.video_id) }}" class="related-video">
 			<img class="related-img" src="{{ thumb['url'] }}" width="{{ thumb['width'] }}"
 				height="{{ thumb['height'] }}" alt="{{ related_post.title }}">
