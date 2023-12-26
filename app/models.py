@@ -1,15 +1,18 @@
+import string
 import sqlalchemy
 from slugify import slugify
 from markdown import markdown
 from datetime import datetime
 from markupsafe import escape
 from sqlalchemy.orm import mapped_column
+from redis.commands.search.query import Query
+from redis.commands.search.result import Result
 
-from flask import current_app
 from flask_login import UserMixin
+from flask import current_app, json
 
 from app import db, login_manager, cache
-from app.helpers import add_to_index, remove_from_index, query_index
+from app.helpers import add_to_index, remove_from_index
 
 
 @login_manager.user_loader
@@ -50,13 +53,35 @@ class SearchableMixin(db.Model):
     __abstract__ = True
 
     @classmethod
-    def search(cls, phrase, page, per_page):
-        ids, total = query_index(phrase, page, per_page)
-        if total == 0:
-            return cls.query.filter_by(id=0), 0
-        when = [(ids[i], i) for i in range(len(ids))]
-        query = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
-        return query, total
+    def search(cls, phrase: str, page: int, per_page: int) -> Result:
+        """
+        Search the RedisSearch index and return a result given the
+        `phrase` and offeset and limit where offeset is `page * per_page`
+        and the limit is `per_page`s.
+
+        Parameters:
+        phrase (str): Phrase to search for in the index.
+        page (int): The search results page number.
+        per_page (int): Number of search results per page.
+
+        Returns:
+        Result: RedisSearch Result object.
+        """
+
+        # get RedisSearch search index
+        search_index = current_app.config["search_index"]
+        # remove punctuation from phrase
+        words = phrase.translate(str.maketrans("", "", string.punctuation))
+        # divide words with pipe symbol (designating OR)
+        words = " | ".join(words.split())
+        # make query object with offset and number of documents
+        query = (
+            Query(words)
+            .paging(offset=page * per_page, num=per_page)
+            .limit_fields(*cls.__searchable__)
+        )
+        # return RediSearch search result
+        return search_index.search(query)
 
     @classmethod
     def _fields_dirty(cls, obj):
@@ -185,10 +210,23 @@ class Post(Base, SearchableMixin):
 
     @classmethod
     @cache.memoize(86400)
-    def get_related_posts(cls, title, per_page):
-        if not (posts := cls.search(title, 0, per_page + 1)[0]):
+    def get_related_posts(cls, title: str, per_page: int):
+        search_result = cls.search(title, 0, per_page + 1)
+
+        if not (search_result := cls.search(title, 0, per_page + 1)):
             posts = cls.query.order_by(sqlalchemy.func.random()).limit(per_page)
-        return [post.serialize for post in posts if post.title != title]
+            return [post.serialize for post in posts if post.title != title]
+
+        return [
+            {
+                "video_id": doc.video_id,
+                "title": escape(doc.title),
+                "thumbnail": json.loads(doc.thumbnail),
+                "srcset": doc.srcset,
+            }
+            for doc in search_result.docs
+            if doc.title != title
+        ]
 
     @classmethod
     @cache.memoize(86400)

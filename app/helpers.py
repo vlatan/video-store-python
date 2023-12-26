@@ -35,8 +35,25 @@ def youtube_build():
 
 
 def add_to_index(obj):
+    """Add item to Redis search index."""
+
+    # get search index object
     search_index = current_app.config["search_index"]
-    document = {field: json.dumps(getattr(obj, field)) for field in obj.__searchable__}
+
+    # searchable fields
+    searchable = {field: str(getattr(obj, field)) for field in obj.__searchable__}
+
+    # additional fields
+    additional = {
+        "video_id": str(obj.video_id),
+        "thumbnail": json.dumps(obj.thumbnails["medium"]),
+        "srcset": str(obj.srcset),
+    }
+
+    # final document
+    document = {**searchable, **additional}
+
+    # add document
     search_index.add_document(doc_id=str(obj.id), replace=True, **document)
 
 
@@ -45,40 +62,18 @@ def remove_from_index(obj):
     search_index.delete_document(str(obj.id), delete_actual_document=True)
 
 
-def query_index(phrase: str, page: int, per_page: int) -> tuple[list[int], int]:
-    """
-    Return offset and number of search results from the index for a given phrase.
-
-    Parameters:
-    phrase (str): Phrase to search for in the index.
-    page (int): The search results page number.
-    per_page (int): Number of search results per page.
-
-    Returns:
-    tuple: A tuple of two values, a list of row ids and the total number of results.
-    """
-
-    # get RedisSearch search index
-    search_index = current_app.config["search_index"]
-    # remove punctuation from phrase
-    words = phrase.translate(str.maketrans("", "", string.punctuation))
-    # divide words with pipe symbol (designating OR)
-    words = " | ".join(words.split())
-    # make query object with offset and number of documents
-    query = Query(words).paging(offset=page * per_page, num=per_page)
-    # get search result
-    search_result = search_index.search(query)
-    # get ids from the results
-    ids = [int(document.id) for document in search_result.docs]
-    # return ids and total items fetched
-    return ids, int(search_result.total)
-
-
 def query_index_all(phrase: str) -> list[int]:
     """Return all search result from the index."""
     search_index = current_app.config["search_index"]
+
     words = phrase.translate(str.maketrans("", "", string.punctuation))
     words = " | ".join(words.split())
-    query = Query(words).paging(offset=0, num=3000)
+
+    query = (
+        Query(words)
+        .paging(offset=0, num=3000)
+        .limit_fields("title", "description", "tags")
+    )
+
     search_result = search_index.search(query).docs
     return [int(document.id) for document in search_result]

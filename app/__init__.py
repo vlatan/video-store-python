@@ -66,11 +66,11 @@ def create_app() -> Flask:
     with app.app_context():
         # create db tables if they don't exist
         db.create_all()
-        # initialize search index
-        initialize_search_index(app)
 
         from app.cron.handlers import populate_search_index
 
+        # initialize search index
+        initialize_search_index(app)
         # populate search index if empty
         populate_search_index(app)
 
@@ -107,9 +107,12 @@ def initialize_search_index(app: Flask) -> None:
     )
 
     schema = (
+        TextField("video_id"),
         TextField("title", weight=2.0),
         TextField("description"),
         TextField("tags"),
+        TextField("thumbnail"),
+        TextField("srcset"),
     )
 
     search_index = redis_client.ft("search_index")
