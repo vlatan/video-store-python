@@ -1,4 +1,3 @@
-import string
 import functools
 from googleapiclient.discovery import build as google_discovery_build
 from redis.commands.search.query import Query
@@ -32,48 +31,3 @@ def youtube_build():
         developerKey=current_app.config["YOUTUBE_API_KEY"],
         cache_discovery=False,
     )
-
-
-def add_to_index(obj):
-    """Add item to Redis search index."""
-
-    # get search index object
-    search_index = current_app.config["search_index"]
-
-    # searchable fields
-    searchable = {field: str(getattr(obj, field)) for field in obj.__searchable__}
-
-    # additional fields
-    additional = {
-        "video_id": str(obj.video_id),
-        "thumbnail": json.dumps(obj.thumbnails["medium"]),
-        "srcset": str(obj.srcset),
-    }
-
-    # final document
-    document = {**searchable, **additional}
-
-    # add document
-    search_index.add_document(doc_id=str(obj.id), replace=True, **document)
-
-
-def remove_from_index(obj):
-    search_index = current_app.config["search_index"]
-    search_index.delete_document(str(obj.id), delete_actual_document=True)
-
-
-def query_index_all(phrase: str) -> list[int]:
-    """Return all search result from the index."""
-    search_index = current_app.config["search_index"]
-
-    words = phrase.translate(str.maketrans("", "", string.punctuation))
-    words = " | ".join(words.split())
-
-    query = (
-        Query(words)
-        .paging(offset=0, num=3000)
-        .limit_fields("title", "description", "tags")
-    )
-
-    search_result = search_index.search(query).docs
-    return [int(document.id) for document in search_result]

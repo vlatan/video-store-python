@@ -12,7 +12,6 @@ from flask_login import UserMixin
 from flask import current_app, json
 
 from app import db, login_manager, cache
-from app.helpers import add_to_index, remove_from_index
 
 
 @login_manager.user_loader
@@ -51,6 +50,29 @@ class ActionMixin(db.Model):
 
 class SearchableMixin(db.Model):
     __abstract__ = True
+
+    def add_to_index(self):
+        """Add item to Redis search index."""
+        # get search index object
+        search_index = current_app.config["search_index"]
+        # searchable fields
+        searchable = {field: str(getattr(self, field)) for field in self.__searchable__}
+
+        # additional fields
+        additional = {
+            "video_id": str(self.video_id),
+            "thumbnail": json.dumps(self.thumbnails["medium"]),
+            "srcset": str(self.srcset(max_width=480)),
+        }
+
+        # final document
+        document = {**searchable, **additional}
+        # add document to search
+        search_index.add_document(doc_id=str(self.id), replace=True, **document)
+
+    def remove_from_index(self):
+        search_index = current_app.config["search_index"]
+        search_index.delete_document(str(self.id), delete_actual_document=True)
 
     @classmethod
     def search(cls, phrase: str, page: int, per_page: int) -> Result:
@@ -102,15 +124,15 @@ class SearchableMixin(db.Model):
     @classmethod
     def after_commit(cls, session):
         for obj in session._changes["add"] + session._changes["update"]:
-            add_to_index(obj)
+            obj.add_to_index()
         for obj in session._changes["delete"]:
-            remove_from_index(obj)
+            obj.remove_from_index()
         session._changes = None
 
     @classmethod
     def reindex(cls):
         for obj in cls.query:
-            add_to_index(obj)
+            obj.add_to_index()
 
 
 class User(Base, UserMixin, ActionMixin):
@@ -211,8 +233,6 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_related_posts(cls, title: str, per_page: int):
-        search_result = cls.search(title, 0, per_page + 1)
-
         if not (search_result := cls.search(title, 0, per_page + 1)):
             posts = cls.query.order_by(sqlalchemy.func.random()).limit(per_page)
             return [post.serialize for post in posts if post.title != title]
@@ -244,6 +264,29 @@ class Post(Base, SearchableMixin):
         query = cls.query.filter(orphans).order_by(cls.upload_date.desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.serialize for post in posts]
+
+    @classmethod
+    @cache.memoize(86400)
+    def search_posts(
+        cls, phrase: str, page: int, per_page: int
+    ) -> tuple[list[dict[str, str]], int]:
+        """Make search results ready."""
+
+        # get search results
+        search_result = cls.search(phrase, page, per_page)
+
+        # prepare results
+        docs = [
+            {
+                "video_id": doc.video_id,
+                "title": escape(doc.title),
+                "thumbnail": json.loads(doc.thumbnail),
+                "srcset": doc.srcset,
+            }
+            for doc in search_result.docs
+        ]
+
+        return docs, search_result.total
 
     @classmethod
     @cache.memoize(86400)

@@ -13,7 +13,6 @@ from flask import (
 )
 
 from app.models import Post
-from app.helpers import query_index_all
 from app.search.forms import SearchForm
 
 
@@ -40,14 +39,13 @@ def search_results() -> Response | str | list:
     except ValueError:
         page = 1
 
+    # starting page is actually ZERO on search
+    offset = page - 1
+
     # return JSON response for scroll content if ids and total in session
-    ids, total = session.get("ids"), session.get("total")
-    if page > 1 and ids and total:
-        # if no more search results to serve on scroll
-        if total <= (start := (page - 1) * per_page):
-            return []
-        # get posts for this this page
-        posts = Post.get_posts_by_id(ids[start : start + per_page])
+    if page > 1 and (phrase := session.get("phrase")):
+        # get posts for this page
+        posts, _ = Post.search_posts(phrase, offset, per_page)
         time.sleep(0.4)
         return posts
 
@@ -58,24 +56,21 @@ def search_results() -> Response | str | list:
     if not g.search_form.validate():
         return redirect(url_for("main.home"))
 
-    # get the search phrase sent via the search form
+    # get phrase from form
     phrase = g.search_form.q.data
-
     # get the search results
-    ids = query_index_all(phrase)
-    # save ids and the total number of posts in session
-    session["ids"], session["total"] = ids, len(ids)
-
-    # get the first page results
-    posts = Post.get_posts_by_id(ids[:per_page])
+    posts, total = Post.search_posts(phrase, offset, per_page)
+    # save phrase in session
+    session["phrase"] = phrase
 
     # calculate the time it took to get the search results
     time_took = time.perf_counter() - start_time
+
     # render the template
     return render_template(
         "search.html",
         posts=posts,
-        total=session["total"],
+        total=total,
         time_took=f"{time_took:.2f}",
         title="Search",
     )
