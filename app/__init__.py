@@ -136,7 +136,12 @@ def setup_generative_ai(app: Flask) -> None:
     # create partial function by supplying safety_settings
     generate_content = functools.partial(
         model.generate_content,
-        safety_settings={"HATE_SPEECH": "block_none", "HARASSMENT": "block_none"},
+        safety_settings={
+            "HARM_CATEGORY_HATE_SPEECH": "block_none",
+            "HARM_CATEGORY_HARASSMENT": "block_none",
+            "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none",
+            "HARM_CATEGORY_DANGEROUS_CONTENT": "block_none",
+        },
     )
 
     # place the func object in the app config
