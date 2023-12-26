@@ -192,7 +192,7 @@ def generate_description(title: str) -> str | None:
     """Generate description from a generative AI given a title."""
 
     generate_content = current_app.config["generate_content"]
-    prompt = f"Write a short text about: {title}."
+    prompt = f"Write one paragraph about: {title}."
 
     try:
         return generate_content(prompt).text
