@@ -4,10 +4,8 @@ import functools
 from dotenv import load_dotenv
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
-from whoosh.fields import Schema, TEXT, ID
 from redis.exceptions import ResponseError
 from redis.commands.search.field import TextField
-from whoosh.filedb.filestore import FileStorage
 from werkzeug.utils import import_string, find_modules
 
 from flask import Flask
