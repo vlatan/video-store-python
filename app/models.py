@@ -140,6 +140,10 @@ class Post(Base, SearchableMixin):
         "PostFave", backref="post", cascade="all,delete-orphan", lazy="dynamic"
     )
 
+    @cache.memoize(86400)
+    def html_content(self, text):
+        return markdown(text)
+
     def srcset(self, max_width=1280):
         """Return string of srcset images for a post."""
         thumbs = sorted(self.thumbnails.values(), key=lambda x: x["width"])
