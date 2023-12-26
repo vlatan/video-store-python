@@ -203,8 +203,8 @@ def generate_description(title: str) -> str | None:
     try:
         return generate_content(prompt).text
     except Exception as e:
-        current_app.logger.warning(f"Was unable to generate a summary for: {title}")
-        current_app.logger.warning(str(e))
+        msg = f"Was unable to generate a summary for: {title.upper()}. Error: {e}"
+        current_app.logger.warning(msg)
         return None
 
 
@@ -217,6 +217,6 @@ def categorize(title: str, categories: str) -> str | None:
     try:
         return generate_content(prompt).text
     except Exception as e:
-        current_app.logger.warning(f"Was unable to generate category for: {title}")
-        current_app.logger.warning(str(e))
+        msg = f"Was unable to generate a category for: {title.upper()}. Error: {e}"
+        current_app.logger.warning(msg)
         return None
