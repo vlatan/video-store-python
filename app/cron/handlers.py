@@ -99,19 +99,19 @@ def process_videos():
 
             # update similar_ids if there's a change
             similar = Post.get_related_posts(posted.title, PER_PAGE)
-            video_ids = [row["video_id"] for row in similar]
-            when = [(value, i) for i, value in enumerate(video_ids)]
-            similar = (
-                Post.query.filter(Post.video_id.in_(video_ids))
-                .order_by(db.case(*when, value=Post.video_id))
-                .limit(PER_PAGE)
-                .all()
-            )
-            similar = [row.id for row in similar]
+            if video_ids := [row["video_id"] for row in similar]:
+                when = [(value, i) for i, value in enumerate(video_ids)]
+                similar = (
+                    Post.query.filter(Post.video_id.in_(video_ids))
+                    .order_by(db.case(*when, value=Post.video_id))
+                    .limit(PER_PAGE)
+                    .all()
+                )
+                similar = [row.id for row in similar]
 
-            if posted.similar != similar:
-                posted.similar = similar
-                db.session.commit()
+                if posted.similar != similar:
+                    posted.similar = similar
+                    db.session.commit()
 
             # update short description if the title was manually edited
             if (title := video["title"]) != posted.title:
