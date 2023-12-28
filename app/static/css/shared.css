@@ -6,11 +6,12 @@
   --secondary-font-color: rgb(213, 215, 216);
   --primary-border-color: hsl(0, 0%, 18.82%);
   --content-width: min(90vw, 1600px);
-  --main-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --main-font-family: system-ui, sans-serif;
   --content-padding: 24px;
   --header-hight: 3.5rem;
   --img-hover-filter: brightness(85%);
   --img-hover-transition-duration: 0.3s;
+  --img-border-radius: 10px;
 }
 
 /* ################# Reset ################# */
@@ -135,6 +136,8 @@ input.search-form-input {
   padding: 0.4rem 1rem;
   color: var(--primary-font-color);
   font-size: 0.9rem;
+  border-top-left-radius: var(--img-border-radius);
+  border-bottom-left-radius: var(--img-border-radius);
 }
 
 input.search-form-input:focus {
@@ -148,6 +151,8 @@ button.search-button {
   height: 2.5rem;
   border: 1px solid transparent;
   background-color: var(--primary-border-color);
+  border-top-right-radius: var(--img-border-radius);
+  border-bottom-right-radius: var(--img-border-radius);
 }
 
 button.search-button-mobile,

@@ -39,6 +39,7 @@
     border: none;
     cursor: pointer;
     transition: var(--img-hover-transition-duration) filter;
+    border-radius: var(--img-border-radius);
 }
 
 .player img:hover {
@@ -214,6 +215,7 @@ img.related-img {
     display: block;
     width: 100%;
     height: auto;
+    border-radius: var(--img-border-radius);
 }
 
 h2.related-post-title {

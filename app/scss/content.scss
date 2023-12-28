@@ -46,6 +46,7 @@ a.video-link:hover {
     overflow: hidden;
     max-width: 100%;
     background: #000;
+    border-radius: var(--img-border-radius);
 }
 
 img.video-img {
@@ -107,18 +108,21 @@ h2.video-title {
     font-size: 1.2rem;
     line-height: 1;
     color: white;
-    top: 5px;
-    right: 5px;
+    top: 8px;
+    right: 8px;
     z-index: 1;
     cursor: pointer;
-    width: 26px;
-    height: 26px;
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
+    border: 1px solid white;
 }
 
-.remove-option:hover {
+.remove-option:hover,
+.remove-option:focus {
     color: black;
     background-color: white;
+    border: 1px solid black;
 }
 
 .content-title {

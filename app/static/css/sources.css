@@ -30,6 +30,7 @@ a.playlist-link {
 img.channel-img {
   width: 100%;
   height: auto;
+  border-radius: var(--img-border-radius);
 }
 
 h2.playlist-title {
@@ -47,6 +48,7 @@ h2.playlist-title {
   text-transform: uppercase;
   font-size: 2rem;
   font-weight: bold;
+  border-radius: var(--img-border-radius);
 }
 
 .orphans::after {
