@@ -125,11 +125,11 @@ def process_videos():
                     posted.short_description = short_desc
                     db.session.commit()
 
-            # temporary generate one paragraph description if it's too long
-            elif len(posted.short_description.split()) > 100:
-                if short_desc := generate_description(posted.title):
-                    posted.short_description = short_desc
-                    db.session.commit()
+            # # temporary generate one paragraph description if it's too long
+            # elif len(posted.short_description.split()) > 100:
+            #     if short_desc := generate_description(posted.title):
+            #         posted.short_description = short_desc
+            #         db.session.commit()
 
             # TODO: Categorize the video using generative AI
 
