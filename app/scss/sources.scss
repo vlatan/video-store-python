@@ -28,6 +28,11 @@ a.playlist-link {
     flex-direction: column;
     gap: 1rem;
     text-decoration: none;
+    transition: var(--img-hover-transition-duration) filter;
+}
+
+a.playlist-link:hover {
+    filter: var(--img-hover-filter);
 }
 
 img.channel-img {
