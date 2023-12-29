@@ -12,7 +12,7 @@
 				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 				<meta name="robots" content="noindex,follow" />
 				<style type="text/css">
-					body { font-family:"Lucida Grande","Lucida Sans Unicode",Tahoma,Verdana; margin:20px;}
+					body { font-size: 14px; font-family: system-ui, sans-serif; margin: 20px;}
 					h1 { margin: 5px; }
 					#intro { margin: 20px 0 20px 5px; color: gray; }
 					#intro p { display: block; line-height: 6px; }
