@@ -23,6 +23,7 @@
     overflow: hidden;
     max-width: 100%;
     background: #000;
+    transition: var(--img-hover-transition-duration) filter;
 }
 
 .player img {
@@ -47,15 +48,22 @@
 }
 
 .player .play {
-    height: 81px;
-    width: 81px;
+    position: absolute;
+    height: 72px;
+    width: 72px;
     left: 50%;
     top: 50%;
-    margin-left: -36px;
-    margin-top: -36px;
-    position: absolute;
+    transform: translate(-50%, -50%);
     background: url(/static/images/play-button.png) no-repeat;
+    background-size: contain;
     cursor: pointer;
+}
+
+@media screen and (max-width: 450px) {
+    .player .play {
+        height: 50px;
+        width: 50px;
+    }
 }
 
 .player iframe {
