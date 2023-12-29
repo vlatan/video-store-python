@@ -26,12 +26,11 @@ bp = Blueprint("main", __name__)
 def redirect_www():
     """Redirect www requests to non-www."""
     urlparts = urlparse(request.url)
-    if not urlparts.netloc.startswith("www."):
+    if not (netloc := urlparts.netloc).startswith("www."):
         return
 
-    netloc = urlparts.netloc.replace("www.", "")
-    urlparts = urlparts._replace(netloc=netloc)
-    return redirect(urlunparse(urlparts), code=302)
+    urlparts = urlparts._replace(netloc=netloc.replace("www.", ""))
+    return redirect(urlunparse(urlparts), code=301)
 
 
 @bp.app_template_filter("autoversion")
