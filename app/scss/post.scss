@@ -26,6 +26,10 @@
     transition: var(--img-hover-transition-duration) filter;
 }
 
+.player:hover {
+    filter: var(--img-hover-filter);
+}
+
 .player img {
     position: absolute;
     display: block;
@@ -39,12 +43,7 @@
     height: auto;
     border: none;
     cursor: pointer;
-    transition: var(--img-hover-transition-duration) filter;
     border-radius: var(--img-border-radius);
-}
-
-.player img:hover {
-    filter: var(--img-hover-filter);
 }
 
 .player .play {
