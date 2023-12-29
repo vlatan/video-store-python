@@ -2,6 +2,7 @@ import os
 import time
 import pathlib
 from datetime import datetime
+from urllib.parse import urlparse, urlunparse
 
 from flask_login import current_user
 from flask import (
@@ -11,6 +12,7 @@ from flask import (
     url_for,
     Blueprint,
     send_from_directory,
+    redirect,
 )
 
 from app.models import Post
@@ -18,6 +20,18 @@ from app.auth.helpers import get_avatar_abs_path, save_avatar
 
 
 bp = Blueprint("main", __name__)
+
+
+@bp.before_app_request
+def redirect_www():
+    """Redirect www requests to non-www."""
+    urlparts = urlparse(request.url)
+    if not urlparts.netloc.startswith("www."):
+        return
+
+    netloc = urlparts.netloc.replace("www.", "")
+    urlparts = urlparts._replace(netloc=netloc)
+    return redirect(urlunparse(urlparts), code=302)
 
 
 @bp.app_template_filter("autoversion")
