@@ -77,12 +77,12 @@ h2.video-title {
 }
 
 #spinner {
-    border: 7px solid var(--primary-background-color);
-    border-top: 7px solid var(--primary-font-color);
-    border-bottom: 7px solid var(--primary-font-color);
+    border: 5px solid var(--primary-background-color);
+    border-top: 5px solid var(--primary-font-color);
+    border-bottom: 5px solid var(--primary-font-color);
     border-radius: 50%;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 3rem;
+    height: 3rem;
     animation: spin 2s linear infinite;
 }
 
