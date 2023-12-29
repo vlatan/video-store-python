@@ -12,6 +12,7 @@
   --img-hover-filter: brightness(85%);
   --img-hover-transition-duration: 0.3s;
   --img-border-radius: 10px;
+  --search-form-height: 2.3rem;
 }
 
 /* ################# Reset ################# */
@@ -120,7 +121,7 @@ a.logo {
 /* ################# Search Box ################# */
 .search-form {
   flex: 1;
-  height: 2.5rem;
+  height: var(--search-form-height);
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -148,7 +149,7 @@ input.search-form-input:focus {
 button.search-button {
   display: flex;
   width: 3.5rem;
-  height: 2.5rem;
+  height: var(--search-form-height);
   border: 1px solid transparent;
   background-color: var(--primary-border-color);
   border-top-right-radius: var(--img-border-radius);
