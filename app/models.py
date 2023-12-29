@@ -208,6 +208,8 @@ class Post(Base, SearchableMixin):
             "video_id": self.video_id,
             "title": escape(self.title),
             "thumbnail": self.thumbnails["medium"],
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
             "srcset": self.srcset(max_width=480),
         }
 
@@ -249,7 +251,7 @@ class Post(Base, SearchableMixin):
         ]
 
     @classmethod
-    @cache.memoize(86400)
+    # @cache.memoize(86400)
     def get_playlist_posts(cls, playlist_id, page, per_page):
         query = cls.query.filter_by(playlist_id=playlist_id)
         query = query.order_by(cls.upload_date.desc())
