@@ -8,7 +8,7 @@ from collections import OrderedDict
 from flask import Blueprint, make_response
 from flask import render_template, current_app, abort, url_for
 
-from app import cache
+from app import cache, db
 from app.models import Playlist, Post, Page
 
 
@@ -83,9 +83,13 @@ def sitemap_index():
 def posts_sitemap(date):
     """Route to return the posts sitemap."""
     data = OrderedDict()
-    posts = Post.query.filter(
-        sqlalchemy.func.strftime("%Y-%m", Post.upload_date) == date
-    )
+
+    posts = db.session.execute(
+        db.select(Post)
+        .filter(sqlalchemy.extract("year", Post.upload_date) == int(date[:4]))
+        .filter(sqlalchemy.extract("month", Post.upload_date) == int(date[-2:]))
+    ).scalars()
+
     for post in posts:
         url = url_for("posts.post", video_id=post.video_id, _external=True)
         data[url] = post.updated_at.strftime("%Y-%m-%d")
