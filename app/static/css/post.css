@@ -22,6 +22,7 @@
   overflow: hidden;
   max-width: 100%;
   background: #000;
+  border-radius: var(--img-border-radius);
   transition: var(--img-hover-transition-duration) filter;
 }
 
