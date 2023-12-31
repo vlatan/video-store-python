@@ -113,23 +113,11 @@ def process_videos():
                     posted.similar = similar
                     db.session.commit()
 
-            # update short description if the title was manually edited
-            if (title := video["title"]) != posted.title:
-                if short_desc := generate_description(title):
-                    posted.short_description = short_desc
-                    db.session.commit()
-
             # if there is NO short description in DB generate one
-            elif not posted.short_description:
+            if not posted.short_description:
                 if short_desc := generate_description(posted.title):
                     posted.short_description = short_desc
                     db.session.commit()
-
-            # # temporary generate one paragraph description if it's too long
-            # elif len(posted.short_description.split()) > 100:
-            #     if short_desc := generate_description(posted.title):
-            #         posted.short_description = short_desc
-            #         db.session.commit()
 
             # TODO: Categorize the video using generative AI
 
