@@ -162,7 +162,7 @@ class User(Base, UserMixin, ActionMixin):
 
 
 class Post(Base, SearchableMixin):
-    __searchable__ = ["title", "description", "tags"]
+    __searchable__ = ["title", "short_description", "tags"]
 
     id = mapped_column(db.Integer, primary_key=True, index=True)
     provider = mapped_column(db.String(7), default="YouTube")
