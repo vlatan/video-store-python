@@ -11,6 +11,7 @@ from flask import flash, redirect, request, current_app
 
 from app import db
 from app.models import User
+from app.static import STATIC_FOLDER
 
 
 def finalize_google_login(credentials):
@@ -114,8 +115,7 @@ def download_avatar(user):
 
 def get_avatar_abs_path(user):
     """Get the local avatar absolute path."""
-    root = pathlib.Path(current_app.root_path)
-    return root / "static" / "images" / "avatars" / f"{user.analytics_id}.jpg"
+    return STATIC_FOLDER / "images" / "avatars" / f"{user.analytics_id}.jpg"
 
 
 def failed_login():
