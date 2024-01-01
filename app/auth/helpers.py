@@ -87,8 +87,8 @@ def get_user_ready(user_info):
         user.name = user_info["name"]
     if user.picture != user_info["picture"]:
         user.picture = user_info["picture"]
+        download_avatar(user)
 
-    download_avatar(user)
     db.session.commit()
     return user
 
