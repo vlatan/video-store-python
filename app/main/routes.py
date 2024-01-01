@@ -69,7 +69,7 @@ def avatar(user):
         return url_for("static", filename=avatar)
 
     # if this is the admin dashboard page
-    if request.referrer == url_for("admin.dashboard", _external=True):
+    if request.url == url_for("admin.dashboard", _external=True):
         # get redis client
         redis_client = current_app.config["REDIS_CLIENT"]
         # construct unique user redis key
