@@ -62,6 +62,12 @@ def revalidate_single_video(post):
             res = req.execute()["items"][0]
             # this will raise ValidationError if video's invalid
             validate_video(res)
+
+            # TEMP: if there is NO short description in DB generate one
+            if not post.short_description:
+                if short_desc := generate_description(post.title):
+                    post.short_description = short_desc
+
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
             try:
