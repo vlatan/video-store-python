@@ -1,6 +1,7 @@
 import os
 import redis
 import functools
+from redis import Redis
 from dotenv import load_dotenv
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
@@ -62,6 +63,8 @@ def create_app() -> Flask:
     register_blueprints(app)
     # initialize generative AI
     setup_generative_ai(app)
+    # init a simple redis client
+    init_redis_client(app)
 
     with app.app_context():
         # create db tables if they don't exist
@@ -147,3 +150,8 @@ def setup_generative_ai(app: Flask) -> None:
 
     # place the func object in the app config
     app.config["generate_content"] = generate_content
+
+
+def init_redis_client(app: Flask) -> None:
+    redis_client_url = app.config["CACHE_REDIS_URL"]
+    app.config["REDIS_CLIENT"] = Redis(decode_responses=True).from_url(redis_client_url)

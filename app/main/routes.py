@@ -53,23 +53,34 @@ def format_datetime(value):
 def avatar(user):
     """
     Check if the user has localy saved avatar.
-    If so serve it, otherwise serve default avatar.
+    If so serve it, otherwise attempt so save the avatar locally.
+    If not able to save the avatar serve default avatar.
     """
     # get absolute path to the user avatar
     avatar_path = get_avatar_abs_path(user)
-
-    # # if user avatar image DOES NOT exist localy
-    # if not os.path.isfile(avatar_path):
-    #     # try to save the image locally
-    #     save_avatar(user)
-
-    # default avatar
+    # default avatar path
     avatar = pathlib.Path("images") / "default_avatar.jpg"
 
     # if user avatar image exists localy
     if os.path.isfile(avatar_path):
         # user avatar path within the static folder
         avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
+        # return user avatar url
+        return url_for("static", filename=avatar)
+
+    redis_client = current_app.config["REDIS_CLIENT"]
+    redis_key = f"user_{user.id}_check_avatar"
+    # if saving the users' avatar was NOT attempted in the previous day
+    if not redis_client.get(redis_key):
+        # try to save the use avatar locally
+        save_avatar(user)
+        # record in Redis that the this user's avatar has been attempted to be saved
+        redis_client.setex(redis_key, time=86400, value="OK")
+
+        # check again if user avatar image exists localy
+        if os.path.isfile(avatar_path):
+            # user avatar path within the static folder
+            avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
 
     # return user avatar url
     return url_for("static", filename=avatar)
