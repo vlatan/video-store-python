@@ -68,18 +68,21 @@ def avatar(user):
         # return user avatar url
         return url_for("static", filename=avatar)
 
-    admin_dashboard = url_for("admin.dashboard", _external=True)
     # if this is the admin dashboard page
-    if request.referrer == admin_dashboard:
+    if request.referrer == url_for("admin.dashboard", _external=True):
+        # get redis client
         redis_client = current_app.config["REDIS_CLIENT"]
+        # construct unique user redis key
         redis_key = f"user_{user.id}_download_avatar"
+
         # if downloading the users' avatar was NOT attempted in the previous day
         if not redis_client.get(redis_key):
             # try to download the user avatar locally
             download_avatar(user)
             # record in Redis that the this user's avatar
             # has been attempted to be downloaded
-            redis_client.setex(redis_key, time=604800, value="OK")
+            WEEK_IN_SECONDS = 7 * 24 * 60 * 60
+            redis_client.setex(redis_key, time=WEEK_IN_SECONDS, value="OK")
 
             # check again if user avatar image exists localy
             if pathlib.Path.is_file(avatar_path):
