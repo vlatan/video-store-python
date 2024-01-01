@@ -75,7 +75,7 @@ def avatar(user):
         # construct unique user redis key
         redis_key = f"user_{user.id}_download_avatar"
 
-        # if downloading the users' avatar was NOT attempted in the previous day
+        # if downloading the users' avatar was NOT attempted in the previous week
         if not redis_client.get(redis_key):
             # try to download the user avatar locally
             download_avatar(user)
