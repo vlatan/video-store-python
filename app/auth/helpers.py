@@ -74,7 +74,7 @@ def get_user_ready(user_info):
         user.analytics_id = generate_hash(user)
         db.session.add(user)
         db.session.commit()
-        save_avatar(user)
+        download_avatar(user)
         return user
 
     # otherwise update mutable info for this user if changed
@@ -86,7 +86,7 @@ def get_user_ready(user_info):
         user.name = user_info["name"]
     if user.picture != user_info["picture"]:
         user.picture = user_info["picture"]
-        save_avatar(user)
+        download_avatar(user)
 
     db.session.commit()
     return user
@@ -100,8 +100,8 @@ def generate_hash(user):
     return hashlib.md5(value.encode()).hexdigest()
 
 
-def save_avatar(user):
-    """Save avatar to file."""
+def download_avatar(user):
+    """Download avatar to disc."""
     if not user.picture:
         return
 

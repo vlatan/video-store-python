@@ -16,7 +16,7 @@ from flask import (
 )
 
 from app.models import Post
-from app.auth.helpers import get_avatar_abs_path, save_avatar
+from app.auth.helpers import get_avatar_abs_path, download_avatar
 
 
 bp = Blueprint("main", __name__)
@@ -69,12 +69,13 @@ def avatar(user):
         return url_for("static", filename=avatar)
 
     redis_client = current_app.config["REDIS_CLIENT"]
-    redis_key = f"user_{user.id}_check_avatar"
-    # if saving the users' avatar was NOT attempted in the previous day
+    redis_key = f"user_{user.id}_download_avatar"
+    # if downloading the users' avatar was NOT attempted in the previous day
     if not redis_client.get(redis_key):
-        # try to save the use avatar locally
-        save_avatar(user)
-        # record in Redis that the this user's avatar has been attempted to be saved
+        # try to download the user avatar locally
+        download_avatar(user)
+        # record in Redis that the this user's avatar
+        # has been attempted to be downloaded
         redis_client.setex(redis_key, time=86400, value="OK")
 
         # check again if user avatar image exists localy
