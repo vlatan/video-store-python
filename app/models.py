@@ -54,7 +54,7 @@ class SearchableMixin(db.Model):
     def add_to_index(self):
         """Add item to Redis search index."""
         # get search index object
-        search_index = current_app.config["search_index"]
+        search_index = current_app.config["SEARCH_INDEX"]
         # searchable fields
         searchable = {field: str(getattr(self, field)) for field in self.__searchable__}
 
@@ -71,7 +71,7 @@ class SearchableMixin(db.Model):
         search_index.add_document(doc_id=str(self.id), replace=True, **document)
 
     def remove_from_index(self):
-        search_index = current_app.config["search_index"]
+        search_index = current_app.config["SEARCH_INDEX"]
         search_index.delete_document(str(self.id), delete_actual_document=True)
 
     @classmethod
@@ -91,7 +91,7 @@ class SearchableMixin(db.Model):
         """
 
         # get RedisSearch search index
-        search_index = current_app.config["search_index"]
+        search_index = current_app.config["SEARCH_INDEX"]
         # remove punctuation from phrase
         words = phrase.translate(str.maketrans("", "", string.punctuation))
         # divide words with pipe symbol (designating OR)

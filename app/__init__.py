@@ -125,7 +125,7 @@ def initialize_search_index(app: Flask) -> None:
     except ResponseError:
         pass
 
-    app.config["search_index"] = search_index
+    app.config["SEARCH_INDEX"] = search_index
 
 
 def setup_generative_ai(app: Flask) -> None:

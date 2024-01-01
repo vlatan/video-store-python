@@ -62,7 +62,7 @@ def avatar(user):
     avatar = pathlib.Path("images") / "default_avatar.jpg"
 
     # if user avatar image exists localy
-    if os.path.isfile(avatar_path):
+    if pathlib.Path.is_file(avatar_path):
         # user avatar path within the static folder
         avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
         # return user avatar url
@@ -79,7 +79,7 @@ def avatar(user):
         redis_client.setex(redis_key, time=86400, value="OK")
 
         # check again if user avatar image exists localy
-        if os.path.isfile(avatar_path):
+        if pathlib.Path.is_file(avatar_path):
             # user avatar path within the static folder
             avatar = pathlib.Path("images") / "avatars" / f"{user.analytics_id}.jpg"
 
