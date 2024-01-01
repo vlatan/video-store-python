@@ -58,8 +58,8 @@ def avatar(user):
     """
     # get absolute path to the user avatar
     avatar_path = get_avatar_abs_path(user)
-    # default avatar path
-    avatar = pathlib.Path("images") / "default_avatar.jpg"
+    # default avatar relative path
+    avatar = pathlib.Path("images") / "avatars" / "default_avatar.jpg"
 
     # if user avatar image exists localy
     if pathlib.Path.is_file(avatar_path):

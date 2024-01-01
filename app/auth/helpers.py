@@ -89,7 +89,6 @@ def get_user_ready(user_info):
         user.picture = user_info["picture"]
 
     download_avatar(user)
-
     db.session.commit()
     return user
 
@@ -104,17 +103,14 @@ def generate_hash(user):
 
 def download_avatar(user):
     """Download avatar to disc."""
-    try:
-        if not user.picture:
-            return
+    if not user.picture:
+        return
 
-        response = requests.get(user.picture)
-        if response.ok:
-            avatar_path = get_avatar_abs_path(user)
-            with open(avatar_path, "wb") as file:
-                file.write(response.content)
-    except Exception as e:
-        current_app.logger.warning(f"Unable to download avatar - {e}")
+    response = requests.get(user.picture)
+    if response.ok:
+        avatar_path = get_avatar_abs_path(user)
+        with open(avatar_path, "wb") as file:
+            file.write(response.content)
 
 
 def get_avatar_abs_path(user):

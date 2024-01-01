@@ -139,4 +139,4 @@ index/
 postgres_data/
 redis_data/
 app/static/images/avatars/*
-!app/static/images/avatars/default.jpg
+!app/static/images/avatars/default_avatar.jpg
