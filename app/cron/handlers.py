@@ -16,7 +16,7 @@ from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
 
 
-def get_youtube_videos():
+def get_youtube_videos() -> tuple[list[dict], bool]:
     all_videos, complete = [], True
     # get all playlists from db
     playlists = Playlist.query.all()
@@ -49,7 +49,7 @@ def get_youtube_videos():
     return all_videos, complete
 
 
-def revalidate_single_video(post):
+def revalidate_single_video(post: Post) -> None:
     with youtube_build() as youtube:
         try:
             scope = {
@@ -85,7 +85,7 @@ def revalidate_single_video(post):
             current_app.logger.warning(msg)
 
 
-def process_videos():
+def process_videos() -> None:
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
     # get all VALID videos from our playlists from YouTube

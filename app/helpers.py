@@ -1,9 +1,8 @@
 import functools
 from googleapiclient.discovery import build as google_discovery_build
-from redis.commands.search.query import Query
 
 from flask_login import current_user, login_required
-from flask import current_app, flash, redirect, url_for, json
+from flask import current_app, flash, redirect, url_for
 
 
 def admin_required(func):
