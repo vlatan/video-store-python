@@ -26,13 +26,13 @@
     <div class="dashboard-item dashboard-header-item">Name</div>
     <div class="dashboard-item dashboard-header-item">Email</div>
     <div class="dashboard-item dashboard-header-item">Login Provider</div>
-    <div class="dashboard-item dashboard-header-item">Signup Date / Time</div>
+    <div class="dashboard-item dashboard-header-item">Signup</div>
     <div class="dashboard-item dashboard-header-item">Last Seen</div>
 
     {% for user in users %}
     <div class="dashboard-item">{{ loop.index }}.</div>
     <div class="dashboard-item dashboard-user-img-container">
-        <img class="dashboard-user-img" src="{{ avatar(user) | autoversion }}">
+        <img class="dashboard-user-img" src="{{ url_for('static', filename=user.avatar_url) | autoversion }}">
     </div>
     <div class="dashboard-item">{{ user.name }}</div>
     <div class="dashboard-item">{{ user.email }}</div>

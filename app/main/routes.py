@@ -1,6 +1,7 @@
 import os
 import time
 import pathlib
+from redis import Redis
 from datetime import datetime
 from urllib.parse import urlparse, urlunparse
 from werkzeug.wrappers.response import Response
@@ -10,7 +11,6 @@ from flask import (
     render_template,
     request,
     current_app,
-    url_for,
     Blueprint,
     send_from_directory,
     redirect,
@@ -51,12 +51,21 @@ def format_datetime(value: datetime) -> str:
     return value.strftime("%Y-%m-%d %H:%M")
 
 
-def avatar(user: User) -> str:
+def avatar(user: User, redis_client: Redis | None = None) -> pathlib.Path:
     """
     Check if the user has localy saved avatar.
-    If so serve it, otherwise attempt so save the avatar locally.
-    If not able to save the avatar serve default avatar.
+    If so return its relative path to the "static" folder.
+    Otherwise attempt so save the avatar locally.
+    If not able to save the avatar serve default avatar relative path.
+
+    Parameters:
+    user (User): User object.
+    redis_client (Redis): Redis client object if any.
+
+    Returns:
+    pathlib.Path: Path object relative to the "static" folder.
     """
+
     # construct absolute path to the user avatar
     avatar_absoulte_path = get_avatar_abs_path(user)
 
@@ -65,27 +74,27 @@ def avatar(user: User) -> str:
 
     # if user avatar image exists localy return user avatar
     if pathlib.Path.is_file(avatar_absoulte_path):
-        return url_for("static", filename=user_avatar)
+        return user_avatar
 
     # default avatar path within the static folder
     default_avatar = pathlib.Path("images") / "avatars" / "default_avatar.jpg"
 
     # get redis client and construct redis key
-    redis_client = current_app.config["REDIS_CLIENT"]
+    redis_client = redis_client or current_app.config["REDIS_CLIENT"]
     redis_key = f"{user.id}:url:{user.picture}"
 
     # if avatar url in redis then it's not downloadable, serve default avatar
     if redis_client.get(redis_key) == "false".encode():
-        return url_for("static", filename=default_avatar)
+        return default_avatar
 
     # try to download user avatar and serve it
     if download_avatar(user):
-        return url_for("static", filename=user_avatar)
+        return user_avatar
 
     # if unable to download avatar, cache that state for one week for that URL
     WEEK_IN_SECONDS = 7 * 24 * 60 * 60
     redis_client.setex(redis_key, time=WEEK_IN_SECONDS, value="false")
-    return url_for("static", filename=default_avatar)
+    return default_avatar
 
 
 @bp.app_context_processor
