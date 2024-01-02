@@ -67,18 +67,22 @@ def revalidate_single_video(post):
             if not post.short_description:
                 if short_desc := generate_description(post.title):
                     post.short_description = short_desc
+                    db.session.commit()
 
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
             try:
                 db.session.delete(post)
                 db.session.commit()
-            except (ObjectDeletedError, StatementError):
+            except (ObjectDeletedError, StatementError) as e:
                 db.session.rollback()
-        except HttpError:
+                msg = f"Could not delete: {post.title.upper()}. Error: {e}"
+                current_app.logger.warning(msg)
+        except HttpError as e:
             # we couldn't connect to YouTube API,
             # so we can't evaluate the video
-            pass
+            msg = f"YouTube API unavailable to revalidate: {post.title.upper()}. Error: {e}"
+            current_app.logger.warning(msg)
 
 
 def process_videos():
