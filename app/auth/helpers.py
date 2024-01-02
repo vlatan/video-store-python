@@ -1,5 +1,3 @@
-import os
-import pathlib
 import hashlib
 import requests
 from datetime import timedelta
@@ -104,13 +102,16 @@ def generate_hash(user):
 def download_avatar(user):
     """Download avatar to disc."""
     if not user.picture:
-        return
+        return False
 
     response = requests.get(user.picture)
-    if response.ok:
-        avatar_path = get_avatar_abs_path(user)
-        with open(avatar_path, "wb") as file:
-            file.write(response.content)
+    if not response.ok:
+        return False
+
+    avatar_path = get_avatar_abs_path(user)
+    with open(avatar_path, "wb") as file:
+        file.write(response.content)
+        return True
 
 
 def get_avatar_abs_path(user):

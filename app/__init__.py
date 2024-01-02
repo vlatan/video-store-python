@@ -154,4 +154,4 @@ def setup_generative_ai(app: Flask) -> None:
 
 def init_redis_client(app: Flask) -> None:
     redis_client_url = app.config["CACHE_REDIS_URL"]
-    app.config["REDIS_CLIENT"] = Redis(decode_responses=True).from_url(redis_client_url)
+    app.config["REDIS_CLIENT"] = Redis().from_url(redis_client_url)
