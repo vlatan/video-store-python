@@ -226,19 +226,19 @@ def facebook():
 
 
 @bp.route("/logout")
-# @login_required
 def logout() -> Response:
     """Logout the user and redirect."""
 
+    # get referrer and home URLs
+    referrer, home = request.referrer, url_for("main.home")
+
+    # if user is not logged in
+    if not current_user.is_authenticated:
+        flash("You need to be logged in to log out!", "info")
+        return redirect(home)
+
     # logout the user (remove user from session)
     logout_user()
-
-    # remove the flash messages from session (that flask-login produces)
-    # https://flask.palletsprojects.com/en/2.3.x/api/#flask.get_flashed_messages
-    get_flashed_messages()
-
-    # insert new flash message in session
-    flash("You've been logged out!", "info")
 
     # pages that need authorization
     login_needed = [
@@ -249,6 +249,6 @@ def logout() -> Response:
         url_for("admin.dashboard", _external=True),
     ]
 
-    # construct response
-    referrer, home = request.referrer, redirect(url_for("main.home"))
-    return home if referrer in login_needed else redirect(referrer)
+    # insert new flash message in session
+    flash("You've been logged out!", "info")
+    return redirect(home) if referrer in login_needed else redirect(referrer)
