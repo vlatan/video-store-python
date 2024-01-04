@@ -232,26 +232,8 @@ def logout() -> Response:
     # logout the user (remove user from session)
     logout_user()
 
-    # insert new flash message in session
+    # insert flash message in session
     flash("You've been logged out!", "info")
 
-    # pages that need authorization
-    login_needed = [
-        url_for("users.likes"),
-        url_for("users.favorites"),
-        url_for("posts.new_post"),
-        url_for("pages.new_page"),
-        url_for("pages.edit_page"),
-        url_for("sources.new_playlist"),
-        url_for("admin.dashboard"),
-    ]
-
-    # check if referrer path is in the pages that need authorization
-    referrer = request.referrer
-    referrer_path = urlparse(referrer).path
-    if any(referrer_path in url for url in login_needed):
-        # if so redirect to homepage
-        return redirect(url_for("main.home"))
-
-    # redirect user to the page from which they initiated the logout
-    return redirect(referrer)
+    # go home
+    return redirect(url_for("main.home"))
