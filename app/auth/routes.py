@@ -221,7 +221,6 @@ def facebook():
 def logout():
     """Logout the user and redirect."""
 
-    logout_user()
     login_needed = [
         url_for("users.likes", _external=True),
         url_for("users.favorites", _external=True),
@@ -229,8 +228,12 @@ def logout():
         url_for("sources.new_playlist", _external=True),
         url_for("admin.dashboard", _external=True),
     ]
+
     referrer = request.referrer
+
+    logout_user()
     flash("You've been logged out!", "info")
+
     if referrer in login_needed:
-        return redirect(url_for("main.home", _external=True))
+        return redirect(url_for("main.home"))
     return redirect(referrer)
