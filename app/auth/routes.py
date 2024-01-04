@@ -244,10 +244,12 @@ def logout() -> Response:
         url_for("admin.dashboard"),
     ]
 
-    # check if referrer path is in pages that need authorization
+    # check if referrer path is in the pages that need authorization
     referrer = request.referrer
     referrer_path = urlparse(referrer).path
     if any(referrer_path in url for url in login_needed):
+        # if so redirect to homepage
         return redirect(url_for("main.home"))
 
+    # redirect user to the page from which they initiated the logout
     return redirect(referrer)
