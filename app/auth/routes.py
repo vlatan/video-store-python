@@ -249,6 +249,8 @@ def logout() -> Response:
         url_for("admin.dashboard", _external=True),
     ]
 
+    print(login_needed)
+
     # insert new flash message in session
     flash("You've been logged out!", "info")
     return redirect(home) if referrer in login_needed else redirect(referrer)
