@@ -247,6 +247,7 @@ def logout() -> Response:
         url_for("posts.new_post", _external=True),
         url_for("sources.new_playlist", _external=True),
         url_for("admin.dashboard", _external=True),
+        url_for("auth.logout", _external=True),
     ]
 
     # get referrer (from which page the user is attempting to log out)
