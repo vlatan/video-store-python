@@ -11,7 +11,6 @@ from flask import (
     redirect,
     session,
     current_app,
-    get_flashed_messages,
     Blueprint,
     url_for,
     flash,
@@ -226,31 +225,29 @@ def facebook():
 
 
 @bp.route("/logout")
+@login_required
 def logout() -> Response:
     """Logout the user and redirect."""
-
-    # get referrer and home URLs
-    referrer, home = request.referrer, url_for("main.home")
-
-    # if user is not logged in
-    if not current_user.is_authenticated:
-        flash("You need to be logged in to log out!", "info")
-        return redirect(home)
 
     # logout the user (remove user from session)
     logout_user()
 
-    # pages that need authorization
-    login_needed = [
-        url_for("users.likes", _external=True),
-        url_for("users.favorites", _external=True),
-        url_for("posts.new_post", _external=True),
-        url_for("sources.new_playlist", _external=True),
-        url_for("admin.dashboard", _external=True),
-    ]
-
-    print(login_needed)
-
     # insert new flash message in session
     flash("You've been logged out!", "info")
-    return redirect(home) if referrer in login_needed else redirect(referrer)
+
+    # pages that need authorization
+    login_needed = [
+        url_for("users.likes"),
+        url_for("users.favorites"),
+        url_for("posts.new_post"),
+        url_for("sources.new_playlist"),
+        url_for("admin.dashboard"),
+    ]
+
+    # check if referrer path is in pages that need authorization
+    referrer = request.referrer
+    referrer_path = urlparse(referrer).path
+    if any(referrer_path in url for url in login_needed):
+        return redirect(url_for("main.home"))
+
+    return redirect(referrer)
