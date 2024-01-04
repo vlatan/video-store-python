@@ -240,6 +240,8 @@ def logout() -> Response:
         url_for("users.likes"),
         url_for("users.favorites"),
         url_for("posts.new_post"),
+        url_for("pages.new_page"),
+        url_for("pages.edit_page"),
         url_for("sources.new_playlist"),
         url_for("admin.dashboard"),
     ]
