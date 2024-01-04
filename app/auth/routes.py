@@ -1,4 +1,5 @@
 import os
+import time
 import hashlib
 import requests
 from google_auth_oauthlib.flow import Flow
@@ -231,5 +232,5 @@ def logout():
     referrer = request.referrer
     flash("You've been logged out!", "info")
     if referrer in login_needed:
-        return redirect(url_for("main.home"))
+        return redirect(url_for("main.home", _external=True))
     return redirect(referrer)
