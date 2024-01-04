@@ -1,13 +1,22 @@
 import os
-import time
 import hashlib
 import requests
 from google_auth_oauthlib.flow import Flow
 from urllib.parse import urlencode, urlparse
+from werkzeug.wrappers.response import Response
 
-from flask import request, redirect, session, current_app
-from flask import Blueprint, url_for, flash, render_template
 from flask_login import current_user, logout_user, login_required
+from flask import (
+    request,
+    redirect,
+    session,
+    current_app,
+    get_flashed_messages,
+    Blueprint,
+    url_for,
+    flash,
+    render_template,
+)
 
 from app.auth.helpers import failed_login, finalize_google_login, finalize_fb_login
 
@@ -218,9 +227,20 @@ def facebook():
 
 @bp.route("/logout")
 @login_required
-def logout():
+def logout() -> Response:
     """Logout the user and redirect."""
 
+    # logout the user (remove from session)
+    logout_user()
+
+    # remove the flash messages from session (that flask-login produces)
+    # https://flask.palletsprojects.com/en/2.3.x/api/#flask.get_flashed_messages
+    get_flashed_messages()
+
+    # insert new flash message in session
+    flash("You've been logged out!", "info")
+
+    # pages that need authorization
     login_needed = [
         url_for("users.likes", _external=True),
         url_for("users.favorites", _external=True),
@@ -229,11 +249,13 @@ def logout():
         url_for("admin.dashboard", _external=True),
     ]
 
+    # get referrer (from which page the user is attempting to log out)
     referrer = request.referrer
 
-    logout_user()
-    flash("You've been logged out!", "info")
-
+    # if the user is attempting to logout from a page that needs authorization
+    # then redirect her to the homepage
     if referrer in login_needed:
         return redirect(url_for("main.home"))
+
+    # else redirect to the page where they have originally been on
     return redirect(referrer)
