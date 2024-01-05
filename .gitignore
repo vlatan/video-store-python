@@ -133,9 +133,7 @@ dmypy.json
 db.load
 .vscode
 todo.txt
-migrations/
 certs/
-index/
 postgres_data/
 redis_data/
 app/static/images/avatars/*
