@@ -43,7 +43,7 @@ docker compose up --build --remove-orphans worker
 3. If **ONLY** there's no `migrations` folder in the root, run `flask db init`. Then run an inital migration `flask db migrate -m "Initial migration"`. These are one time commands.
 4. Run `flask db upgrade` which will create an `alembic_version` table in the database.
 5. Switch to remote production database credentials in the `.env` file and run `flask db upgrade` again to apply the upgrade to the production database as well.
-4. In future after every change to the models first save the version the migration with `flask db migrate -m "Describe the change here"` and then run `flask db upgrade` to actually modify the database.
+4. In future after every change to the models first save the migration version with `flask db migrate -m "Describe the changes here"` and then run `flask db upgrade` to actually modify the database.
 5. Apply `flask db upgrade` again for the production database, after changing the db credentials in the `.env` file, to modify the production database as well.
 
 ## License
