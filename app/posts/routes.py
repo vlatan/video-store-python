@@ -1,3 +1,5 @@
+from wtforms.validators import ValidationError
+
 from flask_login import current_user, login_required
 from flask import render_template, url_for, flash, request
 from flask import redirect, Blueprint, current_app, make_response
@@ -46,13 +48,21 @@ def new_post():
     # the form will not validate if the video is already in the database,
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
+        # if nothing in processed_content
+        if not form.processed_content:
+            raise ValidationError("Unable to fetch the video data.")
         # check if this video was already deleted
         # and if true remove it from DeletedPost table
         if banned := video_banned(form.processed_content["video_id"]):
             db.session.delete(banned)
 
+        print(current_user.id)
         # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(**form.processed_content, author=current_user)
+        post = Post(
+            **form.processed_content,
+            user_id=current_user.id,
+            author=current_user,
+        )  # type: ignore
 
         # fetch short description from openAI
         if short_desc := generate_description(post.title):
