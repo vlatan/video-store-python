@@ -18,7 +18,7 @@ redis_data/
 # files in the root
 db.load
 Dockerfile
-docker-compose.yml
+compose.yaml
 .dockerignore
 .gitignore
 .git
