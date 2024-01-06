@@ -63,10 +63,6 @@ def new_post():
             author=current_user,
         )  # type: ignore
 
-        # fetch short description from openAI
-        if short_desc := generate_description(post.title):
-            post.short_description = short_desc
-
         # add post to database
         db.session.add(post)
         db.session.commit()
