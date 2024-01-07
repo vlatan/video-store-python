@@ -201,12 +201,12 @@ def process_videos() -> None:
         deleted = revalidate_single_video(post)
         if not deleted:
             try:
-                # TEMP: if there is NO short description in DB generate one
+                # if there is NO short description in DB generate one
                 if not post.short_description:
                     if short_desc := generate_description(post.title):
                         post.short_description = short_desc
 
-                # TEMP: if the video is not categorized, do it
+                # if the video is not categorized, do it
                 if not post.category:
                     category = categorize(post.title, categories_string)
                     if category in categories:
