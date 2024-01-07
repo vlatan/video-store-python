@@ -214,8 +214,8 @@ def process_videos() -> None:
                         post.category = categories[category]
             finally:
                 db.session.commit()
-
         time.sleep(1)
+
     current_app.logger.info("Worker job done.")
 
 
@@ -256,7 +256,6 @@ def generate_description(title: str) -> str | None:
     except Exception as e:
         msg = f"Was unable to generate a summary for: {title.upper()}. Error: {e}"
         current_app.logger.warning(msg)
-        return None
 
 
 def categorize(title: str, categories: str) -> str | None:
@@ -270,4 +269,3 @@ def categorize(title: str, categories: str) -> str | None:
     except Exception as e:
         msg = f"Was unable to generate a category for: {title.upper()}. Error: {e}"
         current_app.logger.warning(msg)
-        return None
