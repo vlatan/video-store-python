@@ -148,11 +148,19 @@ class User(Base, UserMixin, ActionMixin):
 
     posts = db.relationship("Post", backref="author", lazy=True)
     playlists = db.relationship("Playlist", backref="author", lazy=True)
+
     liked = db.relationship(
-        "PostLike", backref="user", cascade="all,delete-orphan", lazy="dynamic"
+        "PostLike",
+        backref="user",
+        cascade="all,delete-orphan",
+        lazy="dynamic",
     )
+
     faved = db.relationship(
-        "PostFave", backref="user", cascade="all,delete-orphan", lazy="dynamic"
+        "PostFave",
+        backref="user",
+        cascade="all,delete-orphan",
+        lazy="dynamic",
     )
 
     @property
@@ -178,13 +186,21 @@ class Post(Base, SearchableMixin):
     similar = mapped_column(db.PickleType, default=[])
 
     user_id = mapped_column(db.Integer, db.ForeignKey("user.id"))
+    category_id = mapped_column(db.Integer, db.ForeignKey("category.id"))
     playlist_db_id = mapped_column(db.Integer, db.ForeignKey("playlist.id"))
 
     likes = db.relationship(
-        "PostLike", backref="post", cascade="all,delete-orphan", lazy="dynamic"
+        "PostLike",
+        backref="post",
+        cascade="all,delete-orphan",
+        lazy="dynamic",
     )
+
     faves = db.relationship(
-        "PostFave", backref="post", cascade="all,delete-orphan", lazy="dynamic"
+        "PostFave",
+        backref="post",
+        cascade="all,delete-orphan",
+        lazy="dynamic",
     )
 
     @cache.memoize(86400)
@@ -298,6 +314,12 @@ class Post(Base, SearchableMixin):
         when = [(value, i) for i, value in enumerate(ids)]
         posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
         return [post.serialize for post in posts]
+
+
+class Category(Base):
+    id = mapped_column(db.Integer, primary_key=True)
+    name = mapped_column(db.String(256), unique=True, nullable=False)
+    posts = db.relationship("Post", backref="category", lazy=True)
 
 
 class DeletedPost(Base):
