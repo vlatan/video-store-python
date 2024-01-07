@@ -50,7 +50,19 @@ def get_youtube_videos() -> tuple[list[dict], bool]:
     return all_videos, complete
 
 
-def revalidate_single_video(post: Post) -> None:
+def revalidate_single_video(post: Post) -> bool:
+    """
+    Check if the video satisfies the posting criteria.
+    Delete from database if it doesn't. Return True.
+    Otherwise return False.
+
+    Parameters:
+    post (Post): The post sqlalcheymy object.
+
+    Returns:
+    bool: True of deleted, otherwise False.
+
+    """
     with youtube_build() as youtube:
         try:
             scope = {
@@ -64,17 +76,12 @@ def revalidate_single_video(post: Post) -> None:
             # this will raise ValidationError if video's invalid
             validate_video(res)
 
-            # TEMP: if there is NO short description in DB generate one
-            if not post.short_description:
-                if short_desc := generate_description(post.title):
-                    post.short_description = short_desc
-                    db.session.commit()
-
         # video is not validated or doesn't exist at YouTube
         except (IndexError, ValidationError):
             try:
                 db.session.delete(post)
                 db.session.commit()
+                return True
             except (ObjectDeletedError, StatementError) as e:
                 db.session.rollback()
                 msg = f"Could not delete: {post.title.upper()}. Error: {e}"
@@ -84,6 +91,8 @@ def revalidate_single_video(post: Post) -> None:
             # so we can't evaluate the video
             msg = f"YouTube API unavailable to revalidate: {post.title.upper()}. Error: {e}"
             current_app.logger.warning(msg)
+
+        return False
 
 
 def process_videos() -> None:
@@ -189,7 +198,23 @@ def process_videos() -> None:
     ).all()
     current_app.logger.info(f"Revalidating {len(orphan_posts)} orphan videos...")
     for post in orphan_posts:
-        revalidate_single_video(post)
+        deleted = revalidate_single_video(post)
+        if not deleted:
+            try:
+                # TEMP: if there is NO short description in DB generate one
+                if not post.short_description:
+                    if short_desc := generate_description(post.title):
+                        post.short_description = short_desc
+
+                # TEMP: if the video is not categorized, do it
+                if not post.category:
+                    category = categorize(post.title, categories_string)
+                    if category in categories:
+                        post.category_id = categories[category].id
+                        post.category = categories[category]
+            finally:
+                db.session.commit()
+
         time.sleep(1)
     current_app.logger.info("Worker job done.")
 
