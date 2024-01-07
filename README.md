@@ -38,13 +38,16 @@ docker compose up --build --remove-orphans worker
 
 ## Run DB migration
 
-1. Start the system locally with `docker compose up --build --remove-orphans app`. It needs to run for the duration of the entire operation.
-2. Change `DB_HOST` and `REDIS_HOST` to `localhost` in the `.env` file so you can run `flask-migrate` CLI commands from your terminal. You can simply comment out the hosts in the `.env` file for this purpose. The `flask-migrate` CLI commands will create an app instance so this instance needs to be able to acces the database and redis on localhost ports to which their docker containers are listening to.
-3. If **ONLY** there's no `migrations` folder in the root, run `flask db init`. Then run an inital migration `flask db migrate -m "Initial migration"`. These are one time commands.
-4. Run `flask db upgrade` which will create an `alembic_version` table in the database.
-5. Switch to remote production database credentials in the `.env` file and run `flask db upgrade` again to apply the upgrade to the production database as well.
-4. In future after every change to the models first save the migration version with `flask db migrate -m "Describe the changes here"` and then run `flask db upgrade` to actually modify the database.
-5. Apply `flask db upgrade` again for the production database, after changing the db credentials in the `.env` file, to modify the production database as well.
+1. Make the desired changes to the database models.
+2. Comment out the `db.create_all()` in `app/__init__.py` to avoid error due to discrepancy in models and the actual database that is not yet updated.
+3. Start the system locally with `docker compose up --build --remove-orphans app`. It needs to run for the duration of the entire operation.
+4. Change `DB_HOST` and `REDIS_HOST` to `localhost` in the `.env` file so you can run `flask-migrate` CLI commands from your terminal. You can simply comment out the hosts in the `.env` file for this purpose. The `flask-migrate` CLI commands will create an app instance so this instance needs to be able to acces the database and redis on localhost ports to which their docker containers are listening to.
+5. If **ONLY** there's no `migrations` folder in the root, run `flask db init`. Then run an inital migration `flask db migrate -m "Initial migration"`. These are one time commands.
+6. Run `flask db upgrade` which will create an `alembic_version` table in the database.
+7. Switch to remote production database credentials in the `.env` file and run `flask db upgrade` again to apply the upgrade to the production database as well.
+8. In future, after every change to the models first save the migration version with `flask db migrate -m "Describe the changes here"` and then run `flask db upgrade` to actually modify the database.
+9. Apply `flask db upgrade` again for the production database, after changing the db credentials in the `.env` file, to modify the production database as well.
+10. Uncomment `db.create_all()` and restore `DB_HOST` and `REDIS_HOST` to their values.
 
 ## License
 
