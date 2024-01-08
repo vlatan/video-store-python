@@ -40,7 +40,6 @@ def get_youtube_videos() -> tuple[list[dict], bool]:
                 video["playlist"] = playlist
             # add this batch of videos to the total list of videos
             all_videos += playlist_videos
-            break
 
     # remove duplicates if any
     all_videos = list({v["video_id"]: v for v in all_videos}.values())
