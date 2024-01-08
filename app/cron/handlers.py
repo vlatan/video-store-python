@@ -17,7 +17,7 @@ from app.sources.helpers import validate_playlist
 
 
 def get_youtube_videos() -> tuple[list[dict], bool]:
-    all_videos, complete = [], True
+    all_videos, complete = [], []
     # get all playlists from db
     playlists = Playlist.query.all()
     current_app.logger.info(f"Getting videos from {len(playlists)} YT sources...")
@@ -32,8 +32,8 @@ def get_youtube_videos() -> tuple[list[dict], bool]:
             time.sleep(1)
             # get playlist VALID videos from YT
             playlist_videos, done = get_playlist_videos(playlist.playlist_id, youtube)
-            if not done:
-                complete = False
+            # record bool value if all videos from this playlist are fetched
+            complete.append(done)
             # loop through the videos in this playlist
             for video in playlist_videos:
                 # add relationship with this playlist to the video metadata
@@ -46,7 +46,7 @@ def get_youtube_videos() -> tuple[list[dict], bool]:
     # sort by upload date
     all_videos = sorted(all_videos, key=lambda d: d["upload_date"])
 
-    return all_videos, complete
+    return all_videos, all(complete)
 
 
 def revalidate_single_video(post: Post) -> bool:
