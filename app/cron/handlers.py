@@ -184,11 +184,8 @@ def process_videos() -> None:
         to_delete = Post.query.filter(Post.video_id.in_(to_delete)).all()
         current_app.logger.info(f"Deleting {len(to_delete)} missing videos...")
         for post in to_delete:
-            try:
-                db.session.delete(post)
-                db.session.commit()
-            except (ObjectDeletedError, StatementError):
-                db.session.rollback()
+            # just in case validate the video again
+            revalidate_single_video(post)
             time.sleep(1)
 
     # revalidate orphan videos (not attached to any source/playlist)
