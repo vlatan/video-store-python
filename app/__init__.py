@@ -121,6 +121,11 @@ def initialize_search_index(app: Flask) -> None:
     search_index = redis_client.ft("search_index")
 
     try:
+        search_index.dropindex(delete_documents=True)
+    except ResponseError:
+        pass
+
+    try:
         search_index.create_index(schema)
     except ResponseError:
         pass
