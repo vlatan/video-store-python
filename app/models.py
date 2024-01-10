@@ -327,7 +327,7 @@ class Category(Base):
             kwargs["slug"] = slugify(kwargs.get("name", ""), allow_unicode=True)
         super().__init__(*args, **kwargs)
 
-    # @cache.memoize(86400)
+    @cache.memoize(86400)
     def get_posts(self, page=1, per_page=24):
         if not self.posts:
             return []
