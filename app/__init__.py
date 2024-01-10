@@ -1,6 +1,6 @@
 import os
-import redis
 import functools
+import threading
 from redis import Redis
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -12,6 +12,7 @@ from werkzeug.utils import import_string, find_modules
 from flask import Flask
 from flask_caching import Cache
 from flask_minify import Minify
+from flask.ctx import AppContext
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -69,9 +70,6 @@ def create_app() -> Flask:
     with app.app_context():
         # create db tables if they don't exist
         db.create_all()
-
-        from app.cron.handlers import populate_search_index
-
         # initialize search index
         initialize_search_index(app)
         # populate search index if empty
@@ -94,43 +92,6 @@ def register_blueprints(app: Flask) -> None:
             app.register_blueprint(import_string(f"{module}.bp"))
         except ImportError:
             pass
-
-
-def initialize_search_index(app: Flask) -> None:
-    """
-    Create a search index if not already created
-    and save the object in the app config.
-    """
-
-    redis_client = redis.Redis(
-        host=app.config["REDIS_HOST"],
-        port=app.config["REDIS_PORT"],
-        username=app.config["REDIS_USERNAME"],
-        password=app.config["REDIS_PASSWORD"],
-    )
-
-    schema = (
-        TextField("video_id"),
-        TextField("title", weight=2.0),
-        TextField("description"),
-        TextField("tags"),
-        TextField("thumbnail"),
-        TextField("srcset"),
-    )
-
-    search_index = redis_client.ft("search_index")
-
-    try:
-        search_index.dropindex(delete_documents=True)
-    except ResponseError:
-        pass
-
-    try:
-        search_index.create_index(schema)
-    except ResponseError:
-        pass
-
-    app.config["SEARCH_INDEX"] = search_index
 
 
 def setup_generative_ai(app: Flask) -> None:
@@ -160,3 +121,63 @@ def setup_generative_ai(app: Flask) -> None:
 def init_redis_client(app: Flask) -> None:
     redis_client_url = app.config["CACHE_REDIS_URL"]
     app.config["REDIS_CLIENT"] = Redis().from_url(redis_client_url)
+
+
+def initialize_search_index(app: Flask) -> None:
+    """
+    Create a search index if not already created
+    and save the object in the app config.
+    """
+
+    redis_client = app.config["REDIS_CLIENT"]
+
+    schema = (
+        TextField("video_id"),
+        TextField("title", weight=2.0),
+        TextField("description"),
+        TextField("tags"),
+        TextField("thumbnail"),
+        TextField("srcset"),
+    )
+
+    search_index = redis_client.ft("search_index")
+
+    try:
+        search_index.dropindex(delete_documents=True)
+    except ResponseError:
+        pass
+
+    try:
+        search_index.create_index(schema)
+    except ResponseError:
+        pass
+
+    app.config["SEARCH_INDEX"] = search_index
+
+
+def populate_search_index(app: Flask) -> None:
+    """Populate the app search index."""
+
+    thread_name = "search_index"
+    for thread in threading.enumerate():
+        if thread.name == thread_name:
+            return
+
+    # reindex the app in a thread, send app context in the thread
+    thread = threading.Thread(
+        target=reindex,
+        name=thread_name,
+        args=[app.app_context()],
+    )
+
+    thread.start()
+
+
+def reindex(app_context: AppContext) -> None:
+    if not app_context:
+        return
+
+    from app.models import Post
+
+    with app_context:
+        Post.reindex()

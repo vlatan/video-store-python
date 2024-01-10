@@ -1,12 +1,10 @@
 import time
-import threading
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
 
-from flask.ctx import AppContext
-from flask import Flask, current_app
+from flask import current_app
 
 from app import db
 from app.helpers import youtube_build
@@ -213,32 +211,6 @@ def process_videos() -> None:
         time.sleep(1)
 
     current_app.logger.info("Worker job done.")
-
-
-def reindex(app_context: AppContext) -> None:
-    if not app_context:
-        return
-
-    with app_context:
-        Post.reindex()
-
-
-def populate_search_index(app: Flask) -> None:
-    """Populate the app search index."""
-
-    thread_name = "search_index"
-    for thread in threading.enumerate():
-        if thread.name == thread_name:
-            return
-
-    # reindex the app in a thread, send app context in the thread
-    thread = threading.Thread(
-        target=reindex,
-        name=thread_name,
-        args=[app.app_context()],
-    )
-
-    thread.start()
 
 
 def generate_description(title: str) -> str | None:
