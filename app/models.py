@@ -172,7 +172,7 @@ class User(Base, UserMixin, ActionMixin):
 class Post(Base, SearchableMixin):
     __searchable__ = ["title", "short_description", "tags"]
 
-    id = mapped_column(db.Integer, primary_key=True, index=True)
+    id = mapped_column(db.Integer, primary_key=True)
     provider = mapped_column(db.String(7), default="YouTube")
     video_id = mapped_column(db.String(20), unique=True, nullable=False, index=True)
     playlist_id = mapped_column(db.String(50))
@@ -319,11 +319,17 @@ class Post(Base, SearchableMixin):
 class Category(Base):
     id = mapped_column(db.Integer, primary_key=True)
     name = mapped_column(db.String(256), unique=True, nullable=False)
+    slug = mapped_column(db.String(255), unique=True)
     posts = db.relationship("Post", backref="category", lazy=True)
+
+    def __init__(self, *args, **kwargs):
+        if not "slug" in kwargs:
+            kwargs["slug"] = slugify(kwargs.get("name", ""), allow_unicode=True)
+        super().__init__(*args, **kwargs)
 
 
 class DeletedPost(Base):
-    id = mapped_column(db.Integer, primary_key=True, index=True)
+    id = mapped_column(db.Integer, primary_key=True)
     provider = mapped_column(db.String(7), default="YouTube")
     video_id = mapped_column(db.String(20), unique=True, nullable=False, index=True)
 
@@ -331,8 +337,8 @@ class DeletedPost(Base):
 class Page(Base):
     id = mapped_column(db.Integer, primary_key=True)
     title = mapped_column(db.String(256), nullable=False)
+    slug = mapped_column(db.String(255), unique=True, nullable=False)
     content = mapped_column(db.Text)
-    slug = mapped_column(db.String(255))
 
     def __init__(self, *args, **kwargs):
         if not "slug" in kwargs:
