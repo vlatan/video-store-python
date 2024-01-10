@@ -21,7 +21,7 @@ const loadItems = (url = '', pageValue = 2) => {
     getData(url, pageValue).then(response => {
 
         // If bad response exit the function
-        if (!response.ok) {
+        if (!response.status !== 200) {
             return noMoreScroll();
         }
 
