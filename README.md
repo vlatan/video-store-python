@@ -40,7 +40,7 @@ docker compose up --build --remove-orphans worker
 
 1. Make the desired changes to the database models.
 2. Comment out the `db.create_all()` in `app/__init__.py` to avoid error due to discrepancy in models and the actual database that is not yet updated.
-3. Start the system locally with `docker compose up --build --remove-orphans app`. It needs to run for the duration of the entire operation.
+3. Start the app locally with `docker compose up --build --remove-orphans app`. After it starts you can shut it down with `CTRL+C` after which the database and the redis docker containers will keep running. Restart VS Code to dump the environment vars reflected in the vurtual environment `.venv.`
 4. Change `DB_HOST` and `REDIS_HOST` to `localhost` in the `.env` file so you can run `flask-migrate` CLI commands from your terminal. You can simply comment out the hosts in the `.env` file for this purpose. The `flask-migrate` CLI commands will create an app instance so this instance needs to be able to acces the database and redis on localhost ports to which their docker containers are listening to.
 5. If **ONLY** there's no `migrations` folder in the root, run `flask db init`. Then run an inital migration `flask db migrate -m "Initial migration"`. These are one time commands.
 6. Run `flask db upgrade` which will create an `alembic_version` table in the database.
