@@ -75,13 +75,6 @@ def create_app() -> Flask:
         # populate search index if empty
         populate_search_index(app)
 
-        from app.models import Category
-        from slugify import slugify
-
-        categories = db.session.execute(db.select(Category)).scalars()
-        for category in categories:
-            category.slug = slugify(category.name, allow_unicode=True)
-            db.session.commit()
     return app
 
 
