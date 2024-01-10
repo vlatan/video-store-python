@@ -1,8 +1,17 @@
 import time
+from werkzeug.wrappers.response import Response
 
-from flask import Blueprint, current_app, request, render_template
+from flask import (
+    Blueprint,
+    current_app,
+    request,
+    render_template,
+    abort,
+    jsonify,
+    make_response,
+)
 
-from app import db, cache
+from app import db
 from app.models import Category
 
 
@@ -10,7 +19,7 @@ bp = Blueprint("categories", __name__)
 
 
 @bp.route("/category/<string:slug>/")
-def category(slug: str) -> list | str:
+def category(slug: str) -> Response | list | str:
     """Return posts in a category."""
 
     # posts per page
@@ -22,9 +31,12 @@ def category(slug: str) -> list | str:
         page = 1
 
     category = db.one_or_404(db.select(Category).filter_by(slug=slug))
+    posts = category.get_posts(page=page, per_page=per_page)
 
-    posts = category.posts.paginate(page=page, per_page=per_page, error_out=False)
-    posts = [post.serialize for post in posts.items]
+    if not posts:
+        if page == 1:
+            abort(404)
+        return make_response(jsonify([]), 404)
 
     # return JSON response for scroll content
     if page > 1:

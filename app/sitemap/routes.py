@@ -127,7 +127,11 @@ def pages_sitemap():
 def categories_sitemap():
     """Route to return the categories sitemap."""
     data = OrderedDict()
-    for category in Category.query:
+    categories = Category.query
+    for category in categories:
+        # if no posts in thsi category do not include it in sitemap
+        if not category.posts.first():
+            continue
         url = url_for("categories.category", slug=category.slug, _external=True)
         data[url] = category.updated_at.strftime("%Y-%m-%d")
 

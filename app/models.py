@@ -328,11 +328,12 @@ class Category(Base):
         super().__init__(*args, **kwargs)
 
     # @cache.memoize(86400)
-    # def get_category_posts(cls, playlist_id, page, per_page):
-    #     query = cls.query.filter_by(playlist_id=playlist_id)
-    #     query = query.order_by(cls.upload_date.desc())
-    #     posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-    #     return [post.serialize for post in posts]
+    def get_posts(self, page=1, per_page=24):
+        if not self.posts:
+            return []
+        posts = self.posts.order_by(Post.upload_date.desc())
+        posts = posts.paginate(page=page, per_page=per_page, error_out=False)
+        return [post.serialize for post in posts.items]
 
 
 class DeletedPost(Base):
