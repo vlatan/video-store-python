@@ -319,7 +319,7 @@ class Post(Base, SearchableMixin):
 class Category(Base):
     id = mapped_column(db.Integer, primary_key=True)
     name = mapped_column(db.String(256), unique=True, nullable=False)
-    slug = mapped_column(db.String(255), unique=True)
+    slug = mapped_column(db.String(255), unique=True, nullable=False)
     posts = db.relationship("Post", backref="category", lazy=True)
 
     def __init__(self, *args, **kwargs):
