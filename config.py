@@ -85,7 +85,7 @@ class Config:
     # Database
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = sqlalchemy.URL.create(
-        "postgresql+psycopg",
+        drivername="postgresql+psycopg",
         username=load_env("DB_USER"),
         password=load_env("DB_PASSWORD"),
         host=load_env("DB_HOST") or "localhost",
