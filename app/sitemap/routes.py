@@ -9,7 +9,7 @@ from flask import Blueprint, make_response
 from flask import render_template, current_app, abort, url_for
 
 from app import cache, db
-from app.models import Playlist, Post, Page
+from app.models import Playlist, Post, Page, Category
 
 
 bp = Blueprint("sitemap", __name__)
@@ -47,6 +47,11 @@ def sitemap_index():
 
     # pages
     if latest := Page.query.order_by(Page.updated_at.desc()).first():
+        url = url_for("sitemap.pages_sitemap", _external=True)
+        data[url] = latest.created_at.strftime("%Y-%m-%d")
+
+    # categories
+    if latest := Category.query.order_by(Category.updated_at.desc()).first():
         url = url_for("sitemap.pages_sitemap", _external=True)
         data[url] = latest.created_at.strftime("%Y-%m-%d")
 
@@ -109,6 +114,22 @@ def pages_sitemap():
     for page in Page.query:
         url = url_for("pages.page", slug=page.slug, _external=True)
         data[url] = page.updated_at.strftime("%Y-%m-%d")
+
+    if not data:
+        abort(404)
+
+    return render_template("sitemap_page.xml", data=data)
+
+
+@bp.route("/categories-sitemap.xml")
+@cache.cached(timeout=86400)
+@serve_as(content_type="text/xml")
+def categories_sitemap():
+    """Route to return the categories sitemap."""
+    data = OrderedDict()
+    for category in Category.query:
+        url = url_for("categories.category", slug=category.slug, _external=True)
+        data[url] = category.updated_at.strftime("%Y-%m-%d")
 
     if not data:
         abort(404)

@@ -4,7 +4,7 @@ from slugify import slugify
 from markdown import markdown
 from datetime import datetime
 from markupsafe import escape
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import mapped_column, backref
 from redis.commands.search.query import Query
 from redis.commands.search.result import Result
 
@@ -320,12 +320,19 @@ class Category(Base):
     id = mapped_column(db.Integer, primary_key=True)
     name = mapped_column(db.String(256), unique=True, nullable=False)
     slug = mapped_column(db.String(255), unique=True, nullable=False)
-    posts = db.relationship("Post", backref="category", lazy=True)
+    posts = db.relationship("Post", backref="category", lazy="dynamic")
 
     def __init__(self, *args, **kwargs):
         if not "slug" in kwargs:
             kwargs["slug"] = slugify(kwargs.get("name", ""), allow_unicode=True)
         super().__init__(*args, **kwargs)
+
+    # @cache.memoize(86400)
+    # def get_category_posts(cls, playlist_id, page, per_page):
+    #     query = cls.query.filter_by(playlist_id=playlist_id)
+    #     query = query.order_by(cls.upload_date.desc())
+    #     posts = query.paginate(page=page, per_page=per_page, error_out=False).items
+    #     return [post.serialize for post in posts]
 
 
 class DeletedPost(Base):

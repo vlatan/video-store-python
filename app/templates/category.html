@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% set content_css_url = url_for('static', filename='css/content.css') | autoversion %}
+
+{% block preload_css %}
+{{ super() }}
+<link rel="preload" href="{{ content_css_url }}" as="style">
+{% endblock preload_css %}
+
+{% block css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ content_css_url }}">
+{% endblock css %}
+
+{% block meta %}
+{% set url = url_for('categories.category', slug=category.slug, _external=True) %}
+<link rel="canonical" href="{{ url }}" />
+<meta property='og:title' content='{{ category.name }}'>
+<meta property='og:type' content='article'>
+<meta property='og:url' content='{{ url }}'>
+{{ super() }}
+{% endblock meta %}
+
+{% block title_tag %}
+{{ category.name }} | {{ super() }}
+{% endblock title_tag %}
+
+{% block content %}
+<h1 class="content-title">{{ category.name }}</h1>
+{% include 'content.html' %}
+{% endblock content %}
+
+{% block scripts %}
+{{ super() }}
+<script defer src="{{ url_for('static', filename='js/scroll.js') | autoversion }}"></script>
+{% endblock scripts %}
