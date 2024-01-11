@@ -44,13 +44,11 @@ def likes() -> Response | list | str:
         page = 1
 
     liked = current_user.liked.paginate(page=page, per_page=per_page, error_out=False)
-    posts = [item.post for item in liked.items]
+    posts = [item.post.serialize for item in liked.items]
 
     if page > 1:
-        if not posts:
-            return make_response([], 404)
         time.sleep(0.4)
-        return [post.serialize for post in posts]
+        return posts or make_response([], 404)
 
     content_title = "Documentaries you like will show up here."
     if total := current_user.liked.count():
@@ -79,13 +77,11 @@ def favorites() -> Response | list | str:
         page = 1
 
     faved = current_user.faved.paginate(page=page, per_page=per_page, error_out=False)
-    posts = [item.post for item in faved.items]
+    posts = [item.post.serialize for item in faved.items]
 
     if page > 1:
-        if not posts:
-            return make_response([], 404)
         time.sleep(0.4)
-        return [post.serialize for post in posts]
+        return posts or make_response([], 404)
 
     content_title = "Your favorite documentaries will show up here."
     if total := current_user.faved.count():

@@ -68,10 +68,8 @@ def playlist_videos(playlist_id) -> Response | list | str:
 
     # return JSON response for scroll content
     if page > 1:
-        if not posts:
-            return make_response([], 404)
         time.sleep(0.4)
-        return posts
+        return posts or make_response([], 404)
 
     if not posts:
         abort(404)
@@ -82,7 +80,7 @@ def playlist_videos(playlist_id) -> Response | list | str:
 
 
 @bp.route("/source/other/")
-def orphan_videos() -> list | str:
+def orphan_videos() -> Response | list | str:
     """Route to return all videos that don't belong to a playlist."""
 
     # posts per page
@@ -99,7 +97,10 @@ def orphan_videos() -> list | str:
     # return JSON response for scroll content
     if page > 1:
         time.sleep(0.4)
-        return posts
+        return posts or make_response([], 404)
+
+    if not posts:
+        abort(404)
 
     return render_template("source.html", posts=posts, title="Other Uploads")
 

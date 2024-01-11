@@ -28,7 +28,7 @@
         <span data-id="{{ post.video_id }}" class="remove-option">&times;</span>
         <a class="video-link" href="{{ url_for('posts.post', video_id=post.video_id) }}">
             <span class="video-img-wrap">
-                <img class="video-img" alt="{{ post.title }}" src="{{ post.thumbnails['medium']['url'] }}"
+                <img class="video-img" alt="{{ post.title }}" src="{{ post.thumbnail['url'] }}"
                     srcset="{{post.srcset}}">
             </span>
             <h2 class="video-title">{{ post.title }}</h2>

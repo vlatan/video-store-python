@@ -12,6 +12,7 @@ from flask import (
     request,
     current_app,
     Blueprint,
+    make_response,
     send_from_directory,
     redirect,
 )
@@ -108,7 +109,7 @@ def template_vars():
 
 
 @bp.route("/")
-def home() -> list | str:
+def home() -> Response | list | str:
     """Route to return the posts."""
 
     # posts per page
@@ -140,7 +141,7 @@ def home() -> list | str:
     # return JSON response for scroll content
     if page > 1:
         time.sleep(0.4)
-        return posts
+        return posts or make_response([], 404)
 
     # render HTML template for the first view
     return render_template("home.html", posts=posts)

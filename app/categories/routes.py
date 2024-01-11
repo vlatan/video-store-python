@@ -32,14 +32,12 @@ def category(slug: str) -> Response | list | str:
     category = db.one_or_404(db.select(Category).filter_by(slug=slug))
     posts = category.get_posts(page=page, per_page=per_page)
 
-    if not posts:
-        if page == 1:
-            abort(404)
-        return make_response([], 404)
-
     # return JSON response for scroll content
     if page > 1:
         time.sleep(0.4)
-        return posts
+        return posts or make_response([], 404)
+
+    if not posts:
+        abort(404)
 
     return render_template("category.html", posts=posts, category=category)

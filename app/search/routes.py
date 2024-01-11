@@ -46,10 +46,8 @@ def search_results() -> Response | str | list:
     if page > 1 and (phrase := request.args.get("q")):
         # get posts for this page
         posts, _ = Post.search_posts(phrase, offset, per_page)
-        if not posts:
-            return make_response([], 404)
         time.sleep(0.4)
-        return posts
+        return posts or make_response([], 404)
 
     # note the time now
     start_time = time.perf_counter()
