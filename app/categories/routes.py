@@ -7,7 +7,6 @@ from flask import (
     request,
     render_template,
     abort,
-    jsonify,
     make_response,
 )
 
@@ -36,7 +35,7 @@ def category(slug: str) -> Response | list | str:
     if not posts:
         if page == 1:
             abort(404)
-        return make_response(jsonify([]), 404)
+        return make_response([], 404)
 
     # return JSON response for scroll content
     if page > 1:

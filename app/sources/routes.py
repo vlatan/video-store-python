@@ -7,8 +7,10 @@ from flask import (
     Blueprint,
     current_app,
     request,
+    make_response,
     render_template,
     url_for,
+    abort,
     flash,
 )
 
@@ -49,7 +51,7 @@ def new_playlist() -> Response | str:
 
 
 @bp.route("/source/<string:playlist_id>/")
-def playlist_videos(playlist_id) -> list | str:
+def playlist_videos(playlist_id) -> Response | list | str:
     """Route to return all videos in a playlist."""
 
     # posts per page
@@ -66,8 +68,13 @@ def playlist_videos(playlist_id) -> list | str:
 
     # return JSON response for scroll content
     if page > 1:
+        if not posts:
+            return make_response([], 404)
         time.sleep(0.4)
         return posts
+
+    if not posts:
+        abort(404)
 
     return render_template(
         "source.html", posts=posts, title=playlist.title, playlist_id=playlist_id

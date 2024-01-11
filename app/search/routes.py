@@ -6,10 +6,10 @@ from flask import (
     request,
     redirect,
     current_app,
-    g,
     url_for,
     Blueprint,
-    session,
+    make_response,
+    g,
 )
 
 from app.models import Post
@@ -43,9 +43,11 @@ def search_results() -> Response | str | list:
     offset = page - 1
 
     # return JSON response for scroll content if ids and total in session
-    if page > 1 and (phrase := session.get("phrase")):
+    if page > 1 and (phrase := request.args.get("q")):
         # get posts for this page
         posts, _ = Post.search_posts(phrase, offset, per_page)
+        if not posts:
+            return make_response([], 404)
         time.sleep(0.4)
         return posts
 
@@ -60,8 +62,6 @@ def search_results() -> Response | str | list:
     phrase = g.search_form.q.data
     # get the search results
     posts, total = Post.search_posts(phrase, offset, per_page)
-    # save phrase in session
-    session["phrase"] = phrase
 
     # calculate the time it took to get the search results
     time_took = time.perf_counter() - start_time

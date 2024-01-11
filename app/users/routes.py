@@ -2,12 +2,14 @@ import os
 import time
 import requests
 from datetime import datetime
+from werkzeug.wrappers.response import Response
 
 from flask_login import current_user, login_required
 from flask import (
     redirect,
     Blueprint,
     current_app,
+    make_response,
     render_template,
     url_for,
     flash,
@@ -30,7 +32,7 @@ def record_last_visit():
 
 @bp.route("/user/likes/")
 @login_required
-def likes() -> list | str:
+def likes() -> Response | list | str:
     """Route to return the current user liked posts."""
 
     # posts per page
@@ -41,13 +43,12 @@ def likes() -> list | str:
     except ValueError:
         page = 1
 
-    items = current_user.liked.paginate(
-        page=page, per_page=per_page, error_out=False
-    ).items
-
-    posts = [item.post for item in items]
+    liked = current_user.liked.paginate(page=page, per_page=per_page, error_out=False)
+    posts = [item.post for item in liked.items]
 
     if page > 1:
+        if not posts:
+            return make_response([], 404)
         time.sleep(0.4)
         return [post.serialize for post in posts]
 
@@ -66,7 +67,7 @@ def likes() -> list | str:
 
 @bp.route("/user/favorites/")
 @login_required
-def favorites() -> list | str:
+def favorites() -> Response | list | str:
     """Route to return the current user favorite posts."""
 
     # posts per page
@@ -77,13 +78,12 @@ def favorites() -> list | str:
     except ValueError:
         page = 1
 
-    items = current_user.faved.paginate(
-        page=page, per_page=per_page, error_out=False
-    ).items
-
-    posts = [item.post for item in items]
+    faved = current_user.faved.paginate(page=page, per_page=per_page, error_out=False)
+    posts = [item.post for item in faved.items]
 
     if page > 1:
+        if not posts:
+            return make_response([], 404)
         time.sleep(0.4)
         return [post.serialize for post in posts]
 
