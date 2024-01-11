@@ -3,7 +3,7 @@ const scroller = document.getElementById("scroller");
 const template = document.getElementById("post_template");
 const sentinel = document.getElementById("sentinel");
 const spinner = sentinel.querySelector('div');
-spinner.setAttribute("id", "spinner");
+const postsPerPage = 24; // should correspond with POSTS_PER_PAGE on backend
 let page = 2; // Use infinite scroll from the second page onwards
 let nextPage = true; // Assume there is next page to load
 
@@ -28,11 +28,6 @@ const loadItems = (url = '', pageValue = 2) => {
         // Convert the response data to JSON
         response.json().then(data => {
 
-            // If empty JSON, exit the function
-            if (!data.length) {
-                return noMoreScroll();
-            }
-
             // Iterate over the items in the response
             for (const item of data) {
 
@@ -55,6 +50,11 @@ const loadItems = (url = '', pageValue = 2) => {
                 scroller.appendChild(template_clone);
             }
 
+            // If data.length < posts_per_page there is no next page
+            if (data.length < postsPerPage) {
+                return noMoreScroll();
+            }
+
             // Increment the page counter
             page += 1;
         })
@@ -65,7 +65,9 @@ if ('IntersectionObserver' in window) {
     // Create a new IntersectionObserver instance
     let intersectionObserver = new IntersectionObserver(([entry]) => {
         // If there is next page and the entry is intersecting
-        if (nextPage && entry.isIntersecting) {
+        if (nextPage === true && entry.isIntersecting) {
+
+            spinner.setAttribute("id", "spinner");
 
             // Call the loadItems function
             loadItems(`${window.location.href}`, page);
