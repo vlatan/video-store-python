@@ -34,9 +34,12 @@ def serve_as(content_type="text/html", charset="utf-8"):
 @bp.route("/sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
-def sitemap_index():
+def sitemap_index() -> str:
     """Route to return the sitemap index."""
+
+    # structure to gather the data
     data = OrderedDict()
+
     # posts
     posts = Post.query.order_by(Post.upload_date.desc()).all()
     grouped = groupby(posts, lambda x: x.upload_date.strftime("%Y-%m"))
@@ -46,14 +49,19 @@ def sitemap_index():
         data[url] = lastmod.strftime("%Y-%m-%d")
 
     # pages
-    if latest := Page.query.order_by(Page.updated_at.desc()).first():
+    if latest_page := Page.query.order_by(Page.updated_at.desc()).first():
         url = url_for("sitemap.pages_sitemap", _external=True)
-        data[url] = latest.created_at.strftime("%Y-%m-%d")
+        data[url] = latest_page.updated_at.strftime("%Y-%m-%d")
 
     # categories
-    if latest := Category.query.order_by(Category.updated_at.desc()).first():
-        url = url_for("sitemap.pages_sitemap", _external=True)
-        data[url] = latest.created_at.strftime("%Y-%m-%d")
+    latest_category_post = (
+        Post.query.filter(Post.category_id.is_not(None))
+        .order_by(Post.created_at.desc())
+        .first()
+    )
+    if latest_category_post:
+        url = url_for("sitemap.categories_sitemap", _external=True)
+        data[url] = latest_category_post.created_at.strftime("%Y-%m-%d")
 
     # sources
     lastmods, per_page = [], current_app.config["POSTS_PER_PAGE"]
@@ -85,8 +93,10 @@ def sitemap_index():
 @bp.route("/posts-sitemap-<string:date>.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
-def posts_sitemap(date):
+def posts_sitemap(date: str) -> str:
     """Route to return the posts sitemap."""
+
+    # structure to gather the data
     data = OrderedDict()
 
     posts = db.session.execute(
@@ -108,9 +118,12 @@ def posts_sitemap(date):
 @bp.route("/pages-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
-def pages_sitemap():
+def pages_sitemap() -> str:
     """Route to return the pages sitemap."""
+
+    # structure to gather the data
     data = OrderedDict()
+
     for page in Page.query:
         url = url_for("pages.page", slug=page.slug, _external=True)
         data[url] = page.updated_at.strftime("%Y-%m-%d")
@@ -124,16 +137,24 @@ def pages_sitemap():
 @bp.route("/categories-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
-def categories_sitemap():
+def categories_sitemap() -> str:
     """Route to return the categories sitemap."""
+
+    # structure to hold the data
     data = OrderedDict()
+
+    # get all categories from DB
     categories = Category.query
+
+    # iterate and construct URLs and dates for categories
     for category in categories:
-        # if no posts in thsi category do not include it in sitemap
-        if not category.posts.first():
+        # get latest post in this category
+        latest_post = category.posts.order_by(Post.created_at.desc()).first()
+        # if no posts in this category continue the loop
+        if not latest_post:
             continue
         url = url_for("categories.category", slug=category.slug, _external=True)
-        data[url] = category.updated_at.strftime("%Y-%m-%d")
+        data[url] = latest_post.created_at.strftime("%Y-%m-%d")
 
     if not data:
         abort(404)
@@ -144,9 +165,12 @@ def categories_sitemap():
 @bp.route("/sources-sitemap.xml")
 @cache.cached(timeout=86400)
 @serve_as(content_type="text/xml")
-def sources_sitemap():
+def sources_sitemap() -> str:
     """Route to return the sources sitemap."""
+
+    # structure to gather the data
     data, per_page = OrderedDict(), current_app.config["POSTS_PER_PAGE"]
+
     for source in Playlist.query:
         url = url_for(
             "sources.playlist_videos", playlist_id=source.playlist_id, _external=True
@@ -171,7 +195,10 @@ def sources_sitemap():
 @serve_as(content_type="text/xml")
 def misc_sitemap():
     """Route to return the miscellaneous sitemap."""
+
+    # structure to gather the data
     data, per_page = OrderedDict(), current_app.config["POSTS_PER_PAGE"]
+
     if posts := Post.get_posts(1, per_page):
         dates = [post["created_at"] for post in posts]
         home_lastmod = max(dates).strftime("%Y-%m-%d")
