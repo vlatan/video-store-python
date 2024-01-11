@@ -12,7 +12,7 @@ const noMoreScroll = () => {
     // Replace the spinner with "No more videos"
     sentinel.innerHTML = "No more videos";
     nextPage = false;
-    return
+    return;
 };
 
 // Function to request new items and render to the dom
