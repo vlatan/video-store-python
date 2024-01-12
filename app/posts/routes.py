@@ -8,7 +8,6 @@ from app import db
 from app.posts.forms import PostForm
 from app.helpers import admin_required
 from app.models import Post, DeletedPost
-from app.cron.handlers import generate_description
 from app.posts.helpers import convertDuration, video_banned
 
 
@@ -93,13 +92,13 @@ def perform_action(video_id, action):
         flash("The video has been deleted", "success")
         return redirect(url_for("main.home"))
     elif action == "edit" and current_user.is_admin:
-        frontend_data = request.get_json(silent=True)
-        if title := frontend_data.get("title"):
-            post.title = title
-            db.session.commit()
-            return make_response("Success", 200)
-        elif desc := frontend_data.get("description"):
-            post.short_description = desc
-            db.session.commit()
-            return make_response("Success", 200)
+        if frontend_data := request.get_json(silent=True):
+            if title := frontend_data.get("title"):
+                post.title = title
+                db.session.commit()
+                return make_response("Success", 200)
+            elif desc := frontend_data.get("description"):
+                post.short_description = desc
+                db.session.commit()
+                return make_response("Success", 200)
     return make_response("Sorry, can't resolve the request", 400)
