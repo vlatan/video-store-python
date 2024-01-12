@@ -76,6 +76,10 @@
 				<div class="metadata-block">
 					<div class="video-duration">
 						Duration: {{ duration }}
+						{% if post.category %}
+						, Category: <a href="url_for('categories.category', slug=post.category.slug)">
+							{{ post.category.name }}</a>
+						{% endif %}
 					</div>
 					{% if current_user.is_authenticated and current_user.is_admin %}
 					<button data-modal="video" class="modal-button">Delete</button>
