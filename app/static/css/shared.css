@@ -211,6 +211,13 @@ button.search-arrow {
   transform-origin: top right;
 }
 
+.category-show-dropdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  -moz-column-gap: calc(var(--content-padding) + 0.5rem);
+       column-gap: calc(var(--content-padding) + 0.5rem);
+}
+
 @keyframes growOut {
   80% {
     transform: scale(1.1);

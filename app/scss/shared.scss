@@ -241,9 +241,11 @@ button.search-arrow {
     transform-origin: top right;
 }
 
-// ul.category-dropdown-content {
-//     column-count: 2;
-// }
+.category-show-dropdown {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: calc(var(--content-padding) + 0.5rem);
+}
 
 @keyframes growOut {
     80% {
