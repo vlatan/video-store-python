@@ -329,8 +329,6 @@ class Category(Base):
 
     @cache.memoize(86400)
     def get_posts(self, page=1, per_page=24):
-        if not self.posts.first():
-            return []
         posts = self.posts.order_by(Post.upload_date.desc())
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
         return [post.serialize for post in posts.items]
