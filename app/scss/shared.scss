@@ -227,7 +227,12 @@ button.search-arrow {
     right: 0;
     padding: var(--content-padding) calc(var(--content-padding) + .5rem);
     background-color: var(--secondary-background-color);
-    border-top: none;
+    box-shadow:
+        0 3px 5px -1px rgba(0, 0, 0, 0.2),
+        0 6px 10px 0 rgba(0, 0, 0, 0.14),
+        0 1px 18px 0 rgba(0, 0, 0, 0.12);
+    outline: 1px solid rgb(210, 211, 215);
+    border-radius: var(--img-border-radius);
     flex-direction: column;
     align-items: flex-end;
     row-gap: .5rem;

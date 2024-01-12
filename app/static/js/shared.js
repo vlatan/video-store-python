@@ -65,8 +65,8 @@ document.addEventListener('click', event => {
 
     // Categories Dropdown menu
     const catDropContent = document.querySelector('.category-dropdown-content');
-    if (dropContent) {
-        const catNotDropped = !dropContent.classList.contains('category-show-dropdown');
+    if (catDropContent) {
+        const catNotDropped = !catDropContent.classList.contains('category-show-dropdown');
         const categoriesClicked = event.target.closest('.categories');
         const catMenuNotClicked = !event.target.closest('.category-show-dropdown');
         if (catNotDropped && categoriesClicked) {
