@@ -49,7 +49,7 @@ document.addEventListener('click', event => {
         }
     });
 
-    // Dropdown menu
+    // User Profile Dropdown menu
     const dropContent = document.querySelector('.dropdown-content');
     if (dropContent) {
         const notDropped = !dropContent.classList.contains('show-dropdown');
@@ -60,6 +60,19 @@ document.addEventListener('click', event => {
             dropContent.classList.add('show-dropdown');
         } else if (deleteAccountClicked || menuNotClicked) {
             dropContent.classList.remove('show-dropdown');
+        }
+    }
+
+    // Categories Dropdown menu
+    const catDropContent = document.querySelector('.category-dropdown-content');
+    if (dropContent) {
+        const catNotDropped = !dropContent.classList.contains('category-show-dropdown');
+        const categoriesClicked = event.target.closest('.categories');
+        const catMenuNotClicked = !event.target.closest('.category-show-dropdown');
+        if (catNotDropped && categoriesClicked) {
+            catDropContent.classList.add('category-show-dropdown');
+        } else if (catMenuNotClicked) {
+            catDropContent.classList.remove('category-show-dropdown');
         }
     }
 

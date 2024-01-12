@@ -17,7 +17,8 @@ from flask import (
     redirect,
 )
 
-from app.models import User, Post
+from app import cache
+from app.models import User, Post, Category
 from app.auth.helpers import get_avatar_abs_path, download_avatar
 
 
@@ -98,6 +99,12 @@ def avatar(user: User, redis_client: Redis | None = None) -> pathlib.Path:
     return default_avatar
 
 
+@cache.cached(timeout=86400, key_prefix="all_categories")
+def get_categories():
+    categories = Category.query.order_by(Category.name).all()
+    return [cat for cat in categories if cat.posts.first()]
+
+
 @bp.app_context_processor
 def template_vars():
     """Make variables available in templates."""
@@ -105,6 +112,7 @@ def template_vars():
         now=datetime.utcnow(),
         app_name=current_app.config["APP_NAME"],
         avatar=avatar,
+        categories=get_categories,
     )
 
 

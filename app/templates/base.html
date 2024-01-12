@@ -73,8 +73,22 @@
 				<!-- <a class="nav-item support" href="https://www.patreon.com/">Contribute</a> -->
 				{% endif %}
 
-				{% if current_user.is_authenticated %}
+				<div class="dropdown">
+					<button aria-label="Drop Categories Menu" class="nav-item categories">
+						<span>Categories</span>
+					</button>
+					<ul class="category-dropdown-content">
+						{% for category in categories() %}
+						<li>
+							<a class="nav-item" href="{{ url_for('categories.category', slug=category.slug) }}">
+								{{ category.name }}
+							</a>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
 
+				{% if current_user.is_authenticated %}
 				<div class="dropdown">
 					<button aria-label="Drop User Menu" class="nav-item username">
 						<img src="{{ url_for('static', filename=avatar(current_user)) | autoversion }}"
