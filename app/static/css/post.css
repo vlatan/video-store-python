@@ -113,6 +113,10 @@ button.edit-description {
   gap: var(--content-padding);
 }
 
+.inner-metadata-block .nav-item {
+  color: #f26123;
+}
+
 .video-description {
   padding-bottom: calc(var(--content-padding) / 2);
 }

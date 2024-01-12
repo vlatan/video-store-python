@@ -74,10 +74,11 @@
 			</div>
 			<div class="other-metadata">
 				<div class="metadata-block">
-					<div class="video-duration">
+					<div class="inner-metadata-block">
 						Duration: {{ duration }}
 						{% if post.category %}
-						| Category: <a href="{{ url_for('categories.category', slug=post.category.slug) }}">
+						| Category: <a class="nav-item"
+							href="{{ url_for('categories.category', slug=post.category.slug) }}">
 							{{ post.category.name }}</a>
 						{% endif %}
 					</div>
