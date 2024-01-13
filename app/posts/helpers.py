@@ -47,7 +47,7 @@ def normalize_title(title):
     # remove content after pipe symbol
     title = title.split(" | ")[0]
     # remove bracketed content
-    title = re.sub("[\(\[].*?[\)\]]", "", title).strip()
+    title = re.sub(r"[\(\[].*?[\)\]]", "", title).strip()
     # remove extra spaces
     title = re.sub(" +", " ", title)
     # common prepositions
