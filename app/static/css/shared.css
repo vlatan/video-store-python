@@ -223,6 +223,16 @@ button.search-arrow {
        column-gap: calc(var(--content-padding) + 0.5rem);
 }
 
+/* Change styles for drop down menus on small screen */
+@media screen and (max-width: 400px) {
+  .dropdown {
+    position: unset;
+  }
+  .dropdown-content,
+  .category-dropdown-content {
+    top: 100%;
+  }
+}
 @keyframes growOut {
   80% {
     transform: scale(1.1);
