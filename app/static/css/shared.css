@@ -102,11 +102,12 @@ a {
 }
 
 a.logo {
-  font-size: 1.8rem;
+  font-size: 1.3rem;
   font-weight: 900;
-  letter-spacing: -0.06rem;
+  letter-spacing: -0.05rem;
   line-height: 1;
   display: block;
+  text-transform: uppercase;
 }
 
 .navbar {
