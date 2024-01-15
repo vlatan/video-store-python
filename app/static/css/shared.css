@@ -654,7 +654,7 @@ button.cancel-button {
   min-width: 6rem;
   text-transform: uppercase;
   letter-spacing: 0.03ch;
-  border-radius: 3px;
+  border-radius: var(--img-border-radius);
   overflow: hidden;
   line-height: 1;
   font-weight: 500;
