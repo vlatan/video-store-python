@@ -239,6 +239,9 @@ button.search-arrow {
   overflow: hidden;
   display: inline-flex;
   align-items: center;
+}
+
+.navbar .nav-item {
   font-size: 0.8rem;
   text-transform: uppercase;
 }
