@@ -251,11 +251,8 @@ class Post(Base, SearchableMixin):
     @classmethod
     @cache.memoize(86400)
     def get_related_posts(cls, title: str, per_page: int):
-        if not (search_result := cls.search(title, 0, per_page + 1)):
-            posts = cls.query.order_by(sqlalchemy.func.random()).limit(per_page)
-            return [post.serialize for post in posts if post.title != title]
-
-        return [
+        search_result = cls.search(title, 0, per_page + 1)
+        search_result = [
             {
                 "video_id": doc.video_id,
                 "title": escape(doc.title),
@@ -265,6 +262,14 @@ class Post(Base, SearchableMixin):
             for doc in search_result.docs
             if doc.title != title
         ]
+
+        if len(search_result) < per_page:
+            limit = per_page - len(search_result)
+            posts = cls.query.order_by(sqlalchemy.func.random()).limit(limit)
+            posts = [post.serialize for post in posts if post.title != title]
+            search_result += posts
+
+        return search_result
 
     @classmethod
     @cache.memoize(86400)
