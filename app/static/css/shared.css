@@ -102,7 +102,7 @@ a {
 }
 
 a.logo {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 900;
   letter-spacing: -0.05rem;
   line-height: 1;
@@ -188,7 +188,6 @@ button.search-arrow {
   position: relative;
   display: flex;
   min-height: 1.7rem;
-  font-size: 0.95rem;
 }
 
 .dropdown-content,
@@ -226,16 +225,6 @@ button.search-arrow {
        column-gap: calc(var(--content-padding) + 0.5rem);
 }
 
-/* Change styles for drop down menus on small screen */
-@media screen and (max-width: 400px) {
-  .dropdown {
-    position: unset;
-  }
-  .dropdown-content,
-  .category-dropdown-content {
-    top: 100%;
-  }
-}
 @keyframes growOut {
   80% {
     transform: scale(1.1);
@@ -250,11 +239,15 @@ button.search-arrow {
   overflow: hidden;
   display: inline-flex;
   align-items: center;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 .dropdown-content .nav-item,
 .category-dropdown-content .nav-item {
   white-space: nowrap;
+  font-size: 0.95rem;
+  text-transform: unset;
 }
 
 a.nav-item::after {
@@ -281,9 +274,8 @@ a.nav-item:hover::after {
 .nav-item.username,
 .nav-item.categories {
   gap: 0.5rem;
-  padding-right: 1.15rem;
+  padding-right: 1rem;
   background: inherit;
-  font-size: inherit;
   border: none;
 }
 
@@ -292,14 +284,11 @@ a.nav-item:hover::after {
   content: "";
   position: absolute;
   right: 0;
-  top: 60%;
   width: 0;
   height: 0;
   border: 6px solid transparent;
   border-top-color: var(--primary-font-color);
   border-bottom: 0;
-  margin-left: -6px;
-  margin-top: -6px;
 }
 
 .nav-item img.username-image {
@@ -640,6 +629,7 @@ button.cancel-button {
 
 .snackbar-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   gap: calc(var(--content-padding) * 0.5);
@@ -678,7 +668,7 @@ button.cancel-button {
          column-gap: calc(var(--content-padding) * 3);
   }
 }
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 900px) {
   :root {
     --content-padding: 1rem;
   }
@@ -700,15 +690,7 @@ button.cancel-button {
     right: 5%;
   }
 }
-@media screen and (max-width: 510px) {
-  .snackbar {
-    outline: unset;
-    inset: auto auto 0 auto;
-    border-radius: unset;
-    max-width: none;
-  }
-}
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 600px) {
   .search-form {
     display: none;
     position: absolute;
@@ -731,11 +713,20 @@ button.cancel-button {
     width: 100%;
     flex-wrap: wrap;
   }
+  .snackbar {
+    outline: unset;
+    inset: auto auto 0 auto;
+    border-radius: unset;
+    max-width: none;
+  }
 }
-@media screen and (max-width: 310px) {
-  .snackbar-actions {
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+/* Change styles for drop down menus on small screen */
+@media screen and (max-width: 400px) {
+  .dropdown {
+    position: unset;
+  }
+  .dropdown-content,
+  .category-dropdown-content {
+    top: 100%;
   }
 }
