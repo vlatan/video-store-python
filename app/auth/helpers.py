@@ -45,7 +45,8 @@ def verify_google_token(token):
     https://tinyurl.com/z2b5xr25, https://tinyurl.com/3dwm6pxe
     """
 
-    CLIENT_ID = current_app.config["GOOGLE_CLIENT_ID"]
+    CLIENT_CONFIG = current_app.config["GOOGLE_OAUTH_CLIENT"]
+    CLIENT_ID = CLIENT_CONFIG["web"]["client_id"]
     data = id_token.verify_oauth2_token(token, google_requests.Request(), CLIENT_ID)
     # return user info
     return {

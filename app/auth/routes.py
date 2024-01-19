@@ -31,10 +31,10 @@ def google():
     """
 
     DEBUG = current_app.config["DEBUG"]
-    CLIENT_CONFIG = current_app.config["GOOGLE_CLIENT_CONFIG"]
+    CLIENT_CONFIG = current_app.config["GOOGLE_OAUTH_CLIENT"]
     scheme = None if DEBUG else "https"
     REDIRECT_URL = url_for("auth.google", _scheme=scheme, _external=True)
-    SCOPES = current_app.config["GOOGLE_SCOPES"]
+    SCOPES = current_app.config["GOOGLE_OAUTH_SCOPES"]
 
     # if the request DOESN'T have 'code' argument in the URL
     if "code" not in request.args:
