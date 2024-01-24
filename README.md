@@ -1,8 +1,8 @@
-# Doxder
+# Factual Docs
 
-[https://doxder.com](https://doxder.com)
+[https://factualdocs.com](https://factualdocs.com)
 
-This web app is made with Flask, HTML, CSS, JavaScript and SQLite. It is basically a documentary library that automatically fetches and posts videos (documentaries) from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
+This web app is made using Python (Flask), HTML, CSS, JavaScript, PostgreSQL and Redis. It is basically a documentary library that automatically fetches and posts videos (documentaries) from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
 
 It validates the videos against multiple criteria such as:
 
