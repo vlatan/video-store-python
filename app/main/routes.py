@@ -22,6 +22,14 @@ from app.models import User, Post, Category
 from app.auth.helpers import get_avatar_abs_path, download_avatar
 
 
+FAVICONS = [
+    "apple-touch-icon.png",
+    "favicon-32x32.png",
+    "favicon-16x16.png",
+    "site.webmanifest",
+]
+
+
 bp = Blueprint("main", __name__)
 
 
@@ -38,12 +46,24 @@ def redirect_www() -> Response | None:
 
 @bp.app_template_filter("autoversion")
 def autoversion_file(filename: str) -> str:
-    """Autoversion css/js files based on mtime."""
-    fullpath = os.path.join("app/", filename[1:])
+    """Autoversion files based on mtime."""
+
+    # filename without the first forward slash
+    fn = filename[1:]
+
+    # path to the file on disc
+    path = (
+        os.path.join("app/static/favicons", fn)
+        if fn in FAVICONS
+        else os.path.join("app/", fn)
+    )
+
+    # try to take e timestamp
     try:
-        timestamp = round(os.path.getmtime(fullpath))
+        timestamp = round(os.path.getmtime(path))
     except OSError:
         return filename
+
     return f"{filename}?v={timestamp}"
 
 
