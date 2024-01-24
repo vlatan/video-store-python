@@ -16,10 +16,13 @@
 	<link rel="stylesheet" type="text/css" href="{{ shared_css_url }}">
 	{% endblock css %}
 
-	<link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('main.favicons', filename='apple-touch-icon.png') }}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('main.favicons', filename='favicon-32x32.png') }}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('main.favicons', filename='favicon-16x16.png') }}">
-	<link rel="manifest" href="{{ url_for('main.favicons', filename='site.webmanifest') }}">
+	<link rel="apple-touch-icon" sizes="180x180"
+		href="{{ url_for('main.favicons', filename='apple-touch-icon.png') | autoversion }}">
+	<link rel="icon" type="image/png" sizes="32x32"
+		href="{{ url_for('main.favicons', filename='favicon-32x32.png') | autoversion }}">
+	<link rel="icon" type="image/png" sizes="16x16"
+		href="{{ url_for('main.favicons', filename='favicon-16x16.png') | autoversion }}">
+	<link rel="manifest" href="{{ url_for('main.favicons', filename='site.webmanifest') | autoversion }}">
 
 	{% block meta %}
 	<meta property='og:site_name' content='{{ app_name }}'>
