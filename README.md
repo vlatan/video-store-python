@@ -52,4 +52,4 @@ docker compose up --build --remove-orphans worker
 
 ## License
 
-[![License: GNU GPLv3](https://img.shields.io/github/license/vlatan/doxder?label=License)](/LICENSE "License: GNU GPLv3")
+[![License: GNU GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg?label=License)](/LICENSE "License: GNU GPLv3")
