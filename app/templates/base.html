@@ -7,6 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	{% set shared_css_url = url_for('static', filename='css/shared.css') | autoversion %}
+	{% set app_name_words = app_name.split() %}
 
 	{% block preload_css %}
 	<link rel="preload" href="{{ shared_css_url }}" as="style">
@@ -44,9 +45,17 @@
 	<div class="site-header-wrap">
 		<header class="site-header">
 			{% if title %}
-			<a class="logo" href="/">{{ app_name }}</a>
+			<a class="logo" href="/">
+				<span>{{ app_name_words[0] }}</span>
+				<span>{{ app_name_words[1] }}</span>
+			</a>
 			{% else %}
-			<h1><a class="logo" href="/">{{ app_name }}</a></h1>
+			<h1>
+				<a class="logo" href="/">
+					<span>{{ app_name_words[0] }}</span>
+					<span>{{ app_name_words[1] }}</span>
+				</a>
+			</h1>
 			{% endif %}
 			<nav class="navbar">
 				{% if g.search_form %}

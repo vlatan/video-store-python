@@ -128,13 +128,37 @@ a {
 }
 
 a.logo {
-    font-size: 1.2rem;
+    font-size: .85rem;
     font-weight: 900;
-    letter-spacing: -.05rem;
+    letter-spacing: -.03rem;
     line-height: 1;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-transform: uppercase;
-    box-shadow: 5px 5px 5px rgb(20, 20, 20);
+}
+
+a.logo>* {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0.45em 1em;
+}
+
+a.logo span:first-child {
+    border: .2em solid var(--primary-border-color);
+    border-top-left-radius: var(--img-border-radius);
+    border-bottom-left-radius: var(--img-border-radius);
+    padding-right: .8em;
+}
+
+a.logo span:last-child {
+    border: .2em solid var(--primary-border-color);
+    background: var(--primary-border-color);
+    border-top-right-radius: var(--img-border-radius);
+    border-bottom-right-radius: var(--img-border-radius);
+    padding-left: .8em;
 }
 
 .navbar {
@@ -795,6 +819,10 @@ button.cancel-button {
 
 /* Change styles for drop down menus on small screen */
 @media screen and (max-width: 400px) {
+
+    a.logo {
+        font-size: 0.7rem;
+    }
 
     .dropdown {
         position: unset;
