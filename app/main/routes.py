@@ -38,12 +38,12 @@ FAVICONS = [
 
 def favicons() -> Response:
     """Serve favicon icons as if from root."""
-    return send_from_directory("static/favicons/", request.path)
+    return send_from_directory("static/favicons/", request.path[1:])
 
 
 # add routes only for the favicons in the root
 for favicon in FAVICONS:
-    bp.add_url_rule(f"/{favicon}", view_func=favicons)
+    bp.add_url_rule(rule=f"/{favicon}", view_func=favicons)
 
 
 @bp.before_app_request
