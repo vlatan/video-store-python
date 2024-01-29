@@ -151,14 +151,24 @@ a.logo span:first-child {
     border-top-left-radius: var(--img-border-radius);
     border-bottom-left-radius: var(--img-border-radius);
     padding-right: .8em;
+    transition: .5s background-color;
 }
 
 a.logo span:last-child {
     border: .2em solid var(--primary-border-color);
-    background: var(--primary-border-color);
+    background-color: var(--primary-border-color);
     border-top-right-radius: var(--img-border-radius);
     border-bottom-right-radius: var(--img-border-radius);
     padding-left: .8em;
+    transition: .5s background-color;
+}
+
+a.logo:hover span:first-child {
+    background-color: var(--primary-border-color);
+}
+
+a.logo:hover span:last-child {
+    background-color: unset;
 }
 
 .navbar {
