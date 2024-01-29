@@ -21,9 +21,14 @@
 <meta property='og:image' content='{{ thumb }}'>
 <meta name='thumbnail' content='{{ thumb }}'>
 
+<meta name="twitter:title" content="{{ post.title }}">
+<meta property="twitter:url" content="{{ post_url }}">
+<meta name="twitter:image" content="{{ thumb }}">
+
 {% if meta_description %}
 <meta name='description' content='{{ meta_description }}.'>
 <meta property='og:description' content='{{ meta_description }}.'>
+<meta name="twitter:description" content="{{ meta_description }}">
 {% endif %}
 
 {{ super() }}
