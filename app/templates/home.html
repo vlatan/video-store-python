@@ -20,6 +20,10 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ url }}">
 <meta property="og:description" content="{{ config['APP_DESCRIPTION'] }}">
+<script type="application/ld+json">
+    {"@context":"https:\/\/schema.org","@type":"WebSite","name":"Factual Docs","url":"https:\/\/{{ config.DOMAIN }}\/",
+    "potentialAction":{"@type":"SearchAction","target":"https:\/\/{{ config.DOMAIN }}\/search\/?q={search_term}","query-input":"required name=search_term"}}
+</script>
 {{ super() }}
 {% endblock meta %}
 
