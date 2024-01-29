@@ -130,7 +130,6 @@ def template_vars():
     """Make variables available in templates."""
     return dict(
         now=datetime.utcnow(),
-        app_name=current_app.config["APP_NAME"],
         avatar=avatar,
         categories=get_categories,
     )

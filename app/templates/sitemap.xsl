@@ -8,7 +8,7 @@
 	<xsl:template match="/">
 		<html xmlns="http://www.w3.org/1999/xhtml">
 			<head>
-				<title>XML Sitemap | {{ config['APP_NAME'] }}</title>
+				<title>XML Sitemap | {{ config.APP_NAME }}</title>
 				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 				<meta name="robots" content="noindex,follow" />
 				<style type="text/css">
@@ -82,7 +82,7 @@
 			<p>This is a XML Sitemap which is supposed to be processed by search engines which follow the XML Sitemap standard.</p>
 			<p>You can find more information about XML sitemaps at <a rel="nofollow" href="https://www.sitemaps.org/">sitemaps.org</a>.</p>
 			<p>This file contains links to sub-sitemaps, follow them to see the actual sitemap content.</p>
-			<div><a href="{{ url_for('main.home') }}">&#8593; {{ app_name }}</a></div>
+			<div><a href="{{ url_for('main.home') }}">&#8593; {{ config.APP_NAME }}</a></div>
 		</div>
 
         <div id="content">

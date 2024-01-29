@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	{% set shared_css_url = url_for('static', filename='css/shared.css') | autoversion %}
-	{% set app_name_words = app_name.split() %}
+	{% set app_name_words = config.APP_NAME.split() %}
 
 	{% block preload_css %}
 	<link rel="preload" href="{{ shared_css_url }}" as="style">
@@ -26,13 +26,13 @@
 	<link rel="manifest" href="{{ url_for('main.favicons', filename='site.webmanifest') | autoversion }}">
 
 	{% block meta %}
-	<meta property='og:site_name' content='{{ app_name }}'>
+	<meta property='og:site_name' content='{{ config.APP_NAME }}'>
 	<meta name='twitter:card' content='summary_large_image'>
 	{% endblock meta %}
 
 	<title>
 		{% block title_tag %}
-		{{ app_name }}
+		{{ config.APP_NAME }}
 		{% endblock title_tag %}
 	</title>
 
@@ -148,7 +148,7 @@
 				<div data-body="login" class="modal">
 					<div class="modal-content login-modal-content">
 						<h3 class="login-text">Sign in to</h3>
-						<div class="logo-text">{{ app_name }}</div>
+						<div class="logo-text">{{ config.APP_NAME }}</div>
 						<p>
 							Log in to be able to <strong>save</strong> and <strong>like</strong> your favorite
 							documentaries.
@@ -216,7 +216,7 @@
 		{% endwith %}
 
 		<footer class="site-footer">
-			<span class="site-copy">{{ app_name }} &copy; {{ now.year }}</span>
+			<span class="site-copy">{{ config.APP_NAME }} &copy; {{ now.year }}</span>
 			<a class="nav-item" href="{{ url_for('sources.playlists') }}">Sources</a>
 			<a class="nav-item" href="{{ url_for('pages.page', slug='about') }}">About</a>
 			<a class="nav-item" href="{{ url_for('pages.page', slug='privacy') }}">Privacy</a>
