@@ -23,9 +23,12 @@ from app.auth.helpers import get_avatar_abs_path, download_avatar
 
 
 FAVICONS = [
+    "android-chrome-192x192.png",
+    "android-chrome-512x512.png",
     "apple-touch-icon.png",
-    "favicon-32x32.png",
     "favicon-16x16.png",
+    "favicon-32x32.png",
+    "favicon.ico",
     "site.webmanifest",
 ]
 
@@ -175,6 +178,6 @@ def home() -> Response | list | str:
 
 
 @bp.route("/<path:filename>")
-def favicons(filename):
+def favicons(filename: str) -> Response:
     """Serve favicon icons as if from root."""
     return send_from_directory("static/favicons/", filename)
