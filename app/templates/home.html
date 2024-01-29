@@ -15,11 +15,11 @@
 {% block meta %}
 {% set url = url_for('main.home', _external=True) %}
 <link rel="canonical" href="{{ url }}">
-<meta name="description" content="{{ config['APP_DESCRIPTION'] }}">
+<meta name="description" content="{{ config.APP_DESCRIPTION }}">
 <meta property="og:title" content="{{ config.APP_NAME }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ url }}">
-<meta property="og:description" content="{{ config['APP_DESCRIPTION'] }}">
+<meta property="og:description" content="{{ config.APP_DESCRIPTION }}">
 <script type="application/ld+json">
     {"@context":"https:\/\/schema.org","@type":"WebSite","name":"Factual Docs","url":"https:\/\/{{ config.DOMAIN }}\/",
     "potentialAction":{"@type":"SearchAction","target":"https:\/\/{{ config.DOMAIN }}\/search\/?q={search_term}","query-input":"required name=search_term"}}
