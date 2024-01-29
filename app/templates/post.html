@@ -21,7 +21,8 @@
 <meta property='og:image' content='{{ thumb }}'>
 <meta name='thumbnail' content='{{ thumb }}'>
 {% if post.short_description %}
-<meta name='description' content='{{ post.short_description }}'>
+<!-- Get just the first sentence from the description. -->
+<meta name='description' content='{{ post.short_description.partition(".")[0] }}.'>
 {% endif %}
 {{ super() }}
 {% endblock meta %}
