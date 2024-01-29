@@ -19,6 +19,8 @@
 <meta property="og:title" content="{{ config.APP_NAME }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ url }}">
+<meta property="og:image"
+    content="{{ url_for('static', filename='favicons/android-chrome-512x512.png') | autoversion}}">
 <meta property="og:description" content="{{ config.APP_DESCRIPTION }}">
 <script type="application/ld+json">
     {"@context":"https:\/\/schema.org","@type":"WebSite","name":"Factual Docs","url":"https:\/\/{{ config.DOMAIN }}\/",
