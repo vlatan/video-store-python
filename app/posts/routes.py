@@ -28,15 +28,20 @@ def post(video_id):
     # how many related posts should we fetch
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
+    # get the first sentence from the short desc as meta desc
+    short_desc = post.short_description
+    meta_description = short_desc.partition(".")[0] if short_desc else None
+
     return render_template(
         "post.html",
         post=post,
         thumb=thumb,
         srcset=post.srcset(),
-        duration=convertDuration(post.duration).human,
+        human_duration=convertDuration(post.duration).human,
         likes=likes,
         title=post.title,
         related_posts=Post.get_related_posts(post.title, PER_PAGE),
+        meta_description=meta_description,
     )
 
 

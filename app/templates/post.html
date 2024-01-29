@@ -21,9 +21,7 @@
 <meta property='og:image' content='{{ thumb }}'>
 <meta name='thumbnail' content='{{ thumb }}'>
 
-{% if post.short_description %}
-<!-- Get just the first sentence from the description. -->
-{% set meta_description = post.short_description.partition(".")[0] %}
+{% if meta_description %}
 <meta name='description' content='{{ meta_description }}.'>
 <meta property='og:description' content='{{ meta_description }}.'>
 {% endif %}
@@ -36,9 +34,18 @@
 {% endblock title_tag %}
 
 {% block content %}
-<article class="media-content">
+<article class="media-content" itemscope itemtype="https://schema.org/Movie">
+	<meta itemprop="image" content="{{ thumb }}">
+	<meta itemprop="gengre" content="Documentary">
 	<div class="video-content">
-		<div class="player">
+		<div class="player" itemprop="video" itemscope itemtype="https://schema.org/VideoObject">
+			<meta itemprop="name" content="{{ post.title }}">
+			<meta itemprop="thumbnailUrl" content="{{ thumb }}">
+			<meta itemprop="embedUrl" content="https://www.youtube-nocookie.com/embed/{{ post.video_id }}">
+			{% if meta_description %}
+			<meta itemprop="description" content="{{ meta_description }}.">
+			{% endif %}
+			<meta itemprop="uploadDate" content="{{ post.upload_date }}+00:00">
 			<div class="player-content" id="{{ post.video_id }}">
 				<img alt="{{ post.title }}" src="{{ thumb }}" srcset="{{ srcset }}">
 				<div class="play"></div>
@@ -47,7 +54,7 @@
 
 		<header class="metadata">
 			<div class="metadata-block">
-				<h1 class="video-title">{{ post.title }}</h1>
+				<h1 class="video-title" itemprop="name">{{ post.title }}</h1>
 				<div class="social">
 					{% if current_user.is_authenticated %}
 					{% if current_user.has_casted(post, 'like') %}
@@ -80,7 +87,7 @@
 			<div class="other-metadata">
 				<div class="metadata-block">
 					<div class="inner-metadata-block">
-						Duration: {{ duration }}
+						Duration: <time itemprop="duration" datetime="{{ post.duration }}">{{ human_duration }}</time>
 						{% if post.category %}
 						| Category: <a class="nav-item"
 							href="{{ url_for('categories.category', slug=post.category.slug) }}">
@@ -98,7 +105,7 @@
 		{% if post.short_description %}
 
 		<div class="short_desc_wrap">
-			<div class="video-description">
+			<div class="video-description" itemprop="description">
 				{{ post.html_content(post.short_description) | safe }}
 			</div>
 			<span class="description_discliamer">
