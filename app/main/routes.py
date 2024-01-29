@@ -22,6 +22,9 @@ from app.models import User, Post, Category
 from app.auth.helpers import get_avatar_abs_path, download_avatar
 
 
+bp = Blueprint("main", __name__)
+
+
 FAVICONS = [
     "android-chrome-192x192.png",
     "android-chrome-512x512.png",
@@ -33,7 +36,14 @@ FAVICONS = [
 ]
 
 
-bp = Blueprint("main", __name__)
+def favicons() -> Response:
+    """Serve favicon icons as if from root."""
+    return send_from_directory("static/favicons/", request.path)
+
+
+# add routes only for the favicons in the root
+for favicon in FAVICONS:
+    bp.add_url_rule(f"/{favicon}", view_func=favicons)
 
 
 @bp.before_app_request
@@ -175,9 +185,3 @@ def home() -> Response | list | str:
 
     # render HTML template for the first view
     return render_template("home.html", posts=posts)
-
-
-@bp.route("/<path:filename>")
-def favicons(filename: str) -> Response:
-    """Serve favicon icons as if from root."""
-    return send_from_directory("static/favicons/", filename)
