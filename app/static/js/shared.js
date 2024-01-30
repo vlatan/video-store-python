@@ -65,31 +65,44 @@ document.addEventListener('click', event => {
 
     // Categories Dropdown menu
     const catDropContent = document.querySelector('.category-dropdown-content');
+    const hamburgerIcon = document.querySelector('.hamburger-icon');
     if (catDropContent) {
         const catNotDropped = !catDropContent.classList.contains('category-show-dropdown');
         const categoriesClicked = event.target.closest('.categories');
         const catMenuNotClicked = !event.target.closest('.category-show-dropdown');
         if (catNotDropped && categoriesClicked) {
             catDropContent.classList.add('category-show-dropdown');
+            hamburgerIcon.classList.add('hamburger-icon-change');
         } else if (catMenuNotClicked) {
             catDropContent.classList.remove('category-show-dropdown');
+            hamburgerIcon.classList.remove('hamburger-icon-change');
         }
     }
 
     // Mobile search form
     const searchForm = document.getElementById('searchForm');
     const logo = document.querySelector('a.logo');
+    const searchIcon = document.querySelector('.search-button-mobile');
+    const dropdowns = document.querySelectorAll('.dropdown');
     const arrow = document.querySelector('button.search-arrow')
     const arrowClicked = event.target.closest('button.search-arrow');
     const outsideFormClicked = !event.target.closest('#searchForm');
     if (event.target.closest('.search-button-mobile')) {
+        arrow.style.display = "block";
         searchForm.style.display = 'flex'
         logo.style.display = "none";
-        arrow.style.display = "block";
+        searchIcon.style.display = "none";
+        for (const dropdown of dropdowns) {
+            dropdown.style.display = "none";
+        }
     } else if (arrowClicked || outsideFormClicked) {
+        arrow.removeAttribute('style');
         searchForm.removeAttribute('style');
         logo.removeAttribute('style');
-        arrow.removeAttribute('style');
+        searchIcon.removeAttribute('style');
+        for (const dropdown of dropdowns) {
+            dropdown.removeAttribute('style');
+        }
     }
 });
 

@@ -344,14 +344,17 @@ a.nav-item:hover::after {
 
 .nav-item.username,
 .nav-item.categories {
-    gap: 0.5rem;
     padding-right: 1rem;
     background: inherit;
     border: none;
 }
 
+.nav-item.username {
+    gap: 0.5rem;
+}
+
 .nav-item.username::after,
-.nav-item.categories:after {
+.nav-item.categories::after {
     content: "";
     position: absolute;
     right: 0;
@@ -774,11 +777,48 @@ button.cancel-button {
         column-gap: var(--content-padding);
     }
 
-    .username-text {
+    .hamburger-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        width: 20px;
+        gap: 3px;
+    }
+
+    .bar1,
+    .bar2,
+    .bar3 {
+        width: 100%;
+        height: 2px;
+        border-radius: 10px;
+        background-color: #fff;
+        transition: 0.4s transform;
+    }
+
+    .hamburger-icon-change .bar1 {
+        transform: translate(0, 0.355em) rotate(-45deg);
+    }
+
+    .hamburger-icon-change .bar2 {
+        opacity: 0;
+    }
+
+    .hamburger-icon-change .bar3 {
+        transform: translate(0, -0.355em) rotate(45deg);
+    }
+
+    .username-text,
+    .categories-text {
         display: none;
     }
 
-    .nav-item.username {
+    .nav-item.categories::after {
+        content: none;
+    }
+
+    .nav-item.username,
+    .nav-item.categories {
         padding: 0;
     }
 
@@ -829,10 +869,6 @@ button.cancel-button {
 
 /* Change styles for drop down menus on small screen */
 @media screen and (max-width: 400px) {
-
-    a.logo {
-        font-size: 0.7rem;
-    }
 
     .dropdown {
         position: unset;
