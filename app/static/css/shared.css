@@ -723,25 +723,25 @@ button.cancel-button {
     align-items: center;
     justify-content: space-between;
     width: 20px;
-    gap: 3px;
+    gap: 4px;
   }
   .bar1,
   .bar2,
   .bar3 {
     width: 100%;
-    height: 2px;
+    height: 1px;
     border-radius: 10px;
     background-color: #fff;
     transition: 0.4s transform;
   }
   .hamburger-icon-change .bar1 {
-    transform: translate(0, 0.355em) rotate(-45deg);
+    transform: translate(0, 0.38em) rotate(-45deg);
   }
   .hamburger-icon-change .bar2 {
     opacity: 0;
   }
   .hamburger-icon-change .bar3 {
-    transform: translate(0, -0.355em) rotate(45deg);
+    transform: translate(0, -0.38em) rotate(45deg);
   }
   .username-text,
   .categories-text {
