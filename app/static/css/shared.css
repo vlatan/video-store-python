@@ -628,7 +628,8 @@ button.cancel-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  -moz-column-gap: 1rem;
+       column-gap: 1rem;
   background-color: var(--primary-background-color);
   padding: 0.3rem 0.6rem;
   border: 1px solid var(--primary-border-color);
