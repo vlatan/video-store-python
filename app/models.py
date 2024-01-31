@@ -4,7 +4,7 @@ from slugify import slugify
 from markdown import markdown
 from datetime import datetime
 from markupsafe import escape
-from sqlalchemy.orm import mapped_column, backref
+from sqlalchemy.orm import mapped_column
 from redis.commands.search.query import Query
 from redis.commands.search.result import Result
 
