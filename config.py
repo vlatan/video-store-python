@@ -51,6 +51,11 @@ class Config:
 
     # ======================================== #
 
+    # AdSense
+    ADSENSE_ACCOUNT = load_env("ADSENSE_ACCOUNT")
+
+    # ======================================== #
+
     # Redis
     REDIS_HOST = load_env("REDIS_HOST") or "localhost"
     REDIS_PORT = load_env("REDIS_PORT") or 6379
