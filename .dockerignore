@@ -1,27 +1,34 @@
-# extensions
-**/*.pyc
-**/*.pyo
-**/*.mo
+# extensions (on any level)
 **/*.md
-**/*.swp
-**/*.swo
+**/*.log
+**/*.db
 
-# folders
-**/__pycache__/
-**/.pytest_cache/
-.vscode/
-.venv/
-migrations/
-postgres_data/
-redis_data/
 
-# files in the root
+# cache directories (on any level)
+**/__pycache__
+**/.pytest_cache
+
+
+# directories (in the root)
+.venv
+.vscode
+.git
+certs
+migrations
+postgres_data
+redis_data
+
+
+# files (in the root)
 db.load
 Dockerfile
 compose.yaml
 todo.txt
+
+
+# dotfiles (in the root)
 .coverage
+.coverage*
 .dockerignore
 .gitignore
-.git
 .env
