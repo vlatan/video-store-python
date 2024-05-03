@@ -3,9 +3,10 @@
 *.db
 
 
-# cache directories
+# cache dirs/files
 __pycache__
 .pytest_cache
+.ipynb_checkpoints
 
 
 # directories

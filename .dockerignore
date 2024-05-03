@@ -4,9 +4,10 @@
 **/*.db
 
 
-# cache directories (on any level)
+# cache dirs/files (on any level)
 **/__pycache__
 **/.pytest_cache
+**/.ipynb_checkpoints
 
 
 # directories (in the root)
