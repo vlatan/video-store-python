@@ -10,7 +10,7 @@ RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # set the container's working directory
-WORKDIR /app
+WORKDIR /src
 
 # copy requirements file and install dependencies
 COPY ./requirements.txt .
