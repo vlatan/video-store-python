@@ -19,6 +19,7 @@ redis_data/
 db.load
 Dockerfile
 compose.yaml
+.coverage
 .dockerignore
 .gitignore
 .git
