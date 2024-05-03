@@ -24,7 +24,7 @@ Users can login via Google and Facebook. The app doesn't store passwords so natu
 ## Run the app locally
 
 ```
-docker compose up --build --remove-orphans app
+docker compose run --rm --service-ports app
 ```
 
 Access the app on `https://localhost:5000`
@@ -33,7 +33,7 @@ Access the app on `https://localhost:5000`
 ## Run the worker locally
 
 ```
-docker compose up --build --remove-orphans worker
+docker compose run --rm worker python worker.py
 ```
 
 ## Run DB migration
