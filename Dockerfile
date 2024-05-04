@@ -1,13 +1,12 @@
 # Docker image
 FROM python:3.11-slim
 
-# Allow statements and log messages to immediately appear in logs
-ENV PYTHONUNBUFFERED True
-
 # create virtual environment and prepend its bin dir in $PATH
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}" \
+    # Allow statements and log messages to immediately appear in logs
+    PYTHONUNBUFFERED=1
 
 # set the container's working directory
 WORKDIR /src
@@ -23,7 +22,7 @@ COPY ./app ./app
 
 # command to start the webserver and run the app
 # by default with 1 worker, 6 threads, on port 8000
-CMD exec gunicorn \
+CMD gunicorn \
     --bind :${PORT:-8000} \
     --workers ${$WORKERS:-1} \
     --threads ${THREADS:-6} \
