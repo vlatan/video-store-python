@@ -20,10 +20,11 @@ RUN pip install --upgrade pip && \
 COPY ["./config.py", "./run.py", "worker.py", "./"]
 COPY ./app ./app
 
+# default environment vars
 ENV PORT=8000 \
     WORKERS=1 \
     THREADS=6 \
     TIMEOUT=0
 
-# command to start the webserver and run the app (with 3 workers)
+# command to start the webserver and run the app
 CMD exec gunicorn --bind :$PORT --workers $WORKERS --threads $THREADS --timeout $TIMEOUT run:app
