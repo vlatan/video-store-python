@@ -21,18 +21,44 @@ Via a background process a function is periodically called which goes through th
 
 Users can login via Google and Facebook. The app doesn't store passwords so naturally it makes use of the [Google's OAuth 2.0](https://developers.google.com/identity/protocols/oauth2) and [Facebook's Login Flow](https://developers.facebook.com/docs/facebook-login/guides/advanced/manual-flow).
 
+
 ## Run the app locally
 
+To run the app in `DEBUG` mode make sure to set the `CONFIG_TYPE=config.DevConfig` in the `.env` file.
+
+Build and bring up all the docker services in the background. The app will be among them.
+``` docker
+docker compose up --build --remove-orphans -d
 ```
+
+Observe just the app logs.
+``` docker
+docker compose logs -f app
+```
+
+You can run the app individually with `docker compose run`. The port mapping needs to be specified though. Use the port mapping defined in `compose.yaml` by using `--service-ports`.
+
+``` docker
 docker compose run --rm --service-ports app
 ```
 
-Access the app on `https://localhost:5000`
+Access the app on `https://localhost:port` where `port` is the port defined in `PORT` in the `.env` file.
 
+If you want to run the app **NOT** in `DEBUG` mode - as if in production - then make sure to set the `CONFIG_TYPE=config.ProdConfig` in the `.env` file.
+
+Run this, but be aware that `gunicorn` will spew **WARNING** in STDOUT that the certificate is unknown because you are using a self-signed certificate.
+``` docker
+docker compose run --rm --service-ports app \
+sh -c 'gunicorn --certfile certs/cert.pem \
+--keyfile certs/key.pem --bind :$PORT \
+--workers 1 --threads 6 run:app'
+```
+
+Access the app on `https://localhost:port` where `port` is the port defined in `PORT` in the `.env` file.
 
 ## Run the worker locally
 
-```
+``` docker
 docker compose run --rm worker python worker.py
 ```
 
