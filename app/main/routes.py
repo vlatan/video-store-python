@@ -2,7 +2,7 @@ import os
 import time
 import pathlib
 from redis import Redis
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlparse, urlunparse
 from werkzeug.wrappers.response import Response
 
@@ -25,7 +25,7 @@ from app.auth.helpers import get_avatar_abs_path, download_avatar
 bp = Blueprint("main", __name__)
 
 
-FAVICONS = [
+FAVICONS = (
     "android-chrome-192x192.png",
     "android-chrome-512x512.png",
     "apple-touch-icon.png",
@@ -33,17 +33,13 @@ FAVICONS = [
     "favicon-32x32.png",
     "favicon.ico",
     "site.webmanifest",
-]
+)
 
 
-def favicons() -> Response:
-    """Serve favicon icons as if from root."""
-    return send_from_directory("static/favicons/", request.path[1:])
-
-
-# add routes only for the favicons in the root
+# add root routes for the favicons (but send them from static/favicons)
+send_favicon = lambda: send_from_directory("static/favicons/", request.path[1:])
 for favicon in FAVICONS:
-    bp.add_url_rule(rule=f"/{favicon}", view_func=favicons)
+    bp.add_url_rule(rule=f"/{favicon}", view_func=send_favicon)
 
 
 @bp.before_app_request
@@ -55,6 +51,21 @@ def redirect_www() -> Response | None:
 
     urlparts = urlparts._replace(netloc=netloc.replace("www.", ""))
     return redirect(urlunparse(urlparts), code=301)
+
+
+@bp.after_app_request
+def cloudflare_cache(response: Response) -> Response:
+    """
+    Add Cloudflare cache header for non logged users and non static routes.
+    https://developers.cloudflare.com/cache/concepts/cdn-cache-control/
+    """
+    if (
+        not current_user.is_authenticated
+        and "/static/" not in request.path
+        and not request.path.endswith(FAVICONS)
+    ):
+        response.headers["CDN-Cache-Control"] = "14400"
+    return response
 
 
 @bp.app_template_filter("autoversion")
@@ -142,7 +153,7 @@ def get_categories():
 def template_vars():
     """Make variables available in templates."""
     return dict(
-        now=datetime.utcnow(),
+        now=datetime.now(timezone.utc),
         avatar=avatar,
         categories=get_categories,
     )
