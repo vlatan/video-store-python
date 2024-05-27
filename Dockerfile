@@ -1,5 +1,5 @@
 # Docker image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # create virtual environment and prepend its bin dir in $PATH
 ENV VIRTUAL_ENV=/opt/venv
