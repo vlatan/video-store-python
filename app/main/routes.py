@@ -18,6 +18,7 @@ from flask import (
 )
 
 from app import cache
+from app.helpers import serve_as
 from app.models import User, Post, Category
 from app.auth.helpers import get_avatar_abs_path, download_avatar
 
@@ -157,6 +158,15 @@ def template_vars():
         avatar=avatar,
         categories=get_categories,
     )
+
+
+@bp.route("/ads.txt")
+@cache.cached(timeout=86400)
+@serve_as(content_type="text/plain")
+def ads_txt() -> str:
+    if not (aa := current_app.config["ADSENSE_ACCOUNT"]):
+        return ""
+    return f"google.com, pub-{aa}, DIRECT, f08c47fec0942fa0"
 
 
 @bp.route("/")

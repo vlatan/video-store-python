@@ -136,6 +136,12 @@
 	</div>
 
 	<div class="related_videos">
+		{% if not current_user.is_authenticated and config.ADSENSE_ACCOUNT and config.AD_SLOT_SIDEBAR %}
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-{{ config.ADSENSE_ACCOUNT }}"
+			data-ad-slot="{{ AD_SLOT_SIDEBAR }}" data-ad-format="auto" data-full-width-responsive="true"></ins>
+		<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+		{% endif %}
+
 		{% for related_post in related_posts %}
 		{% set thumb = related_post.thumbnail %}
 		<a href="{{ url_for('posts.post', video_id=related_post.video_id) }}" class="related-video">

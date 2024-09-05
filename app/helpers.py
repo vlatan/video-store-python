@@ -2,7 +2,7 @@ import functools
 from googleapiclient.discovery import build as google_discovery_build
 
 from flask_login import current_user, login_required
-from flask import current_app, flash, redirect, url_for
+from flask import current_app, flash, redirect, url_for, make_response
 
 
 def admin_required(func):
@@ -30,3 +30,19 @@ def youtube_build():
         developerKey=current_app.config["YOUTUBE_API_KEY"],
         cache_discovery=False,
     )
+
+
+def serve_as(content_type="text/html", charset="utf-8"):
+    """Modify response's content-type header."""
+
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            template = func(*args, **kwargs)
+            response = make_response(template)
+            response.headers["content-type"] = f"{content_type}; charset={charset}"
+            return response
+
+        return wrapper
+
+    return decorator

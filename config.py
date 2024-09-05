@@ -53,6 +53,7 @@ class Config:
 
     # AdSense
     ADSENSE_ACCOUNT = load_env("ADSENSE_ACCOUNT")
+    AD_SLOT_SIDEBAR = load_env("AD_SLOT_SIDEBAR")
 
     # ======================================== #
 

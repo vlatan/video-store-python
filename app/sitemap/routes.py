@@ -5,30 +5,15 @@ from itertools import groupby
 from collections import OrderedDict
 
 
-from flask import Blueprint, make_response
+from flask import Blueprint, make_response, Response
 from flask import render_template, current_app, abort, url_for
 
 from app import cache, db
+from app.helpers import serve_as
 from app.models import Playlist, Post, Page, Category
 
 
 bp = Blueprint("sitemap", __name__)
-
-
-def serve_as(content_type="text/html", charset="utf-8"):
-    """Modify response's content-type header."""
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            template = func(*args, **kwargs)
-            response = make_response(template)
-            response.headers["content-type"] = f"{content_type}; charset={charset}"
-            return response
-
-        return wrapper
-
-    return decorator
 
 
 @bp.route("/sitemap.xml")

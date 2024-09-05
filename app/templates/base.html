@@ -5,9 +5,6 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	{% if config.ADSENSE_ACCOUNT %}
-	<meta name="google-adsense-account" content="{{ config.ADSENSE_ACCOUNT }}">
-	{% endif %}
 
 	{% set shared_css_url = url_for('static', filename='css/shared.css') | autoversion %}
 	{% set app_name_words = config.APP_NAME.split() %}
@@ -39,6 +36,12 @@
 
 	{% if not config['DEBUG'] %}
 	{% include 'analytics.html' %}
+	{% endif %}
+
+	{% if not current_user.is_authenticated and config.ADSENSE_ACCOUNT %}
+	<script async
+		src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-{{ config.ADSENSE_ACCOUNT }}"
+		crossorigin="anonymous"></script>
 	{% endif %}
 </head>
 
