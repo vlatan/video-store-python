@@ -32,8 +32,6 @@ def post(video_id):
     short_desc = post.short_description
     meta_description = short_desc.partition(".")[0] if short_desc else None
 
-    print(current_app.config["AD_SLOT_SIDEBAR"])
-
     return render_template(
         "post.html",
         post=post,
