@@ -27,7 +27,7 @@ ENV PORT=8000 \
     TIMEOUT=0
 
 # command to start the webserver and run the app
-CMD sleep 3 && \
+CMD sleep 5 && \
     exec gunicorn \
     --bind :$PORT \
     --workers $WORKERS \
