@@ -1,8 +1,11 @@
 import os
+import json
+import logging
 import functools
 import threading
 from redis import Redis
 from dotenv import load_dotenv
+from collections import OrderedDict
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
 from redis.exceptions import ResponseError
@@ -16,6 +19,7 @@ from flask.ctx import AppContext
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask.logging import default_handler
 
 
 # load the enviroment variables from an .env file
@@ -58,6 +62,11 @@ def create_app() -> Flask:
     app = Flask(__name__, instance_relative_config=True)
     # load config
     app.config.from_object(cfg)
+
+    # setup custom config
+    app.logger.setLevel(logging.INFO)
+    default_handler.setFormatter(CustomFormatter())
+
     # initialize plugins
     initialize_plugins(app)
     # register blueprints
@@ -181,3 +190,14 @@ def reindex(app_context: AppContext) -> None:
 
     with app_context:
         Post.reindex()
+
+
+class CustomFormatter(logging.Formatter):
+    def format(self, record):
+        return json.dumps(
+            OrderedDict(
+                time=self.formatTime(record),
+                level=record.levelname,
+                message=record.getMessage(),
+            )
+        )
