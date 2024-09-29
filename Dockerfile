@@ -27,10 +27,14 @@ ENV PORT=8000 \
     TIMEOUT=0
 
 # command to start the webserver and run the app
+# https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
+# https://docs.gunicorn.org/en/stable/settings.html
 CMD sleep 5 && \
     exec gunicorn \
     --bind :$PORT \
     --workers $WORKERS \
     --threads $THREADS \
     --timeout $TIMEOUT \
+    --access-logfile '-' \
+    --access-logformat '%({cf-connecting-ip}i)s %(u)s %(t)s %(r)s %(s)s %(b)s %(f)s %(a)s' \
     run:app
