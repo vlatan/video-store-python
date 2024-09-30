@@ -49,9 +49,7 @@ If you want to run the app **NOT** in `DEBUG` mode - as if in production - then 
 Run this, but be aware that `gunicorn` will spew **WARNING** in STDOUT that the certificate is unknown because you are using a self-signed certificate.
 ``` docker
 docker compose run --rm --service-ports app \
-sh -c 'gunicorn --certfile certs/cert.pem \
---keyfile certs/key.pem --bind :$PORT \
---workers 1 --threads 6 run:app'
+sh -c 'gunicorn --certfile certs/cert.pem --keyfile certs/key.pem run:app'
 ```
 
 Access the app on `https://localhost:port` where `port` is the port defined in `PORT` in the `.env` file.
