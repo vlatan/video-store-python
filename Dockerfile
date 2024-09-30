@@ -25,8 +25,7 @@ ENV PORT=8000 \
     WORKERS=1 \
     THREADS=6 \
     TIMEOUT=0 \
-    ACCESS_LOGFILE='-' \
-    ACCESS_LOGFORMAT='"%(u)s" "%(t)s" "%(r)s" "%(s)s" "%(b)s" "%(f)s" "%(a)s"'
+    ACCESS_LOGFILE='-'
 
 # command to start the webserver and run the app
 # https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
@@ -38,5 +37,5 @@ CMD sleep 5 && \
     --threads $THREADS \
     --timeout $TIMEOUT \
     --access-logfile $ACCESS_LOGFILE \
-    --access-logformat $ACCESS_LOGFORMAT \
+    --access-logformat '{"remote_address": "%({cf-connecting-ip}i)s", "user_name": "%(u)s", "date": "%(t)s", "status": "%(r)s", "response_code": "%(s)s", "response length": "%(b)s", "referrer": "%(f)s", "user agent": "%(a)s"}' \
     run:app
