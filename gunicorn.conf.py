@@ -1,15 +1,17 @@
+"""
+Full Gunicorn settings
+https://docs.gunicorn.org/en/stable/settings.html
+
+If PORT available in environment gunicorn will bind to "0.0.0.0:$PORT"
+https://docs.gunicorn.org/en/stable/settings.html#bind
+
+Get real remote address.
+If behind CF proxy substitute %(h)s with %({cf-connecting-ip}i)s
+https://docs.gunicorn.org/en/stable/settings.html#access-log-format
+https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
+"""
+
 import os
-
-# Full Gunicorn settings
-# https://docs.gunicorn.org/en/stable/settings.html
-
-# If PORT valiable in environment gunicorn will bind to "0.0.0.0:$PORT"
-# https://docs.gunicorn.org/en/stable/settings.html#bind
-
-# Get real remote address
-# If behind CF proxy substitute %(h)s with %({cf-connecting-ip}i)s
-# https://docs.gunicorn.org/en/stable/settings.html#access-log-format
-# https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
 
 workers = int(os.getenv("WORKERS", 1))
 threads = int(os.getenv("THREADS", 6))
