@@ -37,5 +37,14 @@ CMD sleep 5 && \
     --threads $THREADS \
     --timeout $TIMEOUT \
     --access-logfile $ACCESS_LOGFILE \
-    --access-logformat '{"remote_address": "%({cf-connecting-ip}i)s", "date": "%(t)s", "status": "%(r)s", "response_code": "%(s)s", "response_length": "%(b)s", "referrer": "%(f)s", "user_agent": "%(a)s", "request_time": "%(M)sms"}' \
+    --access-logformat '{\
+    "remote_address": "%({cf-connecting-ip}i)s", \
+    "date": "%(t)s", \
+    "status": "%(r)s", \
+    "response_code": "%(s)s", \
+    "response_length": "%(b)s", \
+    "referrer": "%(f)s", \
+    "user_agent": "%(a)s", \
+    "request_time": "%(M)sms"\
+    }' \
     run:app
