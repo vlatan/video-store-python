@@ -47,5 +47,5 @@ CMD sleep 5 && \
     --threads $THREADS \
     --timeout $TIMEOUT \
     --access-logfile $ACCESS_LOGFILE \
-    --access-logformat ${ACCESS_LOGFORMAT} \
+    --access-logformat $${ACCESS_LOGFORMAT} \
     run:app
