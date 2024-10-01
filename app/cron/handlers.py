@@ -14,24 +14,28 @@ from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
 
 
-def get_youtube_videos() -> tuple[list[dict], bool]:
+def get_youtube_videos(delay: float = 0) -> tuple[list[dict], bool]:
     all_videos, complete = [], []
     # get all playlists from db
     playlists = Playlist.query.all()
     current_app.logger.info(f"Getting videos from {len(playlists)} YT sources...")
+
     # construct youtube API service
     with youtube_build() as youtube:
+
         # loop through the playlists
         for playlist in playlists:
             # refresh playlist thumbs
             source_info = validate_playlist(playlist.playlist_id, youtube)
             playlist.channel_thumbnails = source_info["channel_thumbnails"]
             db.session.commit()
-            time.sleep(1)
+            time.sleep(delay)
+
             # get playlist VALID videos from YT
             playlist_videos, done = get_playlist_videos(playlist.playlist_id, youtube)
             # record bool value if all videos from this playlist are fetched
             complete.append(done)
+
             # loop through the videos in this playlist
             for video in playlist_videos:
                 # add relationship with this playlist to the video metadata
@@ -47,7 +51,7 @@ def get_youtube_videos() -> tuple[list[dict], bool]:
     return all_videos, all(complete)
 
 
-def revalidate_single_video(post: Post) -> bool:
+def revalidate_single_video(post: Post, delay: float = 0) -> bool:
     """
     Check if the video satisfies the posting criteria.
     Delete from database if it doesn't. Return True.
@@ -66,10 +70,12 @@ def revalidate_single_video(post: Post) -> bool:
                 "id": post.video_id,
                 "part": ["status", "snippet", "contentDetails"],
             }
+
             req = youtube.videos().list(**scope)
             # this will raise IndexError if ['items'] is empty list``
             # which means the video does not exist
             res = req.execute()["items"][0]
+
             # this will raise ValidationError if video's invalid
             validate_video(res)
 
@@ -78,9 +84,11 @@ def revalidate_single_video(post: Post) -> bool:
             try:
                 db.session.delete(post)
                 db.session.commit()
+                time.sleep(delay)
                 return True
             except (ObjectDeletedError, StatementError) as e:
                 db.session.rollback()
+                time.sleep(delay)
                 msg = f"Could not delete: {post.title.upper()}. Error: {e}"
                 current_app.logger.warning(msg)
         except HttpError as e:
@@ -96,7 +104,7 @@ def process_videos() -> None:
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
     # get all VALID videos from our playlists from YouTube
-    all_videos, complete = get_youtube_videos()
+    all_videos, complete = get_youtube_videos(delay=0.25)
 
     # get all possible categories from DB
     categories = db.session.execute(db.select(Category)).scalars().all()
@@ -105,67 +113,16 @@ def process_videos() -> None:
     categories_string.replace('"', "")
 
     current_app.logger.info(f"Processing {len(all_videos)} videos...")
-    # loop through total number of videos
-    for video in all_videos:
-        # take a short break before processing the next video
-        time.sleep(0.25)
-
-        count_edited, count_new = 0, 0
-        # if video is already posted
-        if posted := Post.query.filter_by(video_id=video["video_id"]).first():
-            is_edited = False
-            try:
-                # if it doesn't match the playlist id
-                if posted.playlist_id != video["playlist_id"]:
-                    # match playlist id
-                    posted.playlist_id = video["playlist_id"]
-                    # associate with existing playlist in our db
-                    posted.playlist = video["playlist"]
-                    is_edited = True
-
-                # update similar_ids if there's a change
-                similar = Post.get_related_posts(posted.title, PER_PAGE)
-                if video_ids := [row["video_id"] for row in similar]:
-                    when = [(value, i) for i, value in enumerate(video_ids)]
-                    similar = (
-                        Post.query.filter(Post.video_id.in_(video_ids))
-                        .order_by(db.case(*when, value=Post.video_id))
-                        .limit(PER_PAGE)
-                        .all()
-                    )
-                    similar = [row.id for row in similar]
-
-                    if posted.similar != similar:
-                        posted.similar = similar
-                        is_edited = True
-
-                # if there is NO short description in DB generate one
-                if not posted.short_description:
-                    if short_desc := generate_description(posted.title):
-                        posted.short_description = short_desc
-                        is_edited = True
-
-                # if the video is not categorized, do it
-                if not posted.category:
-                    category = categorize(posted.title, categories_string)
-                    if category in categories:
-                        posted.category_id = categories[category].id
-                        posted.category = categories[category]
-                        is_edited = True
-            finally:
-                # If no pending changes are detected,
-                # then no SQL is emitted to the database
-                # https://docs.sqlalchemy.org/en/20/orm/session_basics.html#committing
-                db.session.commit()
-                if is_edited:
-                    count_edited += 1
-        else:
+    count_updated, count_new, count_deleted = 0, 0, 0
+    for video in all_videos:  # loop through total number of videos
+        # if video is NOT already posted
+        if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
             # generate short description
-            if short_desc := generate_description(video["title"]):
+            if short_desc := generate_description(video["title"]):  # call to Gemini
                 video["short_description"] = short_desc
 
             # categorize the video
-            category = categorize(video["title"], categories_string)
+            category = categorize(video["title"], categories_string)  # call to Gemini
             if category in categories:
                 video["category_id"] = categories[category].id
                 video["category"] = categories[category]
@@ -175,69 +132,112 @@ def process_videos() -> None:
             try:
                 db.session.add(post)
                 db.session.commit()
+                time.sleep(0.25)
                 count_new += 1
             except IntegrityError:
                 db.session.rollback()
+                time.sleep(0.25)
 
-    # Log how many videos are edited/added
-    current_app.logger.info(f"Edited {count_edited} videos...")
-    current_app.logger.info(f"Added {count_new} new videos...")
+            # start the loop over
+            continue
+
+        is_updated = False
+        try:
+            # if it doesn't match the playlist id
+            if posted.playlist_id != video["playlist_id"]:
+                # match playlist id
+                posted.playlist_id = video["playlist_id"]
+                # associate with existing playlist in our db
+                posted.playlist = video["playlist"]
+                is_updated = True
+
+            # update similar_ids if there's a change
+            similar = Post.get_related_posts(posted.title, PER_PAGE)
+            if video_ids := [row["video_id"] for row in similar]:
+                when = [(value, i) for i, value in enumerate(video_ids)]
+                similar = (
+                    Post.query.filter(Post.video_id.in_(video_ids))
+                    .order_by(db.case(*when, value=Post.video_id))
+                    .limit(PER_PAGE)
+                    .all()
+                )
+                similar = [row.id for row in similar]
+                if posted.similar != similar:
+                    posted.similar = similar
+                    is_updated = True
+
+            # if there is NO short description in DB generate one
+            if not posted.short_description:
+                if short_desc := generate_description(posted.title):  # call to Gemini
+                    posted.short_description = short_desc
+                    is_updated = True
+
+            # if the video is not categorized, do it
+            if not posted.category:
+                category = categorize(posted.title, categories_string)  # call to Gemini
+                if category in categories:
+                    posted.category_id = categories[category].id
+                    posted.category = categories[category]
+                    is_updated = True
+        finally:
+            # If no pending changes are detected,
+            # then no SQL is emitted to the database
+            # https://docs.sqlalchemy.org/en/20/orm/session_basics.html#committing
+            db.session.commit()
+            time.sleep(0.25)
+            if is_updated:
+                count_updated += 1
 
     # get sources ids
     sources = [pl.playlist_id for pl in Playlist.query.all()]
 
     # delete missing videos if all VALID videos are fetched from YT
     if complete:
-        delete_videos(all_videos, sources)
+        fetched_ids = {video["video_id"] for video in all_videos}
+        posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
+        posted_ids = {post.video_id for post in posted}
+        to_delete_ids = Post.video_id.in_(posted_ids - fetched_ids)
+        for post in Post.query.filter(to_delete_ids).all():
+            if revalidate_single_video(post, 0.25):  # call to YT
+                count_deleted += 1
 
     # revalidate orphan videos (not attached to any source/playlist)
     orphan_posts = (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
     orphan_posts = Post.query.filter(orphan_posts).all()
     current_app.logger.info(f"Revalidating {len(orphan_posts)} orphan videos...")
-    count_deleted, count_edited = 0, 0
-    for post in orphan_posts:
-        time.sleep(0.25)
 
-        if revalidate_single_video(post):
+    for post in orphan_posts:
+        if revalidate_single_video(post, 0.25):  # call to YT
             count_deleted += 1
             continue
 
-        is_edited = False
+        is_updated = False
         try:
             # if there is NO short description in DB generate one
             if not post.short_description:
-                if short_desc := generate_description(post.title):
+                if short_desc := generate_description(post.title):  # call to Gemini
                     post.short_description = short_desc
-                    is_edited = True
+                    is_updated = True
 
             # if the video is not categorized, do it
             if not post.category:
-                category = categorize(post.title, categories_string)
+                # call to Gemini
+                category = categorize(post.title, categories_string)  # call to Gemini
                 if category in categories:
                     post.category_id = categories[category].id
                     post.category = categories[category]
-                    is_edited = True
+                    is_updated = True
         finally:
             db.session.commit()
-            if is_edited:
-                count_edited += 1
+            time.sleep(0.25)
+            if is_updated:
+                count_updated += 1
 
-    current_app.logger.info(f"Edited {count_edited} orphan videos...")
-    current_app.logger.info(f"Deleted {count_deleted} orphan videos...")
+    # Log how many videos are edited/added
+    current_app.logger.info(f"Updated {count_updated} current videos.")
+    current_app.logger.info(f"Added {count_new} new videos.")
+    current_app.logger.info(f"Deleted {count_deleted} invalid videos.")
     current_app.logger.info("Worker job done.")
-
-
-def delete_videos(all_videos: list[dict], sources: list) -> None:
-    count_deleted = 0
-    fetched_ids = {video["video_id"] for video in all_videos}
-    posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
-    posted_ids = {post.video_id for post in posted}
-    to_delete_ids = Post.video_id.in_(posted_ids - fetched_ids)
-    for post in Post.query.filter(to_delete_ids).all():
-        if revalidate_single_video(post):  # revalidate the video again and delete
-            count_deleted += 1
-        time.sleep(0.25)
-    current_app.logger.info(f"Deleted {count_deleted} missing videos...")
 
 
 def generate_description(title: str) -> str | None:
