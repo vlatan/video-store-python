@@ -14,7 +14,7 @@ from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
 
 
-def get_youtube_videos(delay: float = 0) -> tuple[list[dict], bool]:
+def get_youtube_videos() -> tuple[list[dict], bool]:
     all_videos, complete = [], []
     # get all playlists from db
     playlists = Playlist.query.all()
@@ -29,7 +29,6 @@ def get_youtube_videos(delay: float = 0) -> tuple[list[dict], bool]:
             source_info = validate_playlist(playlist.playlist_id, youtube)
             playlist.channel_thumbnails = source_info["channel_thumbnails"]
             db.session.commit()
-            time.sleep(delay)
 
             # get playlist VALID videos from YT
             playlist_videos, done = get_playlist_videos(playlist.playlist_id, youtube)
@@ -51,7 +50,7 @@ def get_youtube_videos(delay: float = 0) -> tuple[list[dict], bool]:
     return all_videos, all(complete)
 
 
-def revalidate_single_video(post: Post, delay: float = 0) -> bool:
+def revalidate_single_video(post: Post) -> bool:
     """
     Check if the video satisfies the posting criteria.
     Delete from database if it doesn't. Return True.
@@ -84,11 +83,9 @@ def revalidate_single_video(post: Post, delay: float = 0) -> bool:
             try:
                 db.session.delete(post)
                 db.session.commit()
-                time.sleep(delay)
                 return True
             except (ObjectDeletedError, StatementError) as e:
                 db.session.rollback()
-                time.sleep(delay)
                 msg = f"Could not delete: {post.title.upper()}. Error: {e}"
                 current_app.logger.warning(msg)
         except HttpError as e:
@@ -104,7 +101,7 @@ def process_videos() -> None:
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
 
     # get all VALID videos from our playlists from YouTube
-    all_videos, complete = get_youtube_videos(delay=0.25)
+    all_videos, complete = get_youtube_videos()
 
     # get all possible categories from DB
     categories = db.session.execute(db.select(Category)).scalars().all()
@@ -118,11 +115,11 @@ def process_videos() -> None:
         # if video is NOT already posted
         if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
             # generate short description
-            if short_desc := generate_description(video["title"]):  # call to Gemini
+            if short_desc := generate_description(video["title"], delay=1):
                 video["short_description"] = short_desc
 
             # categorize the video
-            category = categorize(video["title"], categories_string)  # call to Gemini
+            category = categorize(video["title"], categories_string, delay=1)
             if category in categories:
                 video["category_id"] = categories[category].id
                 video["category"] = categories[category]
@@ -132,11 +129,9 @@ def process_videos() -> None:
             try:
                 db.session.add(post)
                 db.session.commit()
-                time.sleep(0.25)
                 count_new += 1
             except IntegrityError:
                 db.session.rollback()
-                time.sleep(0.25)
 
             # start the loop over
             continue
@@ -168,13 +163,13 @@ def process_videos() -> None:
 
             # if there is NO short description in DB generate one
             if not posted.short_description:
-                if short_desc := generate_description(posted.title):  # call to Gemini
+                if short_desc := generate_description(posted.title, delay=1):
                     posted.short_description = short_desc
                     is_updated = True
 
             # if the video is not categorized, do it
             if not posted.category:
-                category = categorize(posted.title, categories_string)  # call to Gemini
+                category = categorize(posted.title, categories_string, delay=1)
                 if category in categories:
                     posted.category_id = categories[category].id
                     posted.category = categories[category]
@@ -184,7 +179,6 @@ def process_videos() -> None:
             # then no SQL is emitted to the database
             # https://docs.sqlalchemy.org/en/20/orm/session_basics.html#committing
             db.session.commit()
-            time.sleep(0.25)
             if is_updated:
                 count_updated += 1
 
@@ -198,7 +192,7 @@ def process_videos() -> None:
         posted_ids = {post.video_id for post in posted}
         to_delete_ids = Post.video_id.in_(posted_ids - fetched_ids)
         for post in Post.query.filter(to_delete_ids).all():
-            if revalidate_single_video(post, 0.25):  # call to YT
+            if revalidate_single_video(post):  # call to YT
                 count_deleted += 1
 
     # revalidate orphan videos (not attached to any source/playlist)
@@ -207,7 +201,7 @@ def process_videos() -> None:
     current_app.logger.info(f"Revalidating {len(orphan_posts)} orphan videos...")
 
     for post in orphan_posts:
-        if revalidate_single_video(post, 0.25):  # call to YT
+        if revalidate_single_video(post):  # call to YT
             count_deleted += 1
             continue
 
@@ -215,21 +209,19 @@ def process_videos() -> None:
         try:
             # if there is NO short description in DB generate one
             if not post.short_description:
-                if short_desc := generate_description(post.title):  # call to Gemini
+                if short_desc := generate_description(post.title, delay=1):
                     post.short_description = short_desc
                     is_updated = True
 
             # if the video is not categorized, do it
             if not post.category:
-                # call to Gemini
-                category = categorize(post.title, categories_string)  # call to Gemini
+                category = categorize(post.title, categories_string, delay=1)
                 if category in categories:
                     post.category_id = categories[category].id
                     post.category = categories[category]
                     is_updated = True
         finally:
             db.session.commit()
-            time.sleep(0.25)
             if is_updated:
                 count_updated += 1
 
@@ -240,8 +232,11 @@ def process_videos() -> None:
     current_app.logger.info("Worker job done.")
 
 
-def generate_description(title: str) -> str | None:
-    """Generate description from a generative AI given a title."""
+def generate_description(title: str, delay: float) -> str | None:
+    """
+    Call to Gemini API.
+    Generate description from a generative AI given a title.
+    """
 
     generate_content = current_app.config["generate_content"]
     prompt = f"Write one short paragraph about: {title}."
@@ -252,9 +247,14 @@ def generate_description(title: str) -> str | None:
         msg = f"Was unable to generate a summary for: {title.upper()}. Error: {e}"
         current_app.logger.warning(msg)
 
+    time.sleep(delay)
 
-def categorize(title: str, categories: str) -> str | None:
-    """Generate a category from a generative AI based given a title and categories."""
+
+def categorize(title: str, categories: str, delay: float) -> str | None:
+    """
+    Call to Gemini API.
+    Generate a category from a generative AI based given a title and categories.
+    """
 
     generate_content = current_app.config["generate_content"]
     prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
@@ -264,3 +264,5 @@ def categorize(title: str, categories: str) -> str | None:
     except Exception as e:
         msg = f"Was unable to generate a category for: {title.upper()}. Error: {e}"
         current_app.logger.warning(msg)
+
+    time.sleep(delay)
