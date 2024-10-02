@@ -103,13 +103,23 @@ def process_videos() -> None:
     # get all VALID videos from our playlists from YouTube
     all_videos, complete = get_youtube_videos()
 
-    # get all possible categories from DB
+    # get sources/playlists ids
+    sources = [pl.playlist_id for pl in Playlist.query.all()]
+
+    # get orphan videos (not attached to any source/playlist)
+    orphan_posts = (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
+    orphan_posts = Post.query.filter(orphan_posts).all()
+
+    # get all possible categories
     categories = db.session.execute(db.select(Category)).scalars().all()
     categories = {category.name: category for category in categories}
     categories_string = ", ".join(categories)
     categories_string.replace('"', "")
 
-    current_app.logger.info(f"Processing {len(all_videos)} videos...")
+    # log total number of videos to proocess
+    msg = f"Processing {len(all_videos) + len(orphan_posts)} videos..."
+    current_app.logger.info(msg)
+
     count_updated, count_new, count_deleted = 0, 0, 0
     for video in all_videos:  # loop through total number of videos
         # if video is NOT already posted
@@ -182,9 +192,6 @@ def process_videos() -> None:
             if is_updated:
                 count_updated += 1
 
-    # get sources ids
-    sources = [pl.playlist_id for pl in Playlist.query.all()]
-
     # delete missing videos if all VALID videos are fetched from YT
     if complete:
         fetched_ids = {video["video_id"] for video in all_videos}
@@ -196,10 +203,6 @@ def process_videos() -> None:
                 count_deleted += 1
 
     # revalidate orphan videos (not attached to any source/playlist)
-    orphan_posts = (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
-    orphan_posts = Post.query.filter(orphan_posts).all()
-    current_app.logger.info(f"Revalidating {len(orphan_posts)} orphan videos...")
-
     for post in orphan_posts:
         if revalidate_single_video(post):  # call to YT
             count_deleted += 1
