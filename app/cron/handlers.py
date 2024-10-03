@@ -116,9 +116,12 @@ def process_videos() -> None:
     categories_string = ", ".join(categories)
     categories_string.replace('"', "")
 
+    # singular or plural
+    vs = lambda num: "video" if num == 1 else "videos"
+
     # log total number of videos to proocess
-    msg = f"Processing {len(all_videos) + len(orphan_posts)} videos..."
-    current_app.logger.info(msg)
+    total_videos = len(all_videos) + len(orphan_posts)
+    current_app.logger.info(f"Processing {total_videos} {vs(total_videos)}...")
 
     count_updated, count_new, count_deleted = 0, 0, 0
     for video in all_videos:  # loop through total number of videos
@@ -229,9 +232,9 @@ def process_videos() -> None:
                 count_updated += 1
 
     # Log how many videos are edited/added
-    current_app.logger.info(f"Updated {count_updated} current videos.")
-    current_app.logger.info(f"Added {count_new} new videos.")
-    current_app.logger.info(f"Deleted {count_deleted} invalid videos.")
+    current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
+    current_app.logger.info(f"Added {count_new} new {vs(count_new)}.")
+    current_app.logger.info(f"Deleted {count_deleted} invalid {vs(count_deleted)}.")
     current_app.logger.info("Worker job done.")
 
 
