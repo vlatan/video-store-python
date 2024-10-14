@@ -106,9 +106,16 @@ def process_videos() -> None:
     # get sources/playlists ids
     sources = [pl.playlist_id for pl in Playlist.query.all()]
 
-    # get orphan videos (not attached to any source/playlist)
-    orphan_posts = (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
-    orphan_posts = Post.query.filter(orphan_posts).all()
+    # delete missing videos if all VALID videos are fetched from YT
+    count_deleted = 0
+    if complete:
+        fetched_ids = {video["video_id"] for video in all_videos}
+        posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
+        posted_ids = {post.video_id for post in posted}
+        to_delete_ids = Post.video_id.in_(posted_ids - fetched_ids)
+        for post in Post.query.filter(to_delete_ids).all():
+            if revalidate_single_video(post):  # call to YT
+                count_deleted += 1
 
     # get all possible categories
     categories = db.session.execute(db.select(Category)).scalars().all()
@@ -116,14 +123,7 @@ def process_videos() -> None:
     categories_string = ", ".join(categories)
     categories_string.replace('"', "")
 
-    # singular or plural
-    vs = lambda num: "video" if num == 1 else "videos"
-
-    # log total number of videos to proocess
-    total_videos = len(all_videos) + len(orphan_posts)
-    current_app.logger.info(f"Processing {total_videos} {vs(total_videos)}...")
-
-    count_updated, count_new, count_deleted = 0, 0, 0
+    count_updated, count_new = 0, 0
     for video in all_videos:  # loop through total number of videos
         # if video is NOT already posted
         if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
@@ -195,15 +195,9 @@ def process_videos() -> None:
             if is_updated:
                 count_updated += 1
 
-    # delete missing videos if all VALID videos are fetched from YT
-    if complete:
-        fetched_ids = {video["video_id"] for video in all_videos}
-        posted = Post.query.filter(Post.playlist_id.in_(sources)).all()
-        posted_ids = {post.video_id for post in posted}
-        to_delete_ids = Post.video_id.in_(posted_ids - fetched_ids)
-        for post in Post.query.filter(to_delete_ids).all():
-            if revalidate_single_video(post):  # call to YT
-                count_deleted += 1
+    # get orphan videos (not attached to any source/playlist)
+    orphan_posts = (Post.playlist_id == None) | (Post.playlist_id.not_in(sources))
+    orphan_posts = Post.query.filter(orphan_posts).all()
 
     # revalidate orphan videos (not attached to any source/playlist)
     for post in orphan_posts:
@@ -231,9 +225,14 @@ def process_videos() -> None:
             if is_updated:
                 count_updated += 1
 
-    # Log how many videos are edited/added
-    current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
+    # singular or plural
+    vs = lambda num: "video" if num == 1 else "videos"
+
+    # log the processing stats
+    total_videos = len(all_videos) + len(orphan_posts)
+    current_app.logger.info(f"Processed {total_videos} {vs(total_videos)}.")
     current_app.logger.info(f"Added {count_new} new {vs(count_new)}.")
+    current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
     current_app.logger.info(f"Deleted {count_deleted} invalid {vs(count_deleted)}.")
     current_app.logger.info("Worker job done.")
 
