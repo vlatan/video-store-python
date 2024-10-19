@@ -1,4 +1,7 @@
 import time
+import random
+import functools
+from typing import Callable
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -128,11 +131,11 @@ def process_videos() -> None:
         # if video is NOT already posted
         if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
             # generate short description
-            if short_desc := generate_description(video["title"], delay=1):
+            if short_desc := generate_description(video["title"]):
                 video["short_description"] = short_desc
 
             # categorize the video
-            category = categorize(video["title"], categories_string, delay=1)
+            category = categorize(video["title"], categories_string)
             if category in categories:
                 video["category_id"] = categories[category].id
                 video["category"] = categories[category]
@@ -176,13 +179,13 @@ def process_videos() -> None:
 
             # if there is NO short description in DB generate one
             if not posted.short_description:
-                if short_desc := generate_description(posted.title, delay=1):
+                if short_desc := generate_description(posted.title):
                     posted.short_description = short_desc
                     is_updated = True
 
             # if the video is not categorized, do it
             if not posted.category:
-                category = categorize(posted.title, categories_string, delay=1)
+                category = categorize(posted.title, categories_string)
                 if category in categories:
                     posted.category_id = categories[category].id
                     posted.category = categories[category]
@@ -209,13 +212,13 @@ def process_videos() -> None:
         try:
             # if there is NO short description in DB generate one
             if not post.short_description:
-                if short_desc := generate_description(post.title, delay=1):
+                if short_desc := generate_description(post.title):
                     post.short_description = short_desc
                     is_updated = True
 
             # if the video is not categorized, do it
             if not post.category:
-                category = categorize(post.title, categories_string, delay=1)
+                category = categorize(post.title, categories_string)
                 if category in categories:
                     post.category_id = categories[category].id
                     post.category = categories[category]
@@ -237,7 +240,43 @@ def process_videos() -> None:
     current_app.logger.info("Worker job done.")
 
 
-def generate_description(title: str, delay: float) -> str | None:
+def retry_generative_api(
+    fn: Callable | None = None, delay: float = 1, max_retries: int = 5
+) -> Callable:
+    """Provide retry and error logging for a generative API call."""
+
+    def decorator(func: Callable) -> Callable:
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs) -> str | None:
+
+            # Preemptive delay between requests
+            time.sleep(delay)
+
+            retry_delay, error = delay, ""
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    error = str(e)
+                    time.sleep(retry_delay)
+                    retry_delay *= 2
+                    retry_delay += random.uniform(0, 1)
+
+            r = "retry" if attempt == 0 else "retries"
+            msg = (
+                f"Was unable to generate content using function '{func.__name__}; "
+                f"with args '{args[0]}' after {attempt+1} {r}. Error: {error}"
+            )
+            current_app.logger.warning(msg)
+
+        return wrapper
+
+    return decorator(fn) if fn else decorator
+
+
+@retry_generative_api
+def generate_description(title: str) -> str | None:
     """
     Call to Gemini API.
     Generate description from a generative AI given a title.
@@ -245,17 +284,11 @@ def generate_description(title: str, delay: float) -> str | None:
 
     generate_content = current_app.config["generate_content"]
     prompt = f"Write one short paragraph about: {title}."
-
-    try:
-        return generate_content(prompt).text
-    except Exception as e:
-        msg = f"Was unable to generate a summary for: {title.upper()}. Error: {e}"
-        current_app.logger.warning(msg)
-
-    time.sleep(delay)
+    return generate_content(prompt).text
 
 
-def categorize(title: str, categories: str, delay: float) -> str | None:
+@retry_generative_api
+def categorize(title: str, categories: str) -> str | None:
     """
     Call to Gemini API.
     Generate a category from a generative AI based given a title and categories.
@@ -263,11 +296,4 @@ def categorize(title: str, categories: str, delay: float) -> str | None:
 
     generate_content = current_app.config["generate_content"]
     prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
-
-    try:
-        return generate_content(prompt).text
-    except Exception as e:
-        msg = f"Was unable to generate a category for: {title.upper()}. Error: {e}"
-        current_app.logger.warning(msg)
-
-    time.sleep(delay)
+    return generate_content(prompt).text

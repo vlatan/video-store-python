@@ -1,14 +1,16 @@
 import functools
+from typing import Callable
 from googleapiclient.discovery import build as google_discovery_build
 
+from werkzeug.wrappers.response import Response
 from flask_login import current_user, login_required
 from flask import current_app, flash, redirect, url_for, make_response
 
 
-def admin_required(func):
+def admin_required(func) -> Callable:
     @functools.wraps(func)
     @login_required
-    def only_admin(*args, **kwargs):
+    def only_admin(*args, **kwargs) -> Response:
         if current_user.google_id == current_app.config["ADMIN_OPENID"]:
             return func(*args, **kwargs)
         flash("Sorry, it seems you don't have access to that page!", "info")
@@ -17,7 +19,7 @@ def admin_required(func):
     return only_admin
 
 
-def dump_datetime(value):
+def dump_datetime(value) -> list[str] | None:
     """Deserialize datetime object into string form for JSON processing."""
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
 
@@ -32,7 +34,7 @@ def youtube_build():
     )
 
 
-def serve_as(content_type="text/html", charset="utf-8"):
+def serve_as(content_type="text/html", charset="utf-8") -> Callable:
     """Modify response's content-type header."""
 
     def decorator(func):
