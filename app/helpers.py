@@ -37,9 +37,9 @@ def youtube_build():
 def serve_as(content_type="text/html", charset="utf-8") -> Callable:
     """Modify response's content-type header."""
 
-    def decorator(func):
+    def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Response:
             template = func(*args, **kwargs)
             response = make_response(template)
             response.headers["content-type"] = f"{content_type}; charset={charset}"
