@@ -253,22 +253,20 @@ def retry_generative_api(
             # Preemptive delay between requests
             time.sleep(delay)
 
-            retry_delay, error = delay, ""
+            retry_delay, error = delay, None
             for attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    error = str(e)
+                    error = e
                     time.sleep(retry_delay)
                     retry_delay *= 2
                     retry_delay += random.uniform(0, 1)
 
-            r = "retry" if attempt == 0 else "retries"
-            msg = (
-                f"Was unable to generate content using function '{func.__name__}; "
-                f"with args '{args[0]}' after {attempt+1} {r}. Error: {error}"
+            current_app.logger.warning(
+                f"Was unable to generate content using function '{func.__name__}' "
+                f"for title {args[0].upper()} after {attempt+1} retries. Error: {error}"
             )
-            current_app.logger.warning(msg)
 
         return wrapper
 
