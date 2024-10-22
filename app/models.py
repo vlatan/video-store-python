@@ -260,7 +260,7 @@ class Post(Base, SearchableMixin):
                 "srcset": doc.srcset,
             }
             for doc in search_result.docs
-            if doc.title != title
+            if doc.title.lower() != title.lower()
         ]
 
         if len(search_result) < per_page:
