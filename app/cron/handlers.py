@@ -235,13 +235,15 @@ def process_videos() -> None:
     total_videos = len(all_videos) + len(orphan_posts)
     current_app.logger.info(f"Processed {total_videos} {vs(total_videos)}.")
     current_app.logger.info(f"Added {count_new} new {vs(count_new)}.")
-    current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
     current_app.logger.info(f"Deleted {count_deleted} invalid {vs(count_deleted)}.")
+    current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
     current_app.logger.info("Worker job done.")
 
 
-def retry_generative_api(
-    fn: Callable | None = None, delay: float = 1, max_retries: int = 5
+def retry(
+    fn: Callable | None = None,
+    start_delay: float = 0,
+    max_retries: int = 5,
 ) -> Callable:
     """Provide retry and error logging for a generative API call."""
 
@@ -251,9 +253,10 @@ def retry_generative_api(
         def wrapper(*args, **kwargs) -> str | None:
 
             # Preemptive delay between requests
-            time.sleep(delay)
+            if start_delay > 0:
+                time.sleep(start_delay)
 
-            retry_delay, error = delay, None
+            retry_delay, error = start_delay + 1, None
             for attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
@@ -273,7 +276,7 @@ def retry_generative_api(
     return decorator(fn) if fn else decorator
 
 
-@retry_generative_api
+@retry(start_delay=0.6)
 def generate_description(title: str) -> str | None:
     """
     Call to Gemini API.
@@ -285,7 +288,7 @@ def generate_description(title: str) -> str | None:
     return generate_content(prompt).text
 
 
-@retry_generative_api
+@retry(start_delay=0.6)
 def categorize(title: str, categories: str) -> str | None:
     """
     Call to Gemini API.
