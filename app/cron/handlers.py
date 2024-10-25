@@ -241,7 +241,7 @@ def process_videos() -> None:
 
 
 def retry(
-    fn: Callable | None = None,
+    _func: Callable | None = None,
     start_delay: float = 0,
     max_retries: int = 5,
 ) -> Callable:
@@ -273,7 +273,7 @@ def retry(
 
         return wrapper
 
-    return decorator(fn) if fn else decorator
+    return decorator(_func) if _func else decorator
 
 
 @retry(start_delay=0.6)
