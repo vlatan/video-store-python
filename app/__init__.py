@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from collections import OrderedDict
 import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.exc import OperationalError
 from redis.exceptions import ResponseError
 from redis.commands.search.field import TextField
 from werkzeug.utils import import_string, find_modules
@@ -77,12 +78,16 @@ def create_app() -> Flask:
     init_redis_client(app)
 
     with app.app_context():
-        # create db tables if they don't exist
-        # db.create_all()
-        # initialize search index
-        initialize_search_index(app)
-        # populate search index if empty
-        populate_search_index(app)
+        try:
+            # create db tables if they don't exist
+            db.create_all()
+            # initialize search index
+            initialize_search_index(app)
+            # populate search index if empty
+            populate_search_index(app)
+        except OperationalError as err:
+            app.logger.warning(err)
+            pass
 
     return app
 
