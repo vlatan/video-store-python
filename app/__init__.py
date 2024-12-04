@@ -113,8 +113,9 @@ def setup_generative_ai(app: Flask) -> None:
     Place generative ai ready partial method in the app config
     that requires just the prompt.
     """
-    GEMINI_API_KEY = app.config["GEMINI_API_KEY"]
-    genai.configure(api_key=GEMINI_API_KEY)
+    # limit GRPC library to log only errors
+    os.environ["GRPC_VERBOSITY"] = "ERROR"
+    genai.configure(api_key=app.config["GEMINI_API_KEY"])
     model = genai.GenerativeModel("gemini-pro")
 
     # create partial function by supplying safety_settings
