@@ -22,4 +22,4 @@ COPY ./app ./app
 
 # command to start the webserver and run the app
 # gets config from gunicorn.conf.py
-CMD gunicorn run:app
+CMD ["gunicorn", "run:app"]
