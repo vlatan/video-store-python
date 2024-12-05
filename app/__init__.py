@@ -86,7 +86,7 @@ def create_app() -> Flask:
             # populate search index if empty
             populate_search_index(app)
         except OperationalError as err:
-            app.logger.warning(err)
+            app.logger.error(err)
             pass
 
     return app
