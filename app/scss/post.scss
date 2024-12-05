@@ -194,7 +194,14 @@ button.edit-description {
 }
 
 
-/* ############# Related Videos ############# */
+/* ############# Sidebar ############# */
+
+.sidebar_wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
 
 .related_videos {
     display: flex;
