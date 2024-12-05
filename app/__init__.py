@@ -87,7 +87,6 @@ def create_app() -> Flask:
             populate_search_index(app)
         except OperationalError as err:
             app.logger.error(err)
-            pass
 
     return app
 
