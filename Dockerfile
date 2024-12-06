@@ -17,7 +17,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir --upgrade -r requirements.txt
 
 # copy all the necessary app files into the working dir
-COPY ["./config.py", "gunicorn.conf.py", "./run.py", "worker.py", "./"]
+COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
 COPY ./app ./app
 
 # command to start the webserver and run the app

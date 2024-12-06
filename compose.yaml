@@ -63,6 +63,7 @@ services:
     volumes:
       - ./app:/src/app
       - ./config.py:/src/config.py
+      - ./gunicorn.conf.py:/src/gunicorn.conf.py
       - ./run.py:/src/run.py
       - ./certs:/src/certs # we need the certificates for local development
     depends_on:
