@@ -1,12 +1,10 @@
 # Docker image
 FROM python:3.12-slim
 
-# create virtual environment and prepend its bin dir in $PATH
-ENV VIRTUAL_ENV=/opt/venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}" \
-    # Allow statements and log messages to immediately appear in logs
-    PYTHONUNBUFFERED=1
+# create virtual environment, prepend its bin dir in $PATH
+# and allow statements and log messages to immediately appear in logs
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:${PATH}" PYTHONUNBUFFERED=1
 
 # set the container's working directory
 WORKDIR /src
