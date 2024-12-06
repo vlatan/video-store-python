@@ -4,7 +4,8 @@ services:
     restart: always
     image: redis/redis-stack-server
     container_name: redis
-    command: [ redis-stack-server, --requirepass, $REDIS_PASSWORD ]
+    environment:
+      - REDIS_ARGS="--requirepass ${REDIS_PASSWORD}"
     ports:
       - "${EXPOSE_REDIS_PORT:-}:6379"
     healthcheck:
