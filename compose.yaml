@@ -6,10 +6,12 @@ services:
     container_name: redis
     environment:
       - REDIS_ARGS=--requirepass $REDIS_PASSWORD
+      - REDISCLI_AUTH=$REDIS_PASSWORD
+      - REDIS_PING=redis-cli --raw INCR ping
     ports:
       - "${EXPOSE_REDIS_PORT:-}:6379"
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "INCR", "ping" ]
+      test: [ "CMD-SHELL", "$${REDIS_PING} | grep -E ^[0-9]+$ || ($${REDIS_PING} && exit 1)" ]
       interval: 5s
       timeout: 5s
       retries: 3
