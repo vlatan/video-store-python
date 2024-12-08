@@ -5,7 +5,7 @@ services:
     image: redis/redis-stack-server
     container_name: redis
     environment:
-      - REDIS_ARGS="--requirepass ${REDIS_PASSWORD}"
+      - REDIS_ARGS=--requirepass $REDIS_PASSWORD
     ports:
       - "${EXPOSE_REDIS_PORT:-}:6379"
     healthcheck:
