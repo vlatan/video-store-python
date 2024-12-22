@@ -39,7 +39,7 @@ def validate_video(response):
     return True
 
 
-def normalize_title(title):
+def normalize_title(title: str) -> str:
     # specific to SLICE source
     title = title.split(" I SLICE ")[0]
     # remove content after //
@@ -50,8 +50,17 @@ def normalize_title(title):
     title = re.sub(r"[\(\[].*?[\)\]]", "", title).strip()
     # remove extra spaces
     title = re.sub(" +", " ", title)
+    # titlecase the title
+    title = title.title()
+
+    # split title into words
+    words = title.split()
+
+    if words[-1].lower() == "documentary":
+        del words[-1]
+
     # common prepositions
-    prep = [
+    prepositions = [
         "at",
         "by",
         "for",
@@ -72,30 +81,19 @@ def normalize_title(title):
         "but",
         "per",
         "via",
+        "vs",
+        "vs.",
     ]
+
     # punctuation
-    punct = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
-    # split title into words
-    words = title.split()
+    punctuations = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
 
-    if words[-1].lower() == "documentary":
-        del words[-1]
+    for i, word in enumerate(words):
+        if (lowercase_word := word.lower()) in prepositions:
+            if i != 0 and words[i - 1][-1] not in punctuations:
+                words[i] = lowercase_word
 
-    if (length := len(words)) > 1:
-        norm_title = words[0].capitalize()
-        for i in range(1, length - 1):
-            # if here's quotation mark before the first letter of the word
-            if words[i][0] in ['"', "'"]:
-                word = words[i][0] + words[i][1].upper() + words[i][2:]
-            # if the word is common prepositon and there's no punctuation befor it
-            elif words[i].lower() in prep and words[i - 1][-1] not in punct:
-                word = words[i].lower()
-            else:
-                word = words[i].capitalize()
-            norm_title += " " + word
-        title = norm_title + " " + words[-1].capitalize()
-
-    return title
+    return " ".join(words)
 
 
 def normalize_tags(tags, used):
