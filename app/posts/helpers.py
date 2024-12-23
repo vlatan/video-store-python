@@ -93,17 +93,17 @@ def normalize_title(title: str) -> str:
         # remove quatation marks at start/end if any and store them
         first_char, last_char = "", ""
 
-        if word[0] in ['"', "'"]:
+        if len(word) > 1 and word[0] in ['"', "'"]:
             first_char, word = word[0], word[1:]
 
-        if word[-1] in ['"', "'"]:
+        if len(word) > 1 and word[-1] in ['"', "'"]:
             last_char, word = word[-1], word[:-1]
 
         # the word is a preposition but not after a punctuation
         if i != 0 and word.lower() in preps and words[i - 1][-1] not in puncts:
             words[i] = first_char + word.lower() + last_char
 
-        # the words is alreay capitalized or an acronym
+        # the word is alreay capitalized or an acronym
         elif word[0].isupper():
             words[i] = first_char + word + last_char
 
