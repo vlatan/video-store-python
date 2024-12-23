@@ -50,8 +50,6 @@ def normalize_title(title: str) -> str:
     title = re.sub(r"[\(\[].*?[\)\]]", "", title).strip()
     # remove extra spaces
     title = re.sub(" +", " ", title)
-    # titlecase the title
-    title = title.title()
 
     # split title into words
     words = title.split()
@@ -60,7 +58,7 @@ def normalize_title(title: str) -> str:
         del words[-1]
 
     # common prepositions
-    prepositions = [
+    preps = [
         "at",
         "by",
         "for",
@@ -85,13 +83,20 @@ def normalize_title(title: str) -> str:
         "vs.",
     ]
 
-    # punctuation
-    punctuations = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
+    # punctuations
+    puncts = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
 
     for i, word in enumerate(words):
-        if (lowercase_word := word.lower()) in prepositions:
-            if i != 0 and words[i - 1][-1] not in punctuations:
-                words[i] = lowercase_word
+        # the word is a preposition but not after a punctuation
+        if i != 0 and word.lower() in preps and words[i - 1][-1] not in puncts:
+            words[i] = word.lower()
+
+        # the first letter of the word is a single or double quotation mark
+        elif word[0] in ['"', "'"]:
+            words[i] = word[0] + word[1].upper() + word[2:]
+
+        else:  # capitalize any other word
+            words[i] = word.capitalize()
 
     return " ".join(words)
 
