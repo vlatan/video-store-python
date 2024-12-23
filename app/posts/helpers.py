@@ -1,3 +1,5 @@
+from curses.ascii import isupper
+from operator import isub
 import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
@@ -87,16 +89,29 @@ def normalize_title(title: str) -> str:
     puncts = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
 
     for i, word in enumerate(words):
+
+        # remove quatation marks at start/end if any and store them
+        first_char, last_char = "", ""
+
+        if word[0] in ['"', "'"]:
+            first_char = word[0]
+            word = word[1:]
+
+        if word[-1] in ['"', "'"]:
+            last_char = word[-1]
+            word = word[:-1]
+
         # the word is a preposition but not after a punctuation
         if i != 0 and word.lower() in preps and words[i - 1][-1] not in puncts:
-            words[i] = word.lower()
+            words[i] = first_char + word.lower() + last_char
 
-        # the first letter of the word is a single or double quotation mark
-        elif word[0] in ['"', "'"]:
-            words[i] = word[0] + word[1].upper() + word[2:]
+        # the words is alreay capitalized or an acronym
+        elif word[0].isupper():
+            words[i] = first_char + word + last_char
+            continue
 
         else:  # capitalize any other word
-            words[i] = word.capitalize()
+            words[i] = first_char + word.capitalize() + last_char
 
     return " ".join(words)
 
