@@ -42,12 +42,12 @@ def validate_video(response):
 
 
 def normalize_title(title: str) -> str:
-    # specific to SLICE source
-    title = title.split(" I SLICE ")[0]
-    # remove content after //
-    title = title.split(" // ")[0]
-    # remove content after pipe symbol
-    title = title.split(" | ")[0]
+
+    # cut off the title at certain split characters
+    split_chars = [" I SLICE ", " // ", " | "]
+    for char in split_chars:
+        title = title.split(char)[0]
+
     # remove bracketed content
     title = re.sub(r"[\(\[].*?[\)\]]", "", title).strip()
     # remove extra spaces
@@ -90,7 +90,7 @@ def normalize_title(title: str) -> str:
 
     for i, w in enumerate(words):
 
-        # remove quotation marks from word at start/end if any and store them
+        # remove quotation marks from word at start/end and store them
         fc, w = (w[0], w[1:]) if len(w) > 1 and w[0] in ['"', "'"] else ("", w)
         lc, w = (w[-1], w[:-1]) if len(w) > 1 and w[-1] in ['"', "'"] else ("", w)
 
