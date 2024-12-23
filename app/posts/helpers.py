@@ -43,10 +43,9 @@ def validate_video(response):
 
 def normalize_title(title: str) -> str:
 
-    # cut off the title at certain split characters
-    split_chars = [" I SLICE ", " // ", " | "]
-    for char in split_chars:
-        title = title.split(char)[0]
+    # cut off the title at certain substrings
+    for substring in [" I SLICE ", " // ", " | "]:
+        title = title.split(substring)[0]
 
     # remove bracketed content
     title = re.sub(r"[\(\[].*?[\)\]]", "", title).strip()
