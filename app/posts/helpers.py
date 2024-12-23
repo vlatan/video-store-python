@@ -94,12 +94,10 @@ def normalize_title(title: str) -> str:
         first_char, last_char = "", ""
 
         if word[0] in ['"', "'"]:
-            first_char = word[0]
-            word = word[1:]
+            first_char, word = word[0], word[1:]
 
         if word[-1] in ['"', "'"]:
-            last_char = word[-1]
-            word = word[:-1]
+            last_char, word = word[-1], word[:-1]
 
         # the word is a preposition but not after a punctuation
         if i != 0 and word.lower() in preps and words[i - 1][-1] not in puncts:
@@ -108,7 +106,6 @@ def normalize_title(title: str) -> str:
         # the words is alreay capitalized or an acronym
         elif word[0].isupper():
             words[i] = first_char + word + last_char
-            continue
 
         else:  # capitalize any other word
             words[i] = first_char + word.capitalize() + last_char
