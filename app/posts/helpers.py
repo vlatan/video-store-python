@@ -88,27 +88,22 @@ def normalize_title(title: str) -> str:
     # punctuations
     puncts = [":", ".", "!", "?", "-", "—", "–", "//", "--", "|"]
 
-    for i, word in enumerate(words):
+    for i, w in enumerate(words):
 
-        # remove quatation marks at start/end if any and store them
-        first_char, last_char = "", ""
-
-        if len(word) > 1 and word[0] in ['"', "'"]:
-            first_char, word = word[0], word[1:]
-
-        if len(word) > 1 and word[-1] in ['"', "'"]:
-            last_char, word = word[-1], word[:-1]
+        # remove quotation marks from word at start/end if any and store them
+        fc, w = (w[0], w[1:]) if len(w) > 1 and w[0] in ['"', "'"] else ("", w)
+        lc, w = (w[-1], w[:-1]) if len(w) > 1 and w[-1] in ['"', "'"] else ("", w)
 
         # the word is a preposition but not after a punctuation
-        if i != 0 and word.lower() in preps and words[i - 1][-1] not in puncts:
-            words[i] = first_char + word.lower() + last_char
+        if i != 0 and w.lower() in preps and words[i - 1][-1] not in puncts:
+            words[i] = fc + w.lower() + lc
 
-        # the word is alreay capitalized or an acronym
-        elif word[0].isupper():
-            words[i] = first_char + word + last_char
+        # the word is already capitalized or an acronym
+        elif w[0].isupper():
+            words[i] = fc + w + lc
 
         else:  # capitalize any other word
-            words[i] = first_char + word.capitalize() + last_char
+            words[i] = fc + w.capitalize() + lc
 
     return " ".join(words)
 
