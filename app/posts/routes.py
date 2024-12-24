@@ -71,7 +71,7 @@ def new_post():
         db.session.add(post)
         db.session.commit()
 
-        flash("Your post has been created!", "success")
+        flash("Your video has been posted!", "success")
         return redirect(url_for("posts.post", video_id=post.video_id))
 
     return render_template(
