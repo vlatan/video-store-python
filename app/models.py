@@ -266,7 +266,7 @@ class Post(Base, SearchableMixin):
         if len(search_result) < per_page:
             limit = per_page - len(search_result)
             posts = cls.query.order_by(sqlalchemy.func.random()).limit(limit)
-            posts = [post.serialize for post in posts if post.title != title]
+            posts = [p.serialize for p in posts if p.title.lower() != title.lower()]
             search_result += posts
 
         return search_result
