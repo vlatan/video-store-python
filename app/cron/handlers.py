@@ -120,11 +120,10 @@ def process_videos() -> None:
             if revalidate_single_video(post):  # call to YT
                 count_deleted += 1
 
-    # get all possible categories
+    # get all possible categories in a string
     categories = db.session.execute(db.select(Category)).scalars().all()
     categories = {category.name: category for category in categories}
-    categories_string = ", ".join(categories)
-    categories_string.replace('"', "")
+    cat_prompt = ", ".join(categories).replace('"', "")
 
     count_updated, count_new = 0, 0
     for video in all_videos:  # loop through total number of videos
@@ -135,7 +134,7 @@ def process_videos() -> None:
                 video["short_description"] = short_desc
 
             # categorize the video
-            category = categorize(video["title"], categories_string)
+            category = categorize(video["title"], cat_prompt)
             if category in categories:
                 video["category_id"] = categories[category].id
                 video["category"] = categories[category]
@@ -170,7 +169,7 @@ def process_videos() -> None:
 
             # if the video is not categorized, do it
             if not posted.category:
-                category = categorize(posted.title, categories_string)
+                category = categorize(posted.title, cat_prompt)
                 if category in categories:
                     posted.category_id = categories[category].id
                     posted.category = categories[category]
@@ -203,7 +202,7 @@ def process_videos() -> None:
 
             # if the video is not categorized, do it
             if not post.category:
-                category = categorize(post.title, categories_string)
+                category = categorize(post.title, cat_prompt)
                 if category in categories:
                     post.category_id = categories[category].id
                     post.category = categories[category]
