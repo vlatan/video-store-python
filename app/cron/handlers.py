@@ -162,21 +162,6 @@ def process_videos() -> None:
                 posted.playlist = video["playlist"]
                 is_updated = True
 
-            # update similar_ids if there's a change
-            similar = Post.get_related_posts(posted.title, PER_PAGE)
-            if video_ids := [row["video_id"] for row in similar]:
-                when = [(value, i) for i, value in enumerate(video_ids)]
-                similar = (
-                    Post.query.filter(Post.video_id.in_(video_ids))
-                    .order_by(db.case(*when, value=Post.video_id))
-                    .limit(PER_PAGE)
-                    .all()
-                )
-                similar = [row.id for row in similar]
-                if posted.similar != similar:
-                    posted.similar = similar
-                    is_updated = True
-
             # if there is NO short description in DB generate one
             if not posted.short_description:
                 if short_desc := generate_description(posted.title):
