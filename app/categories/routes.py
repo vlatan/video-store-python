@@ -24,7 +24,7 @@ def category(slug: str) -> Response | list | str:
     # posts per page
     per_page = current_app.config["POSTS_PER_PAGE"]
 
-    try:  # get page number in URL query params
+    try:  # get page number from URL query params
         page = int(str(request.args.get("page")))
     except ValueError:
         page = 1
