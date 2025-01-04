@@ -7,6 +7,7 @@ from markupsafe import escape
 from sqlalchemy.orm import mapped_column
 from redis.commands.search.query import Query
 from redis.commands.search.result import Result
+from typing import Union, TYPE_CHECKING
 
 from flask_login import UserMixin
 from flask import current_app, json
@@ -59,20 +60,19 @@ class User(Base, UserMixin):
         """Check if user is admin."""
         return self.google_id == current_app.config["ADMIN_OPENID"]
 
-    def cast(self, post, action):
-        obj = PostLike if action in ["like", "unlike"] else PostFave
+    def cast(self, post, action: str) -> None:
+        obj = PostLike() if action in ["like", "unlike"] else PostFave()
         # if user hasn't liked/faved the post record her like/fave
         if not self.has_casted(post, action):
-            cast = obj(user_id=self.id, post_id=post.id)
-            db.session.add(cast)
-        # if user already liked/faved this post delete her like/fave
-        else:
+            obj.user_id, obj.post_id = self.id, post.id
+            db.session.add(obj)
+        else:  # if user already liked/faved this post delete her like/fave
             cast = obj.query.filter_by(user_id=self.id, post_id=post.id)
             cast.delete()
 
     def has_casted(self, post, action):
-        obj = PostLike if action in ["like", "unlike"] else PostFave
-        query = obj.query.filter(obj.user_id == self.id, obj.post_id == post.id)
+        cls = PostLike if action in ["like", "unlike"] else PostFave
+        query = cls.query.filter_by(user_id=self.id, post_id=post.id)
         return query.count() > 0
 
 
