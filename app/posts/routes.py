@@ -89,7 +89,7 @@ def new_post():
             **form.processed_content,
             user_id=current_user.id,
             author=current_user,
-        )  # type: ignore
+        )
 
         # add post to database
         db.session.add(post)

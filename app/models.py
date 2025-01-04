@@ -1,8 +1,8 @@
 import string
 import sqlalchemy
+import datetime as dt
 from slugify import slugify
 from markdown import markdown
-from datetime import datetime
 from markupsafe import escape
 from sqlalchemy.orm import mapped_column
 from redis.commands.search.query import Query
@@ -22,120 +22,11 @@ def load_user(user_id):
 class Base(db.Model):
     __abstract__ = True
 
-    created_at = mapped_column(db.DateTime, default=datetime.utcnow)
-    updated_at = mapped_column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created_at = mapped_column(db.DateTime, default=dt.datetime.now(dt.timezone.utc))
+    updated_at = mapped_column(db.DateTime, default=dt.datetime.now(dt.timezone.utc))
 
 
-class ActionMixin(db.Model):
-    __abstract__ = True
-
-    def cast(self, post, action):
-        obj = PostLike if action in ["like", "unlike"] else PostFave
-        # if user hasn't liked/faved the post record her like/fave
-        if not self.has_casted(post, action):
-            cast = obj(user_id=self.id, post_id=post.id)
-            db.session.add(cast)
-        # if user already liked/faved this post delete her like/fave
-        else:
-            cast = obj.query.filter_by(user_id=self.id, post_id=post.id)
-            cast.delete()
-
-    def has_casted(self, post, action):
-        obj = PostLike if action in ["like", "unlike"] else PostFave
-        query = obj.query.filter(obj.user_id == self.id, obj.post_id == post.id)
-        return query.count() > 0
-
-
-class SearchableMixin(db.Model):
-    __abstract__ = True
-
-    def add_to_index(self):
-        """Add item to Redis search index."""
-        # get search index object
-        search_index = current_app.config["SEARCH_INDEX"]
-        # searchable fields
-        searchable = {field: str(getattr(self, field)) for field in self.__searchable__}
-
-        # additional fields
-        additional = {
-            "video_id": str(self.video_id),
-            "thumbnail": json.dumps(self.thumbnails["medium"]),
-            "srcset": str(self.srcset(max_width=480)),
-        }
-
-        # final document
-        document = {**searchable, **additional}
-        # add document to search
-        search_index.add_document(doc_id=str(self.id), replace=True, **document)
-
-    def remove_from_index(self):
-        search_index = current_app.config["SEARCH_INDEX"]
-        search_index.delete_document(str(self.id), delete_actual_document=True)
-
-    @classmethod
-    def search(cls, phrase: str, page: int, per_page: int) -> Result:
-        """
-        Search the RedisSearch index and return a result given the
-        `phrase` and offeset and limit where offeset is `page * per_page`
-        and the limit is `per_page`s.
-
-        Parameters:
-        phrase (str): Phrase to search for in the index.
-        page (int): The search results page number.
-        per_page (int): Number of search results per page.
-
-        Returns:
-        Result: RedisSearch Result object.
-        """
-
-        # get RedisSearch search index
-        search_index = current_app.config["SEARCH_INDEX"]
-        # remove punctuation from phrase
-        words = phrase.translate(str.maketrans("", "", string.punctuation))
-        # divide words with pipe symbol (designating OR)
-        words = " | ".join(words.split())
-        # make query object with offset and number of documents
-        query = (
-            Query(words)
-            .paging(offset=page * per_page, num=per_page)
-            .limit_fields(*cls.__searchable__)
-        )
-        # return RediSearch search result
-        return search_index.search(query)
-
-    @classmethod
-    def _fields_dirty(cls, obj):
-        if not isinstance(obj, cls):
-            return False
-        insp = sqlalchemy.inspect(obj)  # https://stackoverflow.com/a/28353846
-        attrs = [getattr(insp.attrs, key) for key in obj.__searchable__]
-        return any([attr.history.has_changes() for attr in attrs])
-
-    @classmethod
-    def before_commit(cls, session):
-        session._changes = {
-            "add": [obj for obj in session.new if isinstance(obj, cls)],
-            "update": [obj for obj in session.dirty if cls._fields_dirty(obj)],
-            "delete": [obj for obj in session.deleted if isinstance(obj, cls)],
-        }
-
-    @classmethod
-    def after_commit(cls, session):
-        for obj in session._changes["add"] + session._changes["update"]:
-            obj.add_to_index()
-        for obj in session._changes["delete"]:
-            obj.remove_from_index()
-        session._changes = None
-
-    @classmethod
-    def reindex(cls):
-        for obj in cls.query:
-            obj.add_to_index()
-
-
-class User(Base, UserMixin, ActionMixin):
+class User(Base, UserMixin):
     id = mapped_column(db.Integer, primary_key=True)
     token = mapped_column(db.String(2048))
     google_id = mapped_column(db.String(256), unique=True, nullable=True, index=True)
@@ -144,7 +35,7 @@ class User(Base, UserMixin, ActionMixin):
     name = mapped_column(db.String(120))
     email = mapped_column(db.String(120))
     picture = mapped_column(db.String(512))
-    last_seen = mapped_column(db.DateTime, default=datetime.utcnow)
+    last_seen = mapped_column(db.DateTime, default=dt.datetime.now(dt.timezone.utc))
 
     posts = db.relationship("Post", backref="author", lazy=True)
     playlists = db.relationship("Playlist", backref="author", lazy=True)
@@ -168,8 +59,24 @@ class User(Base, UserMixin, ActionMixin):
         """Check if user is admin."""
         return self.google_id == current_app.config["ADMIN_OPENID"]
 
+    def cast(self, post, action):
+        obj = PostLike if action in ["like", "unlike"] else PostFave
+        # if user hasn't liked/faved the post record her like/fave
+        if not self.has_casted(post, action):
+            cast = obj(user_id=self.id, post_id=post.id)
+            db.session.add(cast)
+        # if user already liked/faved this post delete her like/fave
+        else:
+            cast = obj.query.filter_by(user_id=self.id, post_id=post.id)
+            cast.delete()
 
-class Post(Base, SearchableMixin):
+    def has_casted(self, post, action):
+        obj = PostLike if action in ["like", "unlike"] else PostFave
+        query = obj.query.filter(obj.user_id == self.id, obj.post_id == post.id)
+        return query.count() > 0
+
+
+class Post(Base):
     __searchable__ = ["title", "short_description", "tags"]
 
     id = mapped_column(db.Integer, primary_key=True)
@@ -318,6 +225,91 @@ class Post(Base, SearchableMixin):
         posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
         return [post.to_dict for post in posts]
 
+    def add_to_index(self):
+        """Add item to Redis search index."""
+        # get search index object
+        search_index = current_app.config["SEARCH_INDEX"]
+        # searchable fields
+        searchable = {field: str(getattr(self, field)) for field in self.__searchable__}
+
+        # additional fields
+        additional = {
+            "video_id": str(self.video_id),
+            "thumbnail": json.dumps(self.thumbnails["medium"]),
+            "srcset": str(self.srcset(max_width=480)),
+        }
+
+        # final document
+        document = {**searchable, **additional}
+        # add document to search
+        search_index.add_document(doc_id=str(self.id), replace=True, **document)
+
+    def remove_from_index(self):
+        search_index = current_app.config["SEARCH_INDEX"]
+        search_index.delete_document(str(self.id), delete_actual_document=True)
+
+    @classmethod
+    def search(cls, phrase: str, page: int, per_page: int) -> Result:
+        """
+        Search the RedisSearch index and return a result given the
+        `phrase` and offeset and limit where offeset is `page * per_page`
+        and the limit is `per_page`s.
+
+        Parameters:
+        phrase (str): Phrase to search for in the index.
+        page (int): The search results page number.
+        per_page (int): Number of search results per page.
+
+        Returns:
+        Result: RedisSearch Result object.
+        """
+
+        # get RedisSearch search index
+        search_index = current_app.config["SEARCH_INDEX"]
+        # remove punctuation from phrase
+        words = phrase.translate(str.maketrans("", "", string.punctuation))
+        # divide words with pipe symbol (designating OR)
+        words = " | ".join(words.split())
+        # make query object with offset and number of documents
+        query = (
+            Query(words)
+            .paging(offset=page * per_page, num=per_page)
+            .limit_fields(*cls.__searchable__)  # type: ignore
+        )
+        # return RediSearch search result
+        return search_index.search(query)
+
+    @classmethod
+    def _fields_dirty(cls, obj):
+        if not isinstance(obj, cls):
+            return False
+        # https://stackoverflow.com/a/28353846
+        if not (inspected := sqlalchemy.inspect(obj)):
+            return False
+        attrs = [getattr(inspected.attrs, key) for key in obj.__searchable__]
+        return any([attr.history.has_changes() for attr in attrs])
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            "add": [obj for obj in session.new if isinstance(obj, cls)],
+            "update": [obj for obj in session.dirty if cls._fields_dirty(obj)],
+            "delete": [obj for obj in session.deleted if isinstance(obj, cls)],
+        }
+
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes["add"] + session._changes["update"]:
+            obj.add_to_index()
+        for obj in session._changes["delete"]:
+            obj.remove_from_index()
+        session._changes = None
+
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            obj.add_to_index()
+
 
 class Category(Base):
     id = mapped_column(db.Integer, primary_key=True)
@@ -332,7 +324,7 @@ class Category(Base):
 
     @cache.memoize(86400)
     def get_posts(self, page=1, per_page=24):
-        posts = self.posts.order_by(Post.upload_date.desc())
+        posts = self.posts.order_by(Post.upload_date.desc())  # type: ignore
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
         return [post.to_dict for post in posts.items]
 
@@ -392,5 +384,5 @@ class PostFave(Base):
 
 
 # listen for commit and make changes to search index
-db.event.listen(db.session, "before_commit", SearchableMixin.before_commit)
-db.event.listen(db.session, "after_commit", SearchableMixin.after_commit)
+db.event.listen(db.session, "before_commit", Post.before_commit)
+db.event.listen(db.session, "after_commit", Post.after_commit)
