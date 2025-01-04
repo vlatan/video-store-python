@@ -1,9 +1,8 @@
-from curses.ascii import isupper
-from operator import isub
 import re
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 from wtforms.validators import ValidationError
+
 from app.models import DeletedPost
 
 
