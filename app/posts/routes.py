@@ -85,11 +85,9 @@ def new_post():
             db.session.delete(banned)
 
         # form.content.data is a dict, just unpack to transform into kwargs
-        post = Post(
-            **form.processed_content,
-            user_id=current_user.id,
-            author=current_user,
-        )
+        post = Post(**form.processed_content)
+        post.user_id = current_user.id
+        post.author = current_user  # type: ignore
 
         # add post to database
         db.session.add(post)
@@ -113,7 +111,8 @@ def perform_action(video_id, action):
         return make_response("Success", 200)
     elif action == "delete" and current_user.is_admin:
         # add this post to DeletedPost table
-        deleted_post = DeletedPost(video_id=post.video_id)
+        deleted_post = DeletedPost()
+        deleted_post.video_id = post.video_id
         db.session.add(deleted_post)
         # delete the post
         db.session.delete(post)
