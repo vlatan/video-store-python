@@ -18,31 +18,49 @@ bp = Blueprint("posts", __name__)
 def post(video_id):
     # query the post
     post = Post.query.filter_by(video_id=video_id).first_or_404()
+    current_app.logger.info(f"Video {post.video_id} retrieved")
+
     # widest thumb
     thumb = max(post.thumbnails.values(), key=lambda x: x["width"])["url"]
+    current_app.logger.info(f"Got the widest thumb for {post.video_id}")
+
     # get likes text
     num_likes = post.likes.count()
     likes = "1 Like" if num_likes == 1 else f"{num_likes} Likes"
     if not num_likes:
         likes = "Like"
-    # how many related posts should we fetch
-    PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
+    current_app.logger.info(f"Got the likes text for {post.video_id}")
 
     # get the first sentence from the short desc as meta desc
     short_desc = post.short_description
     meta_description = short_desc.partition(".")[0] if short_desc else None
+    current_app.logger.info(f"Got the short description for {post.video_id}")
 
-    return render_template(
+    srcset = post.srcset()
+    current_app.logger.info(f"Got the srcset values for {post.video_id}")
+
+    human_duration = convertDuration(post.duration).human
+    current_app.logger.info(f"Got the human duration for {post.video_id}")
+
+    # how many related posts should we fetch
+    PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
+    related_posts = Post.get_related_posts(post.title, PER_PAGE)
+    current_app.logger.info(f"Got the related posts for {post.video_id}")
+
+    template = render_template(
         "post.html",
         post=post,
         thumb=thumb,
-        srcset=post.srcset(),
-        human_duration=convertDuration(post.duration).human,
+        srcset=srcset,
+        human_duration=human_duration,
         likes=likes,
         title=post.title,
-        related_posts=Post.get_related_posts(post.title, PER_PAGE),
+        related_posts=related_posts,
         meta_description=meta_description,
     )
+    current_app.logger.info(f"Rendered the html template for {post.video_id}")
+
+    return template
 
 
 @bp.route("/video/new", methods=["GET", "POST"])
