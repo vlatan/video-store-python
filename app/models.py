@@ -249,7 +249,6 @@ class Post(Base, SearchableMixin):
         return [post.serialize for post in posts]
 
     @classmethod
-    # @cache.memoize(86400)
     def get_related_posts(cls, title: str, per_page: int):
         search_result = cls.search(title, 0, per_page + 1)
         search_result = [
@@ -289,7 +288,6 @@ class Post(Base, SearchableMixin):
         return [post.serialize for post in posts]
 
     @classmethod
-    @cache.memoize(86400)
     def search_posts(
         cls, phrase: str, page: int, per_page: int
     ) -> tuple[list[dict[str, str]], int]:
