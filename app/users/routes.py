@@ -44,7 +44,7 @@ def likes() -> Response | list | str:
         page = 1
 
     liked = current_user.liked.paginate(page=page, per_page=per_page, error_out=False)
-    posts = [item.post.serialize for item in liked.items]
+    posts = [item.post.to_dict for item in liked.items]
 
     if page > 1:
         time.sleep(0.4)
@@ -77,7 +77,7 @@ def favorites() -> Response | list | str:
         page = 1
 
     faved = current_user.faved.paginate(page=page, per_page=per_page, error_out=False)
-    posts = [item.post.serialize for item in faved.items]
+    posts = [item.post.to_dict for item in faved.items]
 
     if page > 1:
         time.sleep(0.4)

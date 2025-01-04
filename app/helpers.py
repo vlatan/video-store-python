@@ -20,7 +20,7 @@ def admin_required(func) -> Callable:
 
 
 def dump_datetime(value) -> list[str] | None:
-    """Deserialize datetime object into string form for JSON processing."""
+    """Deto_dict datetime object into string form for JSON processing."""
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")] if value else None
 
 

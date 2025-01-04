@@ -218,7 +218,7 @@ class Post(Base, SearchableMixin):
         return ", ".join(srcset)
 
     @property
-    def serialize(self):
+    def to_dict(self):
         """Return object data in easily serializable format."""
         return {
             "video_id": self.video_id,
@@ -234,7 +234,7 @@ class Post(Base, SearchableMixin):
     def get_posts(cls, page, per_page):
         query = cls.query.order_by(cls.upload_date.desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-        return [post.serialize for post in posts]
+        return [post.to_dict for post in posts]
 
     @classmethod
     @cache.memoize(86400)
@@ -246,7 +246,7 @@ class Post(Base, SearchableMixin):
         query = cls.query.outerjoin(PostLike).group_by(cls.id)
         query = query.order_by(sqlalchemy.func.count().desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-        return [post.serialize for post in posts]
+        return [post.to_dict for post in posts]
 
     @classmethod
     def get_related_posts(cls, title: str, per_page: int):
@@ -265,7 +265,7 @@ class Post(Base, SearchableMixin):
         if len(search_result) < per_page:
             limit = per_page - len(search_result)
             posts = cls.query.order_by(sqlalchemy.func.random()).limit(limit)
-            posts = [p.serialize for p in posts if p.title.lower() != title.lower()]
+            posts = [p.to_dict for p in posts if p.title.lower() != title.lower()]
             search_result += posts
 
         return search_result
@@ -276,7 +276,7 @@ class Post(Base, SearchableMixin):
         query = cls.query.filter_by(playlist_id=playlist_id)
         query = query.order_by(cls.upload_date.desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-        return [post.serialize for post in posts]
+        return [post.to_dict for post in posts]
 
     @classmethod
     @cache.memoize(86400)
@@ -285,7 +285,7 @@ class Post(Base, SearchableMixin):
         orphans = (cls.playlist_id == None) | (cls.playlist_id.not_in(src_ids))
         query = cls.query.filter(orphans).order_by(cls.upload_date.desc())
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-        return [post.serialize for post in posts]
+        return [post.to_dict for post in posts]
 
     @classmethod
     def search_posts(
@@ -316,7 +316,7 @@ class Post(Base, SearchableMixin):
             return ids
         when = [(value, i) for i, value in enumerate(ids)]
         posts = cls.query.filter(cls.id.in_(ids)).order_by(db.case(*when, value=cls.id))
-        return [post.serialize for post in posts]
+        return [post.to_dict for post in posts]
 
 
 class Category(Base):
@@ -334,7 +334,7 @@ class Category(Base):
     def get_posts(self, page=1, per_page=24):
         posts = self.posts.order_by(Post.upload_date.desc())
         posts = posts.paginate(page=page, per_page=per_page, error_out=False)
-        return [post.serialize for post in posts.items]
+        return [post.to_dict for post in posts.items]
 
 
 class DeletedPost(Base):

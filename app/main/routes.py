@@ -188,7 +188,7 @@ def home() -> Response | list | str:
             date = Post.upload_date.desc()
             query = Post.query.filter_by(short_description=None).order_by(date)
             posts = query.paginate(page=page, per_page=per_page, error_out=False).items
-            posts = [post.serialize for post in posts]
+            posts = [post.to_dict for post in posts]
         else:
             uncached_posts = Post.get_posts.uncached
             posts = uncached_posts(Post, page, per_page)
