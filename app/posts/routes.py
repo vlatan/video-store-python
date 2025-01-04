@@ -34,7 +34,7 @@ def post(video_id):
     # get the first sentence from the short desc as meta desc
     short_desc = post.short_description
     meta_description = short_desc.partition(".")[0] if short_desc else None
-    current_app.logger.info(f"Got the short description for {post.video_id}")
+    current_app.logger.info(f"Got the meta description for {post.video_id}")
 
     srcset = post.srcset()
     current_app.logger.info(f"Got the srcset values for {post.video_id}")
