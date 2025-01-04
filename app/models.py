@@ -7,7 +7,6 @@ from markupsafe import escape
 from sqlalchemy.orm import mapped_column
 from redis.commands.search.query import Query
 from redis.commands.search.result import Result
-from typing import Union, TYPE_CHECKING
 
 from flask_login import UserMixin
 from flask import current_app, json
