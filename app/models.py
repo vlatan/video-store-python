@@ -154,9 +154,15 @@ class Post(Base):
         posts = query.paginate(page=page, per_page=per_page, error_out=False).items
         return [post.to_dict for post in posts]
 
-    @classmethod
-    def get_related_posts(cls, title: str, per_page: int):
-        search_result = cls.search(title, 0, per_page + 1)
+    @cache.memoize(86400)
+    def get_random_posts(self, limit: int) -> list[dict]:
+        """Get random posts excluding the current post."""
+        posts = self.query.order_by(sqlalchemy.func.random()).limit(limit)
+        return [p.to_dict for p in posts if p.title.lower() != self.title.lower()]
+
+    def get_related_posts(self, limit: int) -> list[dict]:
+        """Get related posts from Redis index excluding the current post."""
+        search_result = self.search(self.title, 0, limit + 1)
         search_result = [
             {
                 "video_id": doc.video_id,
@@ -165,14 +171,12 @@ class Post(Base):
                 "srcset": doc.srcset,
             }
             for doc in search_result.docs
-            if doc.title.lower() != title.lower()
+            if doc.title.lower() != self.title.lower()
         ]
 
-        if len(search_result) < per_page:
-            limit = per_page - len(search_result)
-            posts = cls.query.order_by(sqlalchemy.func.random()).limit(limit)
-            posts = [p.to_dict for p in posts if p.title.lower() != title.lower()]
-            search_result += posts
+        if len(search_result) < limit:
+            limit -= len(search_result)
+            search_result += self.get_random_posts(limit)
 
         return search_result
 

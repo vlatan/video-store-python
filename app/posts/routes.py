@@ -50,7 +50,7 @@ def post(video_id):
 
     # how many related posts should we fetch
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
-    related_posts = Post.get_related_posts(post.title, PER_PAGE)
+    related_posts = post.get_related_posts(PER_PAGE)
     current_app.logger.info(f"Got the related posts for {post.video_id}. {ts()}.")
 
     template = render_template(
