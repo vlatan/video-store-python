@@ -1,4 +1,5 @@
 import time
+from wtforms.validators import ValidationError
 from werkzeug.wrappers.response import Response
 
 from flask_login import current_user
@@ -30,13 +31,14 @@ def new_playlist() -> Response | str:
     # the form will not validate if the channel is already in the database,
     # or if it can't fetch its medatata for various reasons
     if form.validate_on_submit():
+        # if nothing in processed_content
+        if not form.processed_content:
+            raise ValidationError("Unable to fetch the source data.")
         # create object from Model
-        # form.content.data is a dict, just unpack to transform into kwargs
-        playlist = Playlist(
-            **form.processed_content,
-            user_id=current_user.id,
-            author=current_user,
-        )  # type: ignore
+        # form.processed_content is a dict, just unpack to transform into kwargs
+        playlist = Playlist(**form.processed_content)
+        playlist.user_id = current_user.id
+        playlist.author = current_user  # type: ignore
 
         # add to db
         db.session.add(playlist)

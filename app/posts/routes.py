@@ -84,7 +84,7 @@ def new_post():
         if banned := video_banned(form.processed_content["video_id"]):
             db.session.delete(banned)
 
-        # form.content.data is a dict, just unpack to transform into kwargs
+        # form.processed_content is a dict, just unpack to transform into kwargs
         post = Post(**form.processed_content)
         post.user_id = current_user.id
         post.author = current_user  # type: ignore
