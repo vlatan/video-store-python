@@ -13,6 +13,7 @@ https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
 
 import os
 
+# https://docs.gunicorn.org/en/latest/design.html#how-many-workers
 workers = int(os.getenv("WORKERS", 4))
 threads = int(os.getenv("THREADS", 1))
 timeout = int(os.getenv("TIMEOUT", 0))
