@@ -83,8 +83,6 @@ def create_app() -> Flask:
             db.create_all()
             # initialize search index
             initialize_search_index(app)
-            # populate search index if empty
-            populate_search_index(app)
         except OperationalError as err:
             app.logger.error(err)
 
@@ -167,34 +165,6 @@ def initialize_search_index(app: Flask) -> None:
         pass
 
     app.config["SEARCH_INDEX"] = search_index
-
-
-def populate_search_index(app: Flask) -> None:
-    """Populate the app search index."""
-
-    thread_name = "search_index"
-    for thread in threading.enumerate():
-        if thread.name == thread_name:
-            return
-
-    # reindex the app in a thread, send app context in the thread
-    thread = threading.Thread(
-        target=reindex,
-        name=thread_name,
-        args=[app.app_context()],
-    )
-
-    thread.start()
-
-
-def reindex(app_context: AppContext) -> None:
-    if not app_context:
-        return
-
-    from app.models import Post
-
-    with app_context:
-        Post.reindex()
 
 
 class CustomFormatter(logging.Formatter):
