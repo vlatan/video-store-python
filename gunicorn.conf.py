@@ -13,8 +13,7 @@ https://developers.cloudflare.com/fundamentals/reference/http-request-headers/
 
 import os
 
-cpu_count = os.cpu_count() or 1
-workers = int(os.getenv("WORKERS", cpu_count * 2 + 1))
+workers = int(os.getenv("WORKERS", 4))
 threads = int(os.getenv("THREADS", 1))
 timeout = int(os.getenv("TIMEOUT", 0))
 accesslog = os.getenv("ACCESS_LOGFILE", "-")
