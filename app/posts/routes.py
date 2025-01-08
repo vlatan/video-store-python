@@ -19,54 +19,36 @@ bp = Blueprint("posts", __name__)
 @bp.route("/video/<string:video_id>/")
 def post(video_id):
 
-    start = time.perf_counter()
-    ts = lambda: f"Time spent so far: {time.perf_counter() - start:.2f}s"
-
     # query the post
     post = Post.query.filter_by(video_id=video_id).first_or_404()
-    current_app.logger.info(f"Video {post.video_id} retrieved from DB. {ts()}.")
 
     # widest thumb
     thumb = max(post.thumbnails.values(), key=lambda x: x["width"])["url"]
-    current_app.logger.info(f"Got the widest thumb for {post.video_id}. {ts()}.")
 
     # get likes text
     num_likes = post.likes.count()
     likes = "1 Like" if num_likes == 1 else f"{num_likes} Likes"
     if not num_likes:
         likes = "Like"
-    current_app.logger.info(f"Got the likes text for {post.video_id}. {ts()}.")
 
     # get the first sentence from the short desc as meta desc
     short_desc = post.short_description
     meta_description = short_desc.partition(".")[0] if short_desc else None
-    current_app.logger.info(f"Got the meta description for {post.video_id}. {ts()}.")
-
-    srcset = post.srcset()
-    current_app.logger.info(f"Got the srcset values for {post.video_id}. {ts()}.")
-
-    human_duration = convertDuration(post.duration).human
-    current_app.logger.info(f"Got the human duration for {post.video_id}. {ts()}.")
 
     # how many related posts should we fetch
     PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
-    related_posts = post.get_related_posts(PER_PAGE)
-    current_app.logger.info(f"Got the related posts for {post.video_id}. {ts()}.")
 
-    template = render_template(
+    return render_template(
         "post.html",
         post=post,
         thumb=thumb,
-        srcset=srcset,
-        human_duration=human_duration,
+        srcset=post.srcset(),
+        human_duration=convertDuration(post.duration).human,
         likes=likes,
         title=post.title,
-        related_posts=related_posts,
+        related_posts=post.get_related_posts(PER_PAGE),
         meta_description=meta_description,
     )
-    current_app.logger.info(f"Rendered the html template for {post.video_id}. {ts()}.")
-
-    return template
 
 
 @bp.route("/video/new", methods=["GET", "POST"])
