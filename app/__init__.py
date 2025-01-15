@@ -1,12 +1,9 @@
 import os
 import json
 import logging
-import functools
-import threading
 from redis import Redis
 from dotenv import load_dotenv
 from collections import OrderedDict
-import google.generativeai as genai
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.exc import OperationalError
 from redis.exceptions import ResponseError
@@ -16,7 +13,6 @@ from werkzeug.utils import import_string, find_modules
 from flask import Flask
 from flask_caching import Cache
 from flask_minify import Minify
-from flask.ctx import AppContext
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -72,8 +68,6 @@ def create_app() -> Flask:
     initialize_plugins(app)
     # register blueprints
     register_blueprints(app)
-    # initialize generative AI
-    setup_generative_ai(app)
     # init a simple redis client
     init_redis_client(app)
 
@@ -103,31 +97,6 @@ def register_blueprints(app: Flask) -> None:
             app.register_blueprint(import_string(f"{module}.bp"))
         except ImportError:
             pass
-
-
-def setup_generative_ai(app: Flask) -> None:
-    """
-    Place generative ai ready partial method in the app config
-    that requires just the prompt.
-    """
-    # limit GRPC library to log only errors
-    os.environ["GRPC_VERBOSITY"] = "ERROR"
-    genai.configure(api_key=app.config["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-pro")
-
-    # create partial function by supplying safety_settings
-    generate_content = functools.partial(
-        model.generate_content,
-        safety_settings={
-            "HARM_CATEGORY_HATE_SPEECH": "block_none",
-            "HARM_CATEGORY_HARASSMENT": "block_none",
-            "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none",
-            "HARM_CATEGORY_DANGEROUS_CONTENT": "block_none",
-        },
-    )
-
-    # place the func object in the app config
-    app.config["generate_content"] = generate_content
 
 
 def init_redis_client(app: Flask) -> None:
