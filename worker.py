@@ -1,4 +1,3 @@
-import os
 import functools
 from flask import Flask
 import google.generativeai as genai
