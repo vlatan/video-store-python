@@ -1,10 +1,19 @@
+"""
+Google Generative AI Resources
+https://ai.google.dev/tutorials/python_quickstart
+https://ai.google.dev/gemini-api/docs/models/gemini
+https://github.com/googleapis/python-genai
+"""
+
 import functools
 from flask import Flask
-import google.generativeai as genai
+
+from google import genai
+from google.genai import types
 
 from app import create_app
 from app.models import Post
-from app.cron.handlers import process_videos
+from app.cron.handlers import Documentary, process_videos
 
 
 def setup_generative_ai(app: Flask) -> None:
@@ -12,22 +21,41 @@ def setup_generative_ai(app: Flask) -> None:
     Place generative ai ready partial method in the app config
     that requires just the prompt.
     """
-    genai.configure(api_key=app.config["GEMINI_API_KEY"])
-    model = genai.GenerativeModel("gemini-pro")
+    client = genai.Client(api_key=app.config["GEMINI_API_KEY"])
 
-    # create partial function by supplying safety_settings
-    generate_content = functools.partial(
-        model.generate_content,
-        safety_settings={
-            "HARM_CATEGORY_HATE_SPEECH": "block_none",
-            "HARM_CATEGORY_HARASSMENT": "block_none",
-            "HARM_CATEGORY_SEXUALLY_EXPLICIT": "block_none",
-            "HARM_CATEGORY_DANGEROUS_CONTENT": "block_none",
-        },
+    safety_settings = [
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+        types.SafetySetting(
+            category=types.HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
+            threshold=types.HarmBlockThreshold.BLOCK_NONE,
+        ),
+    ]
+
+    # create partial function by supplying the model and safety_settings
+    app.config["generate_content"] = functools.partial(
+        client.models.generate_content,
+        model="gemini-1.5-pro",
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=Documentary,
+            safety_settings=safety_settings,
+        ),
     )
-
-    # place the func object in the app config
-    app.config["generate_content"] = generate_content
 
 
 if __name__ == "__main__":

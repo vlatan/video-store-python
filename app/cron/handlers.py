@@ -2,6 +2,7 @@ import time
 import random
 import functools
 from typing import Callable
+from pydantic import BaseModel
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
@@ -15,6 +16,12 @@ from app.posts.helpers import validate_video
 from app.models import Post, Playlist, Category
 from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
+
+
+class Documentary(BaseModel):
+    title: str
+    description: str
+    category: str
 
 
 def get_youtube_videos() -> tuple[list[dict], bool]:
@@ -101,8 +108,6 @@ def revalidate_single_video(post: Post) -> bool:
 
 
 def process_videos() -> None:
-    PER_PAGE = current_app.config["NUM_RELATED_POSTS"]
-
     # get all VALID videos from our playlists from YouTube
     all_videos, complete = get_youtube_videos()
 
@@ -124,20 +129,23 @@ def process_videos() -> None:
     categories = db.session.execute(db.select(Category)).scalars().all()
     categories = {category.name: category for category in categories}
     cat_prompt = ", ".join(categories).replace('"', "")
+    info = Documentary(title="", description="", category="")
 
     count_updated, count_new = 0, 0
     for video in all_videos:  # loop through total number of videos
         # if video is NOT already posted
         if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
-            # generate short description
-            if short_desc := generate_description(video["title"]):
-                video["short_description"] = short_desc
+
+            # generate description and category for the video
+            info = generate_info(video["title"], cat_prompt)
+
+            if info.description:
+                video["short_description"] = info.description
 
             # categorize the video
-            category = categorize(video["title"], cat_prompt)
-            if category in categories:
-                video["category_id"] = categories[category].id
-                video["category"] = categories[category]
+            if info.category in categories:
+                video["category_id"] = categories[info.category].id
+                video["category"] = categories[info.category]
 
             # create object from Model
             post = Post(**video)
@@ -161,19 +169,18 @@ def process_videos() -> None:
                 posted.playlist = video["playlist"]
                 is_updated = True
 
-            # if there is NO short description in DB generate one
-            if not posted.short_description:
-                if short_desc := generate_description(posted.title):
-                    posted.short_description = short_desc
-                    is_updated = True
+            # update AI generated content if missing
+            if not posted.short_description or not posted.category:
+                info = generate_info(posted.title, cat_prompt)
 
-            # if the video is not categorized, do it
-            if not posted.category:
-                category = categorize(posted.title, cat_prompt)
-                if category in categories:
-                    posted.category_id = categories[category].id
-                    posted.category = categories[category]
-                    is_updated = True
+            if not posted.short_description and info.description:
+                posted.short_description = info.description
+                is_updated = True
+
+            if not posted.category and info.category in categories:
+                posted.category_id = categories[info.category].id
+                posted.category = categories[info.category]
+                is_updated = True
         finally:
             # If no pending changes are detected,
             # then no SQL is emitted to the database
@@ -194,19 +201,19 @@ def process_videos() -> None:
 
         is_updated = False
         try:
-            # if there is NO short description in DB generate one
-            if not post.short_description:
-                if short_desc := generate_description(post.title):
-                    post.short_description = short_desc
-                    is_updated = True
+            # update AI generated content if missing
+            if not post.short_description or not post.category:
+                info = generate_info(post.title, cat_prompt)
+
+            if not post.short_description and info.description:
+                post.short_description = info.description
+                is_updated = True
 
             # if the video is not categorized, do it
-            if not post.category:
-                category = categorize(post.title, cat_prompt)
-                if category in categories:
-                    post.category_id = categories[category].id
-                    post.category = categories[category]
-                    is_updated = True
+            if not post.category and info.category in categories:
+                post.category_id = categories[info.category].id
+                post.category = categories[info.category]
+                is_updated = True
         finally:
             db.session.commit()
             if is_updated:
@@ -269,7 +276,7 @@ def generate_description(title: str) -> str | None:
 
     generate_content = current_app.config["generate_content"]
     prompt = f"Write one short paragraph about: {title}."
-    return generate_content(prompt).text
+    return generate_content(contents=prompt).text
 
 
 @retry(start_delay=0.6)
@@ -281,4 +288,26 @@ def categorize(title: str, categories: str) -> str | None:
 
     generate_content = current_app.config["generate_content"]
     prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
-    return generate_content(prompt).text
+    return generate_content(contents=prompt).text
+
+
+@retry(start_delay=0.6)
+def generate_info(title: str, categories: str) -> Documentary:
+    """
+    Call to Gemini API.
+    Generate description and a category from a generative AI based given a title and categories.
+    """
+    prompt = (
+        f"Write one short paragraph about: {title}."
+        f'Also select a category for the documentary "{title}" '
+        f"from these categories: {categories}."
+    )
+
+    generate_content = current_app.config["generate_content"]
+    response = generate_content(contents=prompt)
+
+    return (
+        response.parsed
+        if isinstance(response.parsed, Documentary)
+        else Documentary(title="", description="", category="")
+    )
