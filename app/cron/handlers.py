@@ -241,7 +241,7 @@ def retry(
     def decorator(func: Callable) -> Callable:
 
         @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> str | None:
+        def wrapper(*args, **kwargs) -> Documentary:
 
             # Preemptive delay between requests
             if start_delay > 0:
@@ -262,36 +262,14 @@ def retry(
                 f"for title {args[0].upper()} after {attempt+1} retries. Error: {error}"
             )
 
+            return Documentary(title="", description="", category="")
+
         return wrapper
 
     return decorator(_func) if _func else decorator
 
 
-@retry(start_delay=0.6)
-def generate_description(title: str) -> str | None:
-    """
-    Call to Gemini API.
-    Generate description from a generative AI given a title.
-    """
-
-    generate_content = current_app.config["generate_content"]
-    prompt = f"Write one short paragraph about: {title}."
-    return generate_content(contents=prompt).text
-
-
-@retry(start_delay=0.6)
-def categorize(title: str, categories: str) -> str | None:
-    """
-    Call to Gemini API.
-    Generate a category from a generative AI based given a title and categories.
-    """
-
-    generate_content = current_app.config["generate_content"]
-    prompt = f'Select a category for the documentary "{title}" from these categories: {categories}.'
-    return generate_content(contents=prompt).text
-
-
-@retry(start_delay=0.6)
+@retry(start_delay=1)
 def generate_info(title: str, categories: str) -> Documentary:
     """
     Call to Gemini API.
