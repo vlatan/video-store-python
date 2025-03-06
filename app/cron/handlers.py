@@ -229,6 +229,7 @@ def process_videos() -> None:
     current_app.logger.info(f"Deleted {count_deleted} invalid {vs(count_deleted)}.")
     current_app.logger.info(f"Updated {count_updated} current {vs(count_updated)}.")
     current_app.logger.info("Worker job done.")
+    current_app.logger.info("-" * 40)
 
 
 def retry(
