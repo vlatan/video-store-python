@@ -6,7 +6,8 @@ WORKDIR /src
 # install dependencies in .venv using uv
 COPY requirements.txt .
 RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
+    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt && \
+    rm requirements.txt
 
 # copy only the necessary app files into the working dir
 COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
