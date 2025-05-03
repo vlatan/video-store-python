@@ -3,10 +3,12 @@
 
 FROM python:3.12-slim AS builder
 
+# copy the uv binary from uv image
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 # install dependencies in .venv with uv
 COPY requirements.txt .
-RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
+RUN uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
 
 
 ## ------------------------------- Runtime Stage ------------------------------ ##
