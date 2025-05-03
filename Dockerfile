@@ -16,10 +16,6 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
 
 FROM python:3.12-slim
 
-# create a non-root user to run the app
-RUN useradd --create-home appuser
-USER appuser
-
 # set the container's working directory
 WORKDIR /src
 
