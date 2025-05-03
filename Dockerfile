@@ -1,9 +1,5 @@
 FROM python:3.12-slim
 
-# create user to avoid running as root
-RUN useradd --create-home appuser
-USER appuser
-
 # set the container's working directory
 WORKDIR /src
 
