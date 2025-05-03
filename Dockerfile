@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.12-slim AS builder
 
 # set the container's working directory
 WORKDIR /src
@@ -6,12 +6,21 @@ WORKDIR /src
 # install dependencies in .venv using uv
 COPY requirements.txt .
 RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt && \
-    rm requirements.txt
+    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
+
+
+FROM python:3.12-slim
+
+# set the container's working directory
+WORKDIR /src
 
 # copy only the necessary app files into the working dir
 COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
 COPY ./app ./app
+
+# copy the .venv from the builder stage
+COPY --from=builder /src/.venv .venv
+
 
 # set the virtual environment path
 # allow statements and log messages to immediately appear in logs
