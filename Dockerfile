@@ -16,10 +16,6 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
 
 FROM python:3.12-slim
 
-# create a non-root user to run the app
-RUN useradd --create-home appuser
-USER appuser
-
 # set the container's working directory
 WORKDIR /src
 
@@ -28,7 +24,7 @@ COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
 COPY ./app ./app
 
 # copy the .venv from the builder stage
-COPY --from=builder --chown=appuser:appuser /src/.venv .venv
+COPY --from=builder /src/.venv .venv
 
 # set the virtual environment path
 ENV PATH="/src/.venv/bin:${PATH}" \
