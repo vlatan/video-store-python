@@ -1,5 +1,9 @@
 FROM python:3.12-slim
 
+# create user to avoid running as root
+RUN useradd --create-home appuser
+USER appuser
+
 # set the container's working directory
 WORKDIR /src
 
@@ -7,10 +11,6 @@ WORKDIR /src
 COPY requirements.txt .
 RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
-
-# create user to avoid running as root
-RUN useradd --create-home appuser
-USER appuser
 
 # copy only the necessary app files into the working dir
 COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
