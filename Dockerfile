@@ -1,3 +1,6 @@
+
+## ------------------------------- Build Stage ------------------------------ ##
+
 FROM python:3.12-slim AS builder
 
 # set the container's working directory
@@ -9,7 +12,13 @@ RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
     uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
 
 
+## ------------------------------- Runtime Stage ------------------------------ ##
+
 FROM python:3.12-slim
+
+# create a non-root user to run the app
+RUN useradd --create-home appuser
+USER appuser
 
 # set the container's working directory
 WORKDIR /src
@@ -21,10 +30,9 @@ COPY ./app ./app
 # copy the .venv from the builder stage
 COPY --from=builder /src/.venv .venv
 
-
 # set the virtual environment path
-# allow statements and log messages to immediately appear in logs
 ENV PATH="/src/.venv/bin:${PATH}" \
+    # allow statements and log messages to immediately appear in logs
     PYTHONUNBUFFERED=1
 
 # command to start the webserver and run the app
