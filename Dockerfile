@@ -1,34 +1,22 @@
-
-## ------------------------------- Build Stage ------------------------------ ##
-
-FROM python:3.12-slim AS builder
-
-# set the container's working directory
-WORKDIR /src
-
-# install dependencies in .venv using uv
-COPY requirements.txt .
-RUN --mount=from=ghcr.io/astral-sh/uv,source=/uv,target=/bin/uv \
-    uv venv && uv pip install --no-cache-dir --upgrade -r requirements.txt
-
-
-## ------------------------------- Runtime Stage ------------------------------ ##
-
 FROM python:3.12-slim
 
 # set the container's working directory
 WORKDIR /src
 
-# copy only the necessary app files into the working dir
-COPY app/ config.py gunicorn.conf.py run.py worker.py ./
+# create virtual environment with uv and install dependencies
+COPY requirements.txt .
+RUN --mount=from=ghcr.io/astral-sh/uv:0.7.2,source=/uv,target=/bin/uv \
+    uv venv && \
+    uv pip install --no-cache-dir --upgrade -r requirements.txt && \
+    rm requirements.txt
 
-# copy the .venv from the builder stage
-COPY --from=builder /src/.venv ./.venv
-
-# set the virtual environment path
-ENV PATH="/src/.venv/bin:${PATH}" \
-    # allow statements and log messages to immediately appear in logs
+# prepend the virtual environment path in the PATH env var
+ENV VIRTUAL_ENV=/src/.venv \
+    PATH="/src/.venv/bin:${PATH}" \
     PYTHONUNBUFFERED=1
+
+# copy only the necessary app dir and files into the working dir
+COPY app/ config.py gunicorn.conf.py run.py worker.py ./
 
 # command to start the webserver and run the app
 # gets config from `gunicorn.conf.py`
