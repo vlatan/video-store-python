@@ -20,11 +20,10 @@ FROM python:3.12-slim
 WORKDIR /src
 
 # copy only the necessary app files into the working dir
-COPY ["./config.py", "./gunicorn.conf.py", "./run.py", "./worker.py", "./"]
-COPY ./app ./app
+COPY app/ config.py gunicorn.conf.py run.py worker.py ./
 
 # copy the .venv from the builder stage
-COPY --from=builder /src/.venv .venv
+COPY --from=builder /src/.venv ./.venv
 
 # set the virtual environment path
 ENV PATH="/src/.venv/bin:${PATH}" \
