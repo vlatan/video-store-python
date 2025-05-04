@@ -16,8 +16,7 @@ ENV VIRTUAL_ENV=/src/.venv \
     PYTHONUNBUFFERED=1
 
 # copy only the necessary files into the working dir
-COPY config.py gunicorn.conf.py run.py worker.py ./
-COPY app ./app
+COPY /app config.py gunicorn.conf.py run.py worker.py ./
 
 # command to start the webserver and run the app
 # gets config from `gunicorn.conf.py`
