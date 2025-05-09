@@ -45,6 +45,7 @@ class Config:
     ADMIN_OPENID = str(load_env("ADMIN_OPENID"))
     YOUTUBE_API_KEY = load_env("YOUTUBE_API_KEY")
     GEMINI_API_KEY = load_env("GEMINI_API_KEY")
+    GEMINI_MODEL = load_env("GEMINI_MODEL") or "gemini-2.5-flash"
     GOOGLE_OAUTH_SCOPES = load_env("GOOGLE_OAUTH_SCOPES")
     _GOOGLE_OAUTH_CLIENT_BASE64 = load_env("GOOGLE_OAUTH_CLIENT") or ""
     GOOGLE_OAUTH_CLIENT = json.loads(base64.b64decode(_GOOGLE_OAUTH_CLIENT_BASE64))

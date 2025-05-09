@@ -6,6 +6,7 @@ https://github.com/googleapis/python-genai
 """
 
 import functools
+from pyexpat import model
 from flask import Flask
 
 from google import genai
@@ -49,7 +50,7 @@ def setup_generative_ai(app: Flask) -> None:
     # create partial function by supplying the model and safety_settings
     app.config["generate_content"] = functools.partial(
         client.models.generate_content,
-        model="gemini-1.5-pro",
+        model=app.config["GEMINI_MODEL"],
         config=types.GenerateContentConfig(
             response_mime_type="application/json",
             response_schema=Documentary,
