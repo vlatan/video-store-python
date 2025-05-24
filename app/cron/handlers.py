@@ -244,7 +244,7 @@ def retry(
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Documentary:
 
-            # Preemptive delay between requests
+            # Preemptive delay before the request starts
             if start_delay > 0:
                 time.sleep(start_delay)
 
