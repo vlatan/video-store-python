@@ -73,14 +73,15 @@ def revalidate_single_video(post: Post) -> bool:
 
     """
     try:
-        scope = {
-            "id": post.video_id,
-            "part": ["status", "snippet", "contentDetails"],
-        }
-
         with youtube_build() as youtube:
+            api = YouTubeAPI(youtube)
+
+            scope = {
+                "id": post.video_id,
+                "part": ["status", "snippet", "contentDetails"],
+            }
             # this will raise MaxRetriesExceededError if unsuccessful
-            res = get_youtube_videos(youtube, scope)
+            res = api.get_youtube_videos(scope)
 
         # this will raise ValueError or IndexError
         res = res["items"][0]
@@ -306,24 +307,25 @@ def generate_info(title: str, categories: str) -> Documentary:
     )
 
 
-@retry(max_retries=3)
-def get_youtube_videos(youtube, scope: dict):
-    return youtube.videos().list(**scope).execute()
+class YouTubeAPI:
+    def __init__(self, youtube_resource):
+        self.youtube = youtube_resource
 
+    @retry(max_retries=3)
+    def get_youtube_videos(self, scope: dict):
+        return self.youtube.videos().list(**scope).execute()
 
-@retry(max_retries=3)
-def get_youtube_playlists(youtube, scope: dict):
-    return youtube.playlists().list(**scope).execute()
+    @retry(max_retries=3)
+    def get_youtube_playlists(self, scope: dict):
+        return self.youtube.playlists().list(**scope).execute()
 
+    @retry(max_retries=3)
+    def get_youtube_channels(self, scope: dict):
+        return self.youtube.channels().list(**scope).execute()
 
-@retry(max_retries=3)
-def get_youtube_channels(youtube, scope: dict):
-    return youtube.channels().list(**scope).execute()
-
-
-@retry(max_retries=3)
-def get_youtube_playlists_videos(youtube, scope: dict):
-    return youtube.playlistItems().list(**scope).execute()
+    @retry(max_retries=3)
+    def get_youtube_playlists_videos(self, scope: dict):
+        return self.youtube.playlistItems().list(**scope).execute()
 
 
 class MaxRetriesExceededError(Exception):

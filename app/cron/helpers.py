@@ -1,15 +1,13 @@
 from wtforms.validators import ValidationError
-from app.cron.handlers import (
-    get_youtube_videos,
-    get_youtube_playlists_videos,
-    MaxRetriesExceededError,
-)
+from app.cron.handlers import MaxRetriesExceededError, YouTubeAPI
 from app.posts.helpers import video_banned, validate_video, fetch_video_data
 
 
 def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
     # videos epmty list and first page token is None
     videos, next_page_token, complete = [], None, False
+
+    api = YouTubeAPI(youtube)
 
     # iterate through all the items in the Uploads playlist
     while True:
@@ -22,7 +20,7 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
                 "pageToken": next_page_token,
             }
             # every time it loops it gets the next 50 videos
-            uploads = get_youtube_playlists_videos(youtube, scope)
+            uploads = api.get_youtube_playlists_videos(scope)
 
             # scope for detalied info about each video in this batch
             scope = {
@@ -31,7 +29,7 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
             }
 
             # this will raise MaxRetriesExceededError if unsuccessful
-            res = get_youtube_videos(youtube, scope)
+            res = api.get_youtube_videos(scope)
 
             # this will raise ValueError if unable to access "items"
             items = res["items"]
