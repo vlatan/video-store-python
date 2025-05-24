@@ -1,6 +1,6 @@
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
-from app.cron.handlers import get_youtube_videos
+from app.cron.handlers import get_youtube_videos, get_youtube_playlists_videos
 from app.posts.helpers import video_banned, validate_video, fetch_video_data
 
 
@@ -19,7 +19,8 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
                 "pageToken": next_page_token,
             }
             # every time it loops it gets the next 50 videos
-            uploads = youtube.playlistItems().list(**scope).execute()
+            if not (uploads := get_youtube_playlists_videos(youtube, scope)):
+                raise HttpError(uploads, scope)
 
             # scope for detalied info about each video in this batch
             scope = {
