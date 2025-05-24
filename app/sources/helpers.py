@@ -2,7 +2,7 @@ from urllib.parse import urlparse, parse_qs
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 
-from app.cron.handlers import get_youtube_playlists
+from app.cron.handlers import get_youtube_playlists, get_youtube_channels
 
 
 def parse_playlist(url):
@@ -25,7 +25,11 @@ def validate_playlist(playlist_id, youtube):
 
         channel_id = res["snippet"]["channelId"]
         scope = {"id": channel_id, "part": "snippet"}
-        ch = youtube.channels().list(**scope).execute()["items"][0]
+        if not (ch := get_youtube_channels(youtube, scope)):
+            raise HttpError(res, scope)
+
+        # this will raise either ValueError or IndexError
+        ch = ch["items"][0]
 
         return {
             "playlist_id": playlist_id,

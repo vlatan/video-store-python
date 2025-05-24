@@ -303,3 +303,8 @@ def get_youtube_videos(youtube, scope: dict):
 @retry(max_retries=3)
 def get_youtube_playlists(youtube, scope: dict):
     return youtube.playlists().list(**scope).execute()
+
+
+@retry(max_retries=3)
+def get_youtube_channels(youtube, scope: dict):
+    return youtube.channels().list(**scope).execute()
