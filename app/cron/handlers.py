@@ -1,8 +1,8 @@
 import time
 import random
 import functools
-from typing import Callable, Any
 from pydantic import BaseModel
+from typing import Callable, Any
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -312,19 +312,19 @@ class YouTubeAPI:
         self.youtube = youtube_resource
 
     @retry(max_retries=3)
-    def get_youtube_videos(self, scope: dict):
+    def get_youtube_videos(self, scope: dict) -> dict:
         return self.youtube.videos().list(**scope).execute()
 
     @retry(max_retries=3)
-    def get_youtube_playlists(self, scope: dict):
+    def get_youtube_playlists(self, scope: dict) -> dict:
         return self.youtube.playlists().list(**scope).execute()
 
     @retry(max_retries=3)
-    def get_youtube_channels(self, scope: dict):
+    def get_youtube_channels(self, scope: dict) -> dict:
         return self.youtube.channels().list(**scope).execute()
 
     @retry(max_retries=3)
-    def get_youtube_playlists_videos(self, scope: dict):
+    def get_youtube_playlists_videos(self, scope: dict) -> dict:
         return self.youtube.playlistItems().list(**scope).execute()
 
 
