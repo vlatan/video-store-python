@@ -1,5 +1,6 @@
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
+from app.cron.handlers import get_youtube_videos
 from app.posts.helpers import video_banned, validate_video, fetch_video_data
 
 
@@ -26,8 +27,13 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
                 "part": ["status", "snippet", "contentDetails"],
             }
             # response from YouTube
-            res = youtube.videos().list(**scope).execute()
-        except HttpError:
+            if not (res := get_youtube_videos(youtube, scope)):
+                raise HttpError(res, scope)
+
+            # this will raise ValueError if unable to access "items"
+            items = res["items"]
+
+        except (HttpError, ValueError):
             # failed to connect to YT API
             # we abandon further operation
             # because we don't have the next token
@@ -35,7 +41,7 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
 
         # loop through this batch of videos
         # if there are no videos res['items'] will be empty list
-        for item in res["items"]:
+        for item in items:
             try:
                 # this will raise ValidationError if video's invalid
                 if validate_video(item) and not video_banned(item["id"]):

@@ -1,7 +1,7 @@
 import time
 import random
 import functools
-from typing import Callable
+from typing import Callable, Any
 from pydantic import BaseModel
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
@@ -24,7 +24,7 @@ class Documentary(BaseModel):
     category: str
 
 
-def get_youtube_videos() -> tuple[list[dict], bool]:
+def get_youtube_videos_from_playlists() -> tuple[list[dict], bool]:
     all_videos, complete = [], []
     # get all playlists from db
     playlists = Playlist.query.all()
@@ -73,43 +73,45 @@ def revalidate_single_video(post: Post) -> bool:
     bool: True of deleted, otherwise False.
 
     """
-    with youtube_build() as youtube:
+    try:
+        scope = {
+            "id": post.video_id,
+            "part": ["status", "snippet", "contentDetails"],
+        }
+
+        # Unable to get response from YT at all
+        with youtube_build() as youtube:
+            if not (res := get_youtube_videos(youtube, scope)):
+                raise HttpError(res, scope)
+
+        # this will raise ValueError or IndexError
+        # if unable to access ["items"] or ["items"][0]
+        res = res["items"][0]
+
+        # this will raise ValidationError if video's invalid
+        validate_video(res)
+
+    # video is not validated or doesn't exist at YouTube
+    except (IndexError, ValueError, ValidationError):
         try:
-            scope = {
-                "id": post.video_id,
-                "part": ["status", "snippet", "contentDetails"],
-            }
-
-            req = youtube.videos().list(**scope)
-            # this will raise IndexError if ['items'] is empty list``
-            # which means the video does not exist
-            res = req.execute()["items"][0]
-
-            # this will raise ValidationError if video's invalid
-            validate_video(res)
-
-        # video is not validated or doesn't exist at YouTube
-        except (IndexError, ValidationError):
-            try:
-                db.session.delete(post)
-                db.session.commit()
-                return True
-            except (ObjectDeletedError, StatementError) as e:
-                db.session.rollback()
-                msg = f"Could not delete: {post.title.upper()}. Error: {e}"
-                current_app.logger.warning(msg)
-        except HttpError as e:
-            # we couldn't connect to YouTube API,
-            # so we can't evaluate the video
-            msg = f"YouTube API unavailable to revalidate: {post.title.upper()}. Error: {e}"
+            db.session.delete(post)
+            db.session.commit()
+            return True
+        except (ObjectDeletedError, StatementError) as e:
+            db.session.rollback()
+            msg = f"Could not delete: {post.title.upper()}. Error: {e}"
             current_app.logger.warning(msg)
+    except HttpError as e:
+        # we couldn't connect to YouTube API,
+        # so we can't evaluate the video
+        pass
 
-        return False
+    return False
 
 
 def process_videos() -> None:
     # get all VALID videos from our playlists from YouTube
-    all_videos, complete = get_youtube_videos()
+    all_videos, complete = get_youtube_videos_from_playlists()
 
     # get sources/playlists ids
     sources = [pl.playlist_id for pl in Playlist.query.all()]
@@ -237,12 +239,12 @@ def retry(
     start_delay: float = 0,
     max_retries: int = 5,
 ) -> Callable:
-    """Provide retry and error logging for a generative API call."""
+    """Provide retry and error logging for an API call."""
 
     def decorator(func: Callable) -> Callable:
 
         @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Documentary:
+        def wrapper(*args, **kwargs) -> Any:
 
             # Preemptive delay before the request starts
             if start_delay > 0:
@@ -259,11 +261,12 @@ def retry(
                     retry_delay += random.uniform(0, 1)
 
             current_app.logger.warning(
-                f"Was unable to generate content using function '{func.__name__}' "
-                f"for title {args[0].upper()} after {attempt+1} retries. Error: {error}"
+                f'Was unable to return API response from function "{func.__name__}" '
+                f'with args "{args}" and kwargs "{kwargs}" '
+                f"after {attempt+1} retries. Error: {error}"
             )
 
-            return Documentary(title="", description="", category="")
+            return None
 
         return wrapper
 
@@ -290,3 +293,8 @@ def generate_info(title: str, categories: str) -> Documentary:
         if isinstance(response.parsed, Documentary)
         else Documentary(title="", description="", category="")
     )
+
+
+@retry(max_retries=3)
+def get_youtube_videos(youtube, scope: dict):
+    return youtube.videos().list(**scope).execute()
