@@ -25,7 +25,7 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
                 "pageToken": next_page_token,
             }
             # every time it loops it gets the next 50 videos
-            uploads = api.get_playlists_videos(scope)
+            uploads = api.get_playlist_videos(scope)
 
             # scope for detalied info about each video in this batch
             scope = {
@@ -134,7 +134,7 @@ class YouTubeAPI:
         return self.youtube.channels().list(**scope).execute()
 
     @retry(max_retries=3)
-    def get_playlists_videos(self, scope: dict) -> dict:
+    def get_playlist_videos(self, scope: dict) -> dict:
         return self.youtube.playlistItems().list(**scope).execute()
 
 
