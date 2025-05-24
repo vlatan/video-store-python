@@ -2,9 +2,9 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
 
-from app.cron.handlers import MaxRetriesExceededError, YouTubeAPI
 from app.models import Post
 from app.helpers import youtube_build
+from app.cron.helpers import MaxRetriesExceededError, YouTubeAPI
 from app.posts.helpers import parse_video, validate_video, fetch_video_data
 
 
@@ -38,7 +38,7 @@ class PostForm(FlaskForm):
                 scope = dict(id=video_id, part=part)
 
                 # this will raise MaxRetriesExceededError if unsuccessful
-                res = api.get_youtube_videos(scope)
+                res = api.get_videos(scope)
 
                 # this will raise ValueError or IndexError
                 res = res["items"][0]

@@ -6,7 +6,6 @@ https://github.com/googleapis/python-genai
 """
 
 import functools
-from pyexpat import model
 from flask import Flask
 
 from google import genai

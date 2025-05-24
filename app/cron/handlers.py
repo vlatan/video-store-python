@@ -1,8 +1,4 @@
-import time
-import random
-import functools
 from pydantic import BaseModel
-from typing import Callable, Any
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -13,8 +9,13 @@ from app import db
 from app.helpers import youtube_build
 from app.posts.helpers import validate_video
 from app.models import Post, Playlist, Category
-from app.cron.helpers import get_playlist_videos
 from app.sources.helpers import validate_playlist
+from app.cron.helpers import (
+    retry,
+    YouTubeAPI,
+    get_playlist_videos,
+    MaxRetriesExceededError,
+)
 
 
 class Documentary(BaseModel):
@@ -81,7 +82,7 @@ def revalidate_single_video(post: Post) -> bool:
                 "part": ["status", "snippet", "contentDetails"],
             }
             # this will raise MaxRetriesExceededError if unsuccessful
-            res = api.get_youtube_videos(scope)
+            res = api.get_videos(scope)
 
         # this will raise ValueError or IndexError
         res = res["items"][0]
@@ -241,52 +242,6 @@ def process_videos() -> None:
     current_app.logger.info("-" * 40)
 
 
-def retry(
-    _func: Callable | None = None,
-    start_delay: float = 0,
-    max_retries: int = 5,
-) -> Callable:
-    """Provide retry and error logging for an API call."""
-
-    def decorator(func: Callable) -> Callable:
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Any:
-
-            # Preemptive delay before the request starts
-            if start_delay > 0:
-                time.sleep(start_delay)
-
-            retry_delay, last_exception = start_delay + 1, None
-            for attempt in range(max_retries):
-                try:
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    last_exception = e
-                    time.sleep(retry_delay)
-                    retry_delay *= 2
-                    retry_delay += random.uniform(0, 1)
-
-            current_app.logger.exception(
-                f'All {max_retries} attempts failed for "{func.__name__}".\n'
-                f"Args: {args}.\n"
-                f"Kwargs: {kwargs}.\n"
-                f"Original Error: {last_exception}."
-            )
-
-            raise MaxRetriesExceededError(
-                f"Operation '{func.__name__}' failed after {max_retries} retries.",
-                original_exception=last_exception,
-                func_name=func.__name__,
-                func_args=args,
-                func_kwargs=kwargs,
-            ) from last_exception
-
-        return wrapper
-
-    return decorator(_func) if _func else decorator
-
-
 @retry(start_delay=1)
 def generate_info(title: str, categories: str) -> Documentary:
     """
@@ -305,44 +260,3 @@ def generate_info(title: str, categories: str) -> Documentary:
     return (
         response.parsed if isinstance(response.parsed, Documentary) else Documentary()
     )
-
-
-class YouTubeAPI:
-    """Provides methods to fetch various resources from the YouTube API."""
-
-    def __init__(self, youtube_resource):
-        self.youtube = youtube_resource
-
-    @retry(max_retries=3)
-    def get_youtube_videos(self, scope: dict) -> dict:
-        return self.youtube.videos().list(**scope).execute()
-
-    @retry(max_retries=3)
-    def get_youtube_playlists(self, scope: dict) -> dict:
-        return self.youtube.playlists().list(**scope).execute()
-
-    @retry(max_retries=3)
-    def get_youtube_channels(self, scope: dict) -> dict:
-        return self.youtube.channels().list(**scope).execute()
-
-    @retry(max_retries=3)
-    def get_youtube_playlists_videos(self, scope: dict) -> dict:
-        return self.youtube.playlistItems().list(**scope).execute()
-
-
-class MaxRetriesExceededError(Exception):
-    """Raised when a retriable operation fails after all retries are exhausted."""
-
-    def __init__(
-        self,
-        message,
-        original_exception=None,
-        func_name=None,
-        func_args=None,
-        func_kwargs=None,
-    ):
-        super().__init__(message)
-        self.original_exception = original_exception
-        self.func_name = func_name
-        self.func_args = func_args
-        self.func_kwargs = func_kwargs
