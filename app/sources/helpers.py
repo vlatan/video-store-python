@@ -2,6 +2,8 @@ from urllib.parse import urlparse, parse_qs
 from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 
+from app.cron.handlers import get_youtube_playlists
+
 
 def parse_playlist(url):
     parsed = urlparse(url)
@@ -15,7 +17,11 @@ def parse_playlist(url):
 def validate_playlist(playlist_id, youtube):
     try:
         scope = {"id": playlist_id, "part": "snippet"}
-        res = youtube.playlists().list(**scope).execute()["items"][0]
+        if not (res := get_youtube_playlists(youtube, scope)):
+            raise HttpError(res, scope)
+
+        # this will raise either ValueError or IndexError
+        res = res["items"][0]
 
         channel_id = res["snippet"]["channelId"]
         scope = {"id": channel_id, "part": "snippet"}
@@ -34,5 +40,5 @@ def validate_playlist(playlist_id, youtube):
 
     # could not connect to YT API (HttpError)
     # or the playlist doesn't exist (IndexError)
-    except (HttpError, IndexError):
+    except (HttpError, ValueError, IndexError):
         raise ValidationError("Unable to fetch the playlist.")
