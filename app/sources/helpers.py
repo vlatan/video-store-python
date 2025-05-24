@@ -1,8 +1,11 @@
 from urllib.parse import urlparse, parse_qs
-from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 
-from app.cron.handlers import get_youtube_playlists, get_youtube_channels
+from app.cron.handlers import (
+    get_youtube_playlists,
+    get_youtube_channels,
+    MaxRetriesExceededError,
+)
 
 
 def parse_playlist(url):
@@ -17,16 +20,18 @@ def parse_playlist(url):
 def validate_playlist(playlist_id, youtube):
     try:
         scope = {"id": playlist_id, "part": "snippet"}
-        if not (res := get_youtube_playlists(youtube, scope)):
-            raise HttpError(res, scope)
+
+        # this will raise MaxRetriesExceededError if unsuccessful
+        res = get_youtube_playlists(youtube, scope)
 
         # this will raise either ValueError or IndexError
         res = res["items"][0]
 
         channel_id = res["snippet"]["channelId"]
         scope = {"id": channel_id, "part": "snippet"}
-        if not (ch := get_youtube_channels(youtube, scope)):
-            raise HttpError(res, scope)
+
+        # this will raise MaxRetriesExceededError if unsuccessful
+        ch = get_youtube_channels(youtube, scope)
 
         # this will raise either ValueError or IndexError
         ch = ch["items"][0]
@@ -42,7 +47,7 @@ def validate_playlist(playlist_id, youtube):
             "channel_description": ch["snippet"].get("description"),
         }
 
-    # could not connect to YT API (HttpError)
+    # could not connect to YT API (MaxRetriesExceededError)
     # or the playlist doesn't exist (IndexError)
-    except (HttpError, ValueError, IndexError):
+    except (MaxRetriesExceededError, ValueError, IndexError):
         raise ValidationError("Unable to fetch the playlist.")

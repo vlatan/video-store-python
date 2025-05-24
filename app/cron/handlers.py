@@ -3,7 +3,6 @@ import random
 import functools
 from typing import Callable, Any
 from pydantic import BaseModel
-from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
 from sqlalchemy.orm.exc import ObjectDeletedError
 from sqlalchemy.exc import IntegrityError, StatementError
@@ -19,9 +18,9 @@ from app.sources.helpers import validate_playlist
 
 
 class Documentary(BaseModel):
-    title: str
-    description: str
-    category: str
+    title: str = ""
+    description: str = ""
+    category: str = ""
 
 
 def get_youtube_videos_from_playlists() -> tuple[list[dict], bool]:
@@ -79,13 +78,11 @@ def revalidate_single_video(post: Post) -> bool:
             "part": ["status", "snippet", "contentDetails"],
         }
 
-        # Unable to get response from YT at all
         with youtube_build() as youtube:
-            if not (res := get_youtube_videos(youtube, scope)):
-                raise HttpError(res, scope)
+            # this will raise MaxRetriesExceededError if unsuccessful
+            res = get_youtube_videos(youtube, scope)
 
         # this will raise ValueError or IndexError
-        # if unable to access ["items"] or ["items"][0]
         res = res["items"][0]
 
         # this will raise ValidationError if video's invalid
@@ -101,7 +98,7 @@ def revalidate_single_video(post: Post) -> bool:
             db.session.rollback()
             msg = f"Could not delete: {post.title.upper()}. Error: {e}"
             current_app.logger.warning(msg)
-    except HttpError as e:
+    except MaxRetriesExceededError as e:
         # we couldn't connect to YouTube API,
         # so we can't evaluate the video
         pass
@@ -139,7 +136,10 @@ def process_videos() -> None:
         if not (posted := Post.query.filter_by(video_id=video["video_id"]).first()):
 
             # generate description and category for the video
-            info = generate_info(video["title"], cat_prompt)
+            try:
+                info = generate_info(video["title"], cat_prompt)
+            except MaxRetriesExceededError:
+                info = Documentary()
 
             if info.description:
                 video["short_description"] = info.description
@@ -173,7 +173,10 @@ def process_videos() -> None:
 
             # update AI generated content if missing
             if not posted.short_description or not posted.category:
-                info = generate_info(posted.title, cat_prompt)
+                try:
+                    info = generate_info(posted.title, cat_prompt)
+                except MaxRetriesExceededError:
+                    info = Documentary()
 
             if not posted.short_description and info.description:
                 posted.short_description = info.description
@@ -205,7 +208,10 @@ def process_videos() -> None:
         try:
             # update AI generated content if missing
             if not post.short_description or not post.category:
-                info = generate_info(post.title, cat_prompt)
+                try:
+                    info = generate_info(post.title, cat_prompt)
+                except MaxRetriesExceededError:
+                    info = Documentary()
 
             if not post.short_description and info.description:
                 post.short_description = info.description
@@ -250,23 +256,30 @@ def retry(
             if start_delay > 0:
                 time.sleep(start_delay)
 
-            retry_delay, error = start_delay + 1, None
+            retry_delay, last_exception = start_delay + 1, None
             for attempt in range(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
-                    error = e
+                    last_exception = e
                     time.sleep(retry_delay)
                     retry_delay *= 2
                     retry_delay += random.uniform(0, 1)
 
-            current_app.logger.warning(
-                f'Was unable to return API response from function "{func.__name__}" '
-                f'with args "{args}" and kwargs "{kwargs}" '
-                f"after {attempt+1} retries. Error: {error}"
+            current_app.logger.exception(
+                f'All {max_retries} attempts failed for "{func.__name__}".\n'
+                f"Args: {args}.\n"
+                f"Kwargs: {kwargs}.\n"
+                f"Original Error: {last_exception}."
             )
 
-            return None
+            raise MaxRetriesExceededError(
+                f"Operation '{func.__name__}' failed after {max_retries} retries.",
+                original_exception=last_exception,
+                func_name=func.__name__,
+                func_args=args,
+                func_kwargs=kwargs,
+            ) from last_exception
 
         return wrapper
 
@@ -289,9 +302,7 @@ def generate_info(title: str, categories: str) -> Documentary:
     response = generate_content(contents=prompt)
 
     return (
-        response.parsed
-        if isinstance(response.parsed, Documentary)
-        else Documentary(title="", description="", category="")
+        response.parsed if isinstance(response.parsed, Documentary) else Documentary()
     )
 
 
@@ -313,3 +324,21 @@ def get_youtube_channels(youtube, scope: dict):
 @retry(max_retries=3)
 def get_youtube_playlists_videos(youtube, scope: dict):
     return youtube.playlistItems().list(**scope).execute()
+
+
+class MaxRetriesExceededError(Exception):
+    """Raised when a retriable operation fails after all retries are exhausted."""
+
+    def __init__(
+        self,
+        message,
+        original_exception=None,
+        func_name=None,
+        func_args=None,
+        func_kwargs=None,
+    ):
+        super().__init__(message)
+        self.original_exception = original_exception
+        self.func_name = func_name
+        self.func_args = func_args
+        self.func_kwargs = func_kwargs

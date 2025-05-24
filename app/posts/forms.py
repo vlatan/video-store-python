@@ -1,10 +1,8 @@
-from googleapiclient.errors import HttpError
-
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired, URL, ValidationError
 
-from app.cron.handlers import get_youtube_videos
+from app.cron.handlers import get_youtube_videos, MaxRetriesExceededError
 from app.models import Post
 from app.helpers import youtube_build
 from app.posts.helpers import parse_video, validate_video, fetch_video_data
@@ -37,11 +35,10 @@ class PostForm(FlaskForm):
                 part = ["status", "snippet", "contentDetails"]
                 scope = dict(id=video_id, part=part)
 
-                if not (res := get_youtube_videos(youtube, scope)):
-                    raise HttpError(res, scope)
+                # this will raise MaxRetriesExceededError if unsuccessful
+                res = get_youtube_videos(youtube, scope)
 
                 # this will raise ValueError or IndexError
-                # if unable to access ["items"] or ["items"][0]
                 res = res["items"][0]
 
                 # this will raise exception if unable to fetch
@@ -52,5 +49,5 @@ class PostForm(FlaskForm):
                 # re-raise the exception thrown from validate_video()
                 raise
             # if ['items'] list is empty or unable to connect to YT API
-            except (HttpError, ValueError, IndexError):
+            except (MaxRetriesExceededError, ValueError, IndexError):
                 raise ValidationError("Unable to fetch the video.")

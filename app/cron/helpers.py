@@ -1,6 +1,9 @@
-from googleapiclient.errors import HttpError
 from wtforms.validators import ValidationError
-from app.cron.handlers import get_youtube_videos, get_youtube_playlists_videos
+from app.cron.handlers import (
+    get_youtube_videos,
+    get_youtube_playlists_videos,
+    MaxRetriesExceededError,
+)
 from app.posts.helpers import video_banned, validate_video, fetch_video_data
 
 
@@ -19,22 +22,21 @@ def get_playlist_videos(playlist_id: str, youtube) -> tuple[list[dict], bool]:
                 "pageToken": next_page_token,
             }
             # every time it loops it gets the next 50 videos
-            if not (uploads := get_youtube_playlists_videos(youtube, scope)):
-                raise HttpError(uploads, scope)
+            uploads = get_youtube_playlists_videos(youtube, scope)
 
             # scope for detalied info about each video in this batch
             scope = {
                 "id": [item["contentDetails"]["videoId"] for item in uploads["items"]],
                 "part": ["status", "snippet", "contentDetails"],
             }
-            # response from YouTube
-            if not (res := get_youtube_videos(youtube, scope)):
-                raise HttpError(res, scope)
+
+            # this will raise MaxRetriesExceededError if unsuccessful
+            res = get_youtube_videos(youtube, scope)
 
             # this will raise ValueError if unable to access "items"
             items = res["items"]
 
-        except (HttpError, ValueError):
+        except (MaxRetriesExceededError, ValueError):
             # failed to connect to YT API
             # we abandon further operation
             # because we don't have the next token
