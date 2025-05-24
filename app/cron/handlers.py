@@ -308,6 +308,8 @@ def generate_info(title: str, categories: str) -> Documentary:
 
 
 class YouTubeAPI:
+    """Provides methods to fetch various resources from the YouTube API."""
+
     def __init__(self, youtube_resource):
         self.youtube = youtube_resource
 
