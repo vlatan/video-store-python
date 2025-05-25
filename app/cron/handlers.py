@@ -19,9 +19,9 @@ from app.cron.helpers import (
 
 
 class Documentary(BaseModel):
-    title: str = ""
-    description: str = ""
-    category: str = ""
+    title: str
+    description: str
+    category: str
 
 
 def get_youtube_videos_from_playlists() -> tuple[list[dict], bool]:
@@ -141,7 +141,7 @@ def process_videos() -> None:
             try:
                 info = generate_info(video["title"], cat_prompt)
             except MaxRetriesExceededError:
-                info = Documentary()
+                info = Documentary(title="", description="", category="")
 
             if info.description:
                 video["short_description"] = info.description
@@ -178,7 +178,7 @@ def process_videos() -> None:
                 try:
                     info = generate_info(posted.title, cat_prompt)
                 except MaxRetriesExceededError:
-                    info = Documentary()
+                    info = Documentary(title="", description="", category="")
 
             if not posted.short_description and info.description:
                 posted.short_description = info.description
@@ -213,7 +213,7 @@ def process_videos() -> None:
                 try:
                     info = generate_info(post.title, cat_prompt)
                 except MaxRetriesExceededError:
-                    info = Documentary()
+                    info = Documentary(title="", description="", category="")
 
             if not post.short_description and info.description:
                 post.short_description = info.description
@@ -258,5 +258,7 @@ def generate_info(title: str, categories: str) -> Documentary:
     response = generate_content(contents=prompt)
 
     return (
-        response.parsed if isinstance(response.parsed, Documentary) else Documentary()
+        response.parsed
+        if isinstance(response.parsed, Documentary)
+        else Documentary(title="", description="", category="")
     )

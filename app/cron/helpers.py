@@ -86,7 +86,7 @@ def retry(
                 time.sleep(start_delay)
 
             retry_delay, last_exception = start_delay + 1, None
-            for attempt in range(max_retries):
+            for _ in range(max_retries):
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
@@ -96,7 +96,7 @@ def retry(
                     retry_delay += random.uniform(0, 1)
 
             current_app.logger.exception(
-                f'All {max_retries} attempts failed for "{func.__name__}".\n'
+                f"All {max_retries} attempts failed for '{func.__name__}.\n"
                 f"Args: {args}.\n"
                 f"Kwargs: {kwargs}.\n"
                 f"Original Error: {last_exception}."
