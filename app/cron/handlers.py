@@ -249,8 +249,15 @@ def generate_info(title: str, categories: str) -> Documentary:
     Generate description and a category from a generative AI based given a title and categories.
     """
     prompt = (
-        f"Write one short paragraph about: {title}."
-        f'Also select a category for the documentary "{title}" '
+        f'Write one short paragraph synopsis for the documentary "{title}".\n\n'
+        "When writing the synopsis:\n"
+        "- Do not include timestamps.\n"
+        "- Do not include meta comments about the documentary itself, "
+        "e.g., 'The film provides,' 'This production offers', "
+        "'The narrative charts', 'This documentary explores'.\n"
+        "- Do not use concluding remarks, e.g., 'Ultimately', 'In conclusion'.\n"
+        "- Do not repeat the documentary title inside the synopsis.\n\n"
+        f'Also select one category for the documentary "{title}" '
         f"from these categories: {categories}."
     )
 
