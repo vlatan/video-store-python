@@ -66,6 +66,13 @@ class Config:
 
     # ======================================== #
 
+    # Flask-Login
+    REMEMBER_COOKIE_NAME = load_env("REMEMBER_COOKIE_NAME") or "fd_session"
+    REMEMBER_COOKIE_SECURE = load_env("REMEMBER_COOKIE_SECURE") or False
+    REMEMBER_COOKIE_SAMESITE = load_env("REMEMBER_COOKIE_SAMESITE") or None
+
+    # ======================================== #
+
     # Flask-Caching
     CACHE_TYPE = load_env("CACHE_TYPE") or "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = load_env("CACHE_DEFAULT_TIMEOUT") or 300
