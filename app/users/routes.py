@@ -1,7 +1,7 @@
 import os
 import time
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from werkzeug.wrappers.response import Response
 
 from flask_login import current_user, login_required
@@ -26,7 +26,7 @@ bp = Blueprint("users", __name__)
 @bp.before_app_request
 def record_last_visit():
     if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
+        current_user.last_seen = datetime.now(timezone.utc)
         db.session.commit()
 
 
