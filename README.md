@@ -1,6 +1,6 @@
 # Video Store (Python)
 
-This web app is made using Python (Flask), HTML, CSS, JavaScript, PostgreSQL and Redis. It is basically a documentary library that automatically fetches and posts videos (documentaries) from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
+This web app is made using Python (Flask), HTML, CSS, JavaScript, PostgreSQL and Redis. It is basically a video library that automatically fetches and posts videos from predetermined sources (YouTube playlists) therefore it heavily utilizes the [YouTube API](https://developers.google.com/youtube/v3/docs).
 
 It validates the videos against multiple criteria such as:
 
